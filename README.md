@@ -5,8 +5,8 @@
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 [![PyPI](https://img.shields.io/pypi/v/flux-cloud)](https://pypi.org/project/flux-cloud/)
 
-<a target="_blank" rel="noopener noreferrer" href="https://github.com/converged-computing/fluxcloud/blob/main/docs/assets/img/logo.png">
-    <img align="right" style="width: 250px; float: right; padding-left: 20px;" src="https://github.com/converged-computing/fluxcloud/raw/main/docs/assets/img/logo.png" alt="fluxcloud Logo">
+<a target="_blank" rel="noopener noreferrer" href="https://github.com/converged-computing/flux-cloud/blob/main/docs/assets/img/logo.png">
+    <img align="right" style="width: 250px; float: right; padding-left: 20px;" src="https://github.com/converged-computing/flux-cloud/raw/main/docs/assets/img/logo.png" alt="fluxcloud Logo">
 </a>
 
 > deploy workflows to the flux operator in the cloud! ☁️
