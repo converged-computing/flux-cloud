@@ -1,0 +1,121 @@
+#!/bin/bash
+
+SHORT="p:,c:,z:,v:,m:,t:,s:,h"
+LONG="project:,cluster:,zone:,cluster-version:,machine:,tags:,size:,help"
+OPTS=$(getopt -a -n create --options $SHORT --longoptions $LONG -- "$@")
+
+eval set -- "$OPTS"
+
+HERE=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+# Source shared helper scripts
+. ${HERE}/helpers.sh
+
+# Defaults
+CLUSTER_NAME="flux-cluster"
+ZONE="us-central1-a"
+CLUSTER_VERSION="1.23"
+MACHINE_TYPE="n1-standard-1"
+SIZE=4
+TAGS=flux-cluster
+
+function usage() {
+   echo "This is the Google Cloud kubernetes cluster creator."
+   echo "usage: cluster-create --project <project> --machine <machine> --cluster <cluster-name> --size <size> --zone <zone>"
+}
+
+while :
+do
+  case "$1" in
+    -p | --project)
+        GOOGLE_PROJECT=$2
+        shift 2
+        ;;
+    -c | --cluster)
+        CLUSTER_NAME=$2
+        shift 2
+        ;;
+    -z | --zone)
+        ZONE=$2
+        shift 2
+        ;;
+    -v | --cluster-version)
+        CLUSTER_VERSION=$2
+        shift 2
+        ;;
+    -m | --machine)
+        MACHINE_TYPE=$2
+        shift 2
+        ;;
+    -t | --tags)
+        TAGS=$2
+        shift 2
+        ;;
+    -s | --size)
+        SIZE=$2
+        shift 2
+        ;;
+    -h | --help)
+      usage
+      exit 2
+      ;;
+    --)
+      shift;
+      break
+      ;;
+    *)
+      echo "Unexpected option: $1"
+      ;;
+  esac
+done
+
+# Required arguments
+if [ -z ${GOOGLE_PROJECT+x} ]; then
+    echo "Please provide your Google Project with --project";
+    exit 1
+fi
+
+if [ -z ${ZONE+x} ]; then
+    echo "Please provide your Google Cloud zone with --zone";
+    exit 1
+fi
+
+if [ -z ${MACHINE_TYPE+x} ]; then
+    echo "Please provide your Google Cloud machine type with --machine";
+    exit 1
+fi
+
+echo "   cluster  : ${CLUSTER_NAME}"
+echo "     version: ${CLUSTER_VERSION}"
+echo "  project   : ${GOOGLE_PROJECT}"
+echo "  machine   : ${MACHINE_TYPE}"
+echo "     zone   : ${ZONE}"
+echo "     tags   : ${TAGS}"
+echo "     size   : ${SIZE}"
+
+is_installed kubectl
+is_installed gcloud
+
+prompt "Do you want to create this cluster?"
+
+# Create the cluster
+run_echo gcloud container clusters create ${CLUSTER_NAME} --project $GOOGLE_PROJECT \
+    --zone ${ZONE} --cluster-version ${CLUSTER_VERSION} --machine-type ${MACHINE_TYPE} \
+    --num-nodes=${SIZE} --enable-network-policy --tags=${TAGS} --enable-intra-node-visibility
+
+# Get credentials so kubectl will work
+run_echo gcloud container clusters get-credentials ${CLUSTER_NAME} --zone ${ZONE} --project $GOOGLE_PROJECT
+run_echo kubectl create clusterrolebinding cluster-admin-binding --clusterrole cluster-admin --user $(gcloud config get-value core/account)
+
+# Show nodes
+run_echo kubectl get nodes
+
+exit 0
+
+# TODO need easy way to deploy operator - likely not requiring complete download of the repo here
+
+# git clone https://github.com/flux-framework/flux-operator
+# cd flux-operator
+# make deploy
+run_echo kubectl get namespace
+run_echo kubectl describe namespace operator-system

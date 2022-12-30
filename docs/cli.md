@@ -46,7 +46,7 @@ system to interact with Kubernetes.
 
 ### Pre-requisites
 
-You should first [install gcloud](https://cloud.google.com/sdk/docs/quickstarts) 
+You should first [install gcloud](https://cloud.google.com/sdk/docs/quickstarts)
 and ensure you are logged in and have kubectl installed:
 
 ```bash
@@ -62,7 +62,7 @@ or just [on your own](https://kubernetes.io/docs/tasks/tools/).
 
 ### Run Experiments
 
-Each experiment is defined by the matrix and variables in an `experiment.yaml` that is used to 
+Each experiment is defined by the matrix and variables in an `experiment.yaml` that is used to
 populate a `minicluster-template.yaml` that you can either provide, or use a template provided by the
 library. One of the goals of the Flux Cloud Experiment runner is not just to run things, but to
 provide this library for you to easily edit and use! Take a look at the [examples](../examples)
@@ -72,7 +72,7 @@ have installed flux-cloud, along with kubectl and gcloud, and set your defaults 
 in your settings.
 
 ```bash
-$ flux-cloud run experiments.yaml  
+$ flux-cloud run experiments.yaml
 ```
 
 Note that since the experiments file defaults to that name, you can also just do:
@@ -81,7 +81,7 @@ Note that since the experiments file defaults to that name, you can also just do
 $ flux-cloud run
 ```
 
-Given an experiments.yaml in the present working directory. Take a look at an `experients.yaml` in an example directory. 
+Given an experiments.yaml in the present working directory. Take a look at an `experients.yaml` in an example directory.
 Note that machines and size are required for the matrix, and variables get piped into all experiments (in full). Under variables,
 both "commands" and "ids" are required, and must be equal in length (each command is assigned to one id
 for output). To just run the first entry in the matrix (test mode) do:
@@ -91,3 +91,18 @@ $ flux-cloud run experiments.yaml --test
 ```
 
 By default, results will be written to a temporary output directory, but you can customize this with `--outdir`.
+
+## Partial Commands
+
+Instead of a "run" command that does the following:
+
+1. Creates the cluster
+2. Runs each of the experiments, saving output and timing
+3. Brings down the cluster
+
+If you want to have more control, you can run one step at a time,
+each of "up" "apply" and "down."
+
+### up
+
+Here is how to bring up a cluster (with the operator installed).

@@ -5,14 +5,14 @@
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 [![PyPI](https://img.shields.io/pypi/v/flux-cloud)](https://pypi.org/project/flux-cloud/)
 
-<a target="_blank" rel="noopener noreferrer" href="https://github.com/converged-computing/flux-cloud/blob/main/docs/assets/img/logo.png">
-    <img align="right" style="width: 250px; float: right; padding-left: 20px;" src="https://github.com/converged-computing/flux-cloud/raw/main/docs/assets/img/logo.png" alt="fluxcloud Logo">
+<a target="_blank" rel="noopener noreferrer" href="https://github.com/converged-computing/flux-cloud/blob/main/docs/assets/img/logo-transparent.png">
+    <img align="right" style="width: 250px; float: right; padding-left: 20px;" src="https://github.com/converged-computing/flux-cloud/raw/main/docs/assets/img/logo-transparent.png" alt="fluxcloud Logo">
 </a>
 
 > deploy workflows to the flux operator in the cloud! ☁️
 
 This library was originally created to make it easy to run automated experiments across
-a series of machine types and sizes using the [Flux Operator](https://github.com/flux-framework-flux-operator) 
+a series of machine types and sizes using the [Flux Operator](https://github.com/flux-framework-flux-operator)
 in Google Cloud on Google Kubernetes Engine. It will also provide a library
 of templates to make it easy to learn or get started with workflows.
 It will be expanded as needed.
@@ -23,7 +23,17 @@ Code is under development and will be added soon! In the meantime, for early doc
 
 ## TODO
 
+ - up should also install operator (separate function)
+ - should be separate command to just apply
  - should have generic template provided by library
+ - cloud-select could estimate the cost?
+ - command mode that only shows commands?
+ - check if something already exists before create/delete
+ - make experiment attributes more easily accessible (class? functions?)
+ - script confirmation should look nicer (bash colors and better spacing?)
+ - automated container build
+ - linting and checks
+ - pretty documentation
 
 ## 😁️ Contributors 😁️
 

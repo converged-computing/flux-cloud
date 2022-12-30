@@ -1,0 +1,14 @@
+include README.md
+include COPYRIGHT
+recursive-include fluxcloud *.png
+recursive-include fluxcloud *.sh
+recursive-include fluxcloud *
+recursive-include * *.png
+prune env*
+global-exclude .env
+global-exclude *.py[co]
+recursive-exclude .git *
+global-exclude __pycache__
+prune docs*
+prune fluxcloud/tests
+prune apigen
