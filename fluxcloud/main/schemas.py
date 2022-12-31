@@ -44,7 +44,7 @@ single_experiment_properties = {
 
 cloud_properties = {"zone": {"type": "string"}, "machine": {"type": "string"}}
 google_cloud_properties = copy.deepcopy(cloud_properties)
-google_cloud_properties["project"] = {"type": "string"}
+google_cloud_properties["project"] = {"type": ["null", "string"]}
 
 kubernetes_properties = {"version": {"type": "string"}}
 kubernetes_cluster_properties = {

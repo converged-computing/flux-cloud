@@ -1,6 +1,6 @@
 # Google Cloud
 
-> Running on Google Kubenetes Engine, GKE
+> Running on Google Kubernetes Engine, GKE
 
 The main functionality that flux-cloud provides are easy wrappers (and templates) to running
 the Flux Operator on GKE. The main steps of running experiments are:
