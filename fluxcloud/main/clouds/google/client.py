@@ -43,9 +43,6 @@ class GoogleCloud(ExperimentClient):
             )
         apply_script = self.get_script("minicluster-run")
 
-        # Save times on the level of the experiment
-        times = {}
-
         # One run per job (command)
         jobs = experiment.get("jobs", [])
         minicluster = setup.get_minicluster(experiment)
@@ -95,7 +92,7 @@ class GoogleCloud(ExperimentClient):
                 "--job",
                 minicluster["name"],
             ]
-            self.run_timed_append(f"minicluster-run-{jobname}", cmd, times)
+            self.run_timed(f"{self.job_prefix}-{jobname}", cmd)
 
             # Clean up temporary crd if we get here
             if os.path.exists(crd):
@@ -104,10 +101,23 @@ class GoogleCloud(ExperimentClient):
         # Save times and experiment metadata to file
         # TODO we could add cost estimation here - data from cloud select
         meta = copy.deepcopy(experiment)
-        times.update(self.times)
-        meta["times"] = times
+        meta["times"] = self.times
         meta_file = os.path.join(experiment_dir, "meta.json")
         utils.write_json(meta, meta_file)
+        self.clear_minicluster_times()
+
+    def clear_minicluster_times(self):
+        """
+        Update times to not include jobs
+        """
+        times = {}
+        for key, value in self.times.items():
+
+            # Don't add back a job that was already saved
+            if key.startswith(self.job_prefix):
+                continue
+            times[key] = value
+        self.times = times
 
     def up(self, setup, experiment=None):
         """

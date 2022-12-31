@@ -7,7 +7,7 @@ import os
 
 import fluxcloud.utils as utils
 from fluxcloud.logger import logger
-from fluxcloud.main.decorator import job_timed, timed
+from fluxcloud.main.decorator import timed
 
 here = os.path.dirname(os.path.abspath(__file__))
 
@@ -23,15 +23,14 @@ class ExperimentClient:
         self.settings = settings.Settings
         self.times = {}
 
+        # Job prefix is used for organizing time entries
+        self.job_prefix = "minicluster-run"
+
     def __repr__(self):
         return str(self)
 
     @timed
     def run_timed(self, name, cmd):
-        return utils.run_command(cmd)
-
-    @job_timed
-    def run_timed_append(self, name, cmd, times):
         return utils.run_command(cmd)
 
     def __str__(self):
