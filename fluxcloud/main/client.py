@@ -52,9 +52,11 @@ class ExperimentClient:
         2. run each command and save output
         3. bring down the cluster
         """
-        self.up(setup)
-        self.apply(setup, force=force)
-        self.down(setup)
+        # Each experiment has its own cluster size and machine type
+        for experiment in setup.matrices:
+            self.up(setup, experiment=experiment)
+            self.apply(setup, force=force, experiment=experiment)
+            self.down(setup, experiment=experiment)
 
     def down(self, *args, **kwargs):
         """

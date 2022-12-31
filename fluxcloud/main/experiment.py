@@ -18,7 +18,13 @@ from fluxcloud.logger import logger
 
 class ExperimentSetup:
     def __init__(
-        self, experiments, template=None, outdir=None, validate=True, test=False
+        self,
+        experiments,
+        template=None,
+        outdir=None,
+        validate=True,
+        test=False,
+        quiet=False,
     ):
         """
         An experiment setup.
@@ -28,6 +34,7 @@ class ExperimentSetup:
         self._outdir = outdir
         self.test = None
         self.settings = settings.Settings
+        self.quiet = quiet
         if validate:
             self.validate()
         # Prepare the matrices for the setup
@@ -50,7 +57,8 @@ class ExperimentSetup:
         # Test mode means just one run
         if self.test:
             matrices = [matrices[0]]
-        logger.info(f"🧪 Prepared {len(matrices)} experiment matrices")
+        if not self.quiet:
+            logger.info(f"🧪 Prepared {len(matrices)} experiment matrices")
         self.matrices = matrices
 
     def get_single_experiment(self):
@@ -150,7 +158,20 @@ def expand_experiments(experiments):
     elif "experiments" in experiments:
         matrix = expand_single_experiment(experiments)
     else:
-        raise ValueError('The key "experiment" or "matrix" is required.')
+        raise ValueError(
+            'The key "experiment" or "experiments" or "matrix" is required.'
+        )
+    # Add ids to all entries
+    matrix = add_experiment_ids(matrix)
+    return matrix
+
+
+def add_experiment_ids(matrix):
+    """
+    Add experiment identifiers based on machine and size.
+    """
+    for entry in matrix:
+        entry["id"] = f"{entry['machine']}-{entry['size']}"
     return matrix
 
 

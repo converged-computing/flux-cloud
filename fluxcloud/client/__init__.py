@@ -135,6 +135,7 @@ flux-cloud config add cloud aws""",
         description="Apply experiments (CRDs) to the cluster.",
         formatter_class=argparse.RawTextHelpFormatter,
     )
+
     up = subparsers.add_parser(
         "up",
         description="Bring up a cluster and install the operator",
@@ -145,7 +146,20 @@ flux-cloud config add cloud aws""",
         description="Bring down or destroy a cluster",
         formatter_class=argparse.RawTextHelpFormatter,
     )
-    for command in run, up, down, apply:
+    down.add_argument(
+        "--all",
+        default=False,
+        action="store_true",
+        help="Bring down all experiment clusters",
+        dest="down_all",
+    )
+
+    listing = subparsers.add_parser(
+        "list",
+        description="List experiment ids available.",
+        formatter_class=argparse.RawTextHelpFormatter,
+    )
+    for command in run, up, down, apply, listing:
         command.add_argument(
             "experiments",
             default="experiments.yaml",
@@ -158,6 +172,14 @@ flux-cloud config add cloud aws""",
             "--cloud",
             help="cloud to use",
             choices=clouds.cloud_names,
+        )
+
+    for command in apply, up, down:
+        command.add_argument(
+            "--id",
+            "-e",
+            dest="experiment_id",
+            help="experiment ID to apply to (<machine>-<size>)",
         )
 
     for command in run, apply:
@@ -232,6 +254,8 @@ def run():
     # Does the user want a shell?
     if args.command == "apply":
         from .apply import main
+    elif args.command == "list":
+        from .listing import main
     elif args.command == "run":
         from .run import main
     elif args.command == "config":
