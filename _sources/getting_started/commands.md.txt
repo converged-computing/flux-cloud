@@ -53,8 +53,33 @@ $ tree ./data/
         └── log.out
 ```
 
+That looks like this:
+
+```bash
+$ flux-cloud run
+```
+
+or for entirely headless (no ask for confirmation to create/delete clusters):
+
+```bash
+$ flux-cloud run --force-cluster
+```
+
+To force overwrite of existing results (by default they are skipped)
+
+```bash
+$ flux-cloud run -e n1-standard-1-2 --force
+```
+
 If you want to have more control, you can run one step at a time,
-each of "up" "apply" and "down," discussed next.
+each of "up" "apply" and "down":
+
+```bash
+$ flux-cloud up -e n1-standard-1-2
+$ flux-cloud apply -e n1-standard-1-2
+$ flux-cloud down -e n1-standard-1-2
+```
+These commands are discussed in more next.
 
 ### up
 
@@ -77,13 +102,31 @@ $ flux-cloud up -e n1-standard-1-2
 Selected experiment n1-standard-1-2.
 ```
 
+And to force up without a prompt:
+
+```bash
+$ flux-cloud up -e n1-standard-1-2 --force-cluster
+```
+
 ## apply
 
-And then run experiments (as you feel) with "apply." The same convention applies - not providing the identifier runs the
-first entry, otherwise we use the identifier you provide.
+And then run experiments (as you feel) with "apply."
 
 ```bash
 $ flux-cloud apply
+```
+
+The same convention applies - not providing the identifier runs the
+first entry, otherwise we use the identifier you provide.
+
+```bash
+$ flux-cloud apply -e n1-standard-1-2
+```
+
+To force overwrite of existing results (by default they are skipped)
+
+```bash
+$ flux-cloud apply -e n1-standard-1-2 --force
 ```
 
 ## down
@@ -101,12 +144,11 @@ Or all your experiment clusters:
 $ flux-cloud down --all
 ```
 
+You can also use `--force-cluster` here:
+
+```bash
+$ flux-cloud down --force-cluster
+```
+
 And that's it! I think there might be a more elegant way to determine what cluster is running,
 however if the user decides to launch more than one, it might be harder. More thinking / docs / examples coming soon.
-
-## shared arguments
-
-Note that for each of the commands to run things, there are shared arguments!
-
-- **force**: will not overwrite results that exist.
-- **test**: runs just one experiment in a set.
