@@ -1,0 +1,47 @@
+cloud\_select package
+=====================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   fluxcloud.client
+   fluxcloud.main
+   fluxcloud.utils
+
+Submodules
+----------
+
+cloud\_select.defaults module
+-----------------------------
+
+.. automodule:: fluxcloud.defaults
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+cloud\_select.logger module
+---------------------------
+
+.. automodule:: fluxcloud.logger
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+cloud\_select.version module
+----------------------------
+
+.. automodule:: fluxcloud.version
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: fluxcloud
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -8,8 +8,7 @@ minicluster:
   name: lammps-job
   namespace: flux-operator
 
-# Each job can have a command and working directory (workdir), and image.
 # If your jobs share the same variables you can just put them in the template directly!
 jobs:
-  osu_get_latency:
+  reaxc-hns:
     command: 'lmp -v x 2 -v y 2 -v z 2 -in in.reaxc.hns -nocite'

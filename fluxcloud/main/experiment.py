@@ -132,12 +132,22 @@ def expand_experiments(experiments):
     """
     Given a valid experiments.yaml, expand out into experiments
     """
-    if "matrix" in experiments and "experiment" in experiments:
-        raise ValueError("You can either define a matrix OR experiment, but not both.")
+    # We should only have one of these keys
+    count = 0
+    for key in ["experiment", "experiments", "matrix"]:
+        if key in experiments:
+            count += 1
+
+    if count > 1:
+        raise ValueError(
+            "You can either define a matrix OR experiment OR experiments, but not more than one."
+        )
 
     if "matrix" in experiments:
         matrix = expand_experiment_matrix(experiments)
     elif "experiment" in experiments:
+        matrix = expand_single_experiment(experiments)
+    elif "experiments" in experiments:
         matrix = expand_single_experiment(experiments)
     else:
         raise ValueError('The key "experiment" or "matrix" is required.')

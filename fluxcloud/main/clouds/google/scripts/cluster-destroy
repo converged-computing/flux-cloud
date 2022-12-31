@@ -55,5 +55,14 @@ echo "     zone   : ${ZONE}"
 
 is_installed gcloud
 
+# Check if it already exists
+gcloud container clusters list --zone ${ZONE} | grep ${CLUSTER_NAME}
+retval=$?
+if [[ "${retval}" != "0" ]]; then
+    print_blue "${CLUSTER_NAME} in ${ZONE} does not exist."
+    echo
+    exit 0
+fi
+
 # This command has a confirmation already
 run_echo gcloud container clusters delete --zone ${ZONE} ${CLUSTER_NAME}

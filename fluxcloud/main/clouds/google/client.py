@@ -56,11 +56,15 @@ class GoogleCloud(ExperimentClient):
                 logger.warning(f"Experiment {experiment} has no jobs, nothing to run.")
                 continue
 
+            # The experiment is defined by the machine type and size
+            experiment_prefix = "%s-%s" % (experiment["machine"], experiment["size"])
+            experiment_dir = os.path.join(setup.outdir, experiment_prefix)
+
             # Jobname is used for output
             for jobname, job in jobs.items():
 
                 # Job specific output directory
-                job_output = os.path.join(setup.outdir, jobname)
+                job_output = os.path.join(experiment_dir, jobname)
                 logfile = os.path.join(job_output, "log.out")
 
                 # Do we have output?

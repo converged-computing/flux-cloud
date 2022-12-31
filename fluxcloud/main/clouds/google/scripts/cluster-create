@@ -101,6 +101,15 @@ is_installed kubectl
 is_installed gcloud
 is_installed wget
 
+# Check if it already exists
+gcloud container clusters list --zone ${ZONE} | grep ${CLUSTER_NAME}
+retval=$?
+if [[ "${retval}" == "0" ]]; then
+    print_blue "${CLUSTER_NAME} in ${ZONE} already exists."
+    echo
+    exit 0
+fi
+
 prompt "Do you want to create this cluster?"
 
 # Create the cluster

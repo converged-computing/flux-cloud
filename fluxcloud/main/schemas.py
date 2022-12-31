@@ -97,6 +97,13 @@ settings_properties = {
     },
 }
 
+single_experiment = {
+    "type": "object",
+    "properties": single_experiment_properties,
+    "additionalProperties": False,
+    "required": ["machine", "size"],
+}
+
 experiment_schema = {
     "$schema": schema_url,
     "title": "Experiment Schema",
@@ -104,12 +111,11 @@ experiment_schema = {
     "properties": {
         "jobs": jobs_properties,
         "variables": keyvals,
-        "experiment": {
-            "type": "object",
-            "properties": single_experiment_properties,
-            "additionalProperties": False,
-            "required": ["machine", "size"],
+        "experiments": {
+            "type": "array",
+            "items": single_experiment,
         },
+        "experiment": single_experiment,
         "minicluster": minicluster,
         "cluster": {
             "type": "object",

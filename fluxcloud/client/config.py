@@ -26,11 +26,7 @@ def main(args, parser, extra, subparser):
     # If the user wants the central config file
     if args.central:
         args.settings_file = defaults.default_settings_file
-
-    cli = get_experiment_client(
-        quiet=args.quiet,
-        settings_file=args.settings_file,
-    )
+    cli = get_experiment_client()
 
     # For each new setting, update and save!
     if command == "inituser":

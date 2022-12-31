@@ -1,44 +1,6 @@
-# flux-cloud
+# Google Cloud
 
-This is early notes / documentation for the flux-cloud client.
-
-## Setup
-
-Note that if you first want to create user-level settings, do:
-
-```bash
-$ flux-cloud inituser
-```
-
-You should then edit the defaults in your settings.yml, either via directly editing
-the settings file, via the command line.
-
-```bash
-$ flux-cloud config get default_cloud
-default_cloud                  google
-
-$ flux-cloud config get google:project
-google:project                 unset
-
-$ flux-cloud config set google:project dinosaur
-Updated google:project to be dinosaur
-
-$ flux-cloud config get google:project
-google:project                 dinosaur
-```
-
-Also set your editor of choice, and then you can edit in it (it defaults to vim)
-
-```bash
-$ flux-cloud config get config_editor
-config_editor                  vim
-```
-
-```bash
-$ flux-cloud config edit
-```
-
-## Google Cloud GKE
+> Running on Google Kubenetes Engine, GKE
 
 The main functionality that flux-cloud provides are easy wrappers (and templates) to running
 the Flux Operator on GKE. The main steps of running experiments are:
@@ -53,7 +15,7 @@ machine to do the work (e.g., kubectl and gcloud) and importantly, for every ste
 you the command, and if it fails, give you a chance to bail out. We do this so if you
 want to remove the abstraction at any point and run the commands on your own, you can.
 
-### Pre-requisites
+## Pre-requisites
 
 You should first [install gcloud](https://cloud.google.com/sdk/docs/quickstarts)
 and ensure you are logged in and have kubectl installed:
@@ -69,7 +31,7 @@ $ gcloud components install kubectl
 ```
 or just [on your own](https://kubernetes.io/docs/tasks/tools/).
 
-### Run Experiments
+## Run Experiments
 
 Each experiment is defined by the matrix and variables in an `experiment.yaml` that is used to
 populate a `minicluster-template.yaml` that you can either provide, or use a template provided by the

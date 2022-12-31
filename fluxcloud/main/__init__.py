@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
-def get_experiment_client(cloud):
+def get_experiment_client(cloud=None):
     """
     Create the cloud experiment client.
     """

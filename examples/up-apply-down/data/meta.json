@@ -7,12 +7,13 @@
             "namespace": "flux-operator"
         },
         "jobs": {
-            "osu_get_latency": {
+            "reaxc-hns": {
                 "command": "lmp -v x 2 -v y 2 -v z 2 -in in.reaxc.hns -nocite"
             }
         },
         "times": {
-            "minicluster-run-osu_get_latency": 5.595403432846069
+            "minicluster-run-reaxc-hns": 198.465562582016,
+            "create-cluster": 367.33847880363464
         }
     }
 ]

@@ -86,7 +86,24 @@ while [[ "${brokerReady}" == "false" ]]; do
     sleep 2
     for pod in $(kubectl get pods --selector=job-name=${JOB} --namespace ${NAMESPACE} --output=jsonpath='{.items[*].metadata.name}'); do
         if [[ "${pod}" == ${brokerPrefix}* ]]; then
+            echo
             print_green "🌀️ Broker pod is created."
+            brokerReady="true"
+            break
+        fi
+    done
+done
+
+# Now broker pod needs to be running
+echo
+print_blue "Waiting for broker pod with prefix ${brokerPrefix} to be running..."
+brokerReady="false"
+while [[ "${brokerReady}" == "false" ]]; do
+    echo -n "."
+    for pod in $(kubectl get pods --namespace ${NAMESPACE} --field-selector=status.phase=Running --output=jsonpath='{.items[*].metadata.name}'); do
+        if [[ "${pod}" == ${brokerPrefix}* ]]; then
+            echo
+            print_green "🌀️ Broker pod is running."
             brokerReady="true"
             break
         fi
@@ -97,26 +114,10 @@ done
 pods=($(kubectl get pods --selector=job-name=${JOB} --namespace ${NAMESPACE} --output=jsonpath='{.items[*].metadata.name}'))
 brokerpod=${pods[0]}
 
-# Now broker pod needs to be running
-echo
-print_blue "Waiting for broker pod with prefix ${brokerPrefix} to be running..."
-brokerReady="false"
-while [[ "${brokerReady}" == "false" ]]; do
-    echo -n "."
-    sleep 2
-    for pod in $(kubectl get pods --namespace ${NAMESPACE} --field-selector=status.phase!=ContainerCreating --output=jsonpath='{.items[*].metadata.name}'); do
-        if [[ "${pod}" == ${brokerPrefix}* ]]; then
-            print_green "🌀️ Broker pod is running."
-            brokerReady="true"
-            break
-        fi
-    done
-done
-
 # This will hang like this until the job finishes running
 echo
-print_green "kubectl -n flux-operator logs ${brokerpod} -f > ${LOGFILE}"
-kubectl -n flux-operator logs ${brokerpod} -f > ${LOGFILE}
+print_green "kubectl -n ${NAMESPACE} logs ${brokerpod} -f > ${LOGFILE}"
+kubectl -n ${NAMESPACE} logs ${brokerpod} -f > ${LOGFILE}
 
 for exitcode in $(kubectl get -n ${NAMESPACE} pod --selector=job-name=${JOB} --output=jsonpath={.items...containerStatuses..state.terminated.exitCode}); do
     if [[ "${exitcode}" != "0" ]]; then

@@ -53,7 +53,7 @@ class ExperimentClient:
         3. bring down the cluster
         """
         self.up(setup)
-        self.run_experiments(setup, force=force)
+        self.apply(setup, force=force)
         self.down(setup)
 
     def down(self, *args, **kwargs):

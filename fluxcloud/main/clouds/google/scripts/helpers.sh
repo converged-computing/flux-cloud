@@ -43,11 +43,7 @@ function run_echo() {
     # Show the user the command then run it
     echo
     print_green "$@"
-    $@
-    retval=$?
-    if [[ "${retval}" != "0" ]]; then
-        prompt "That command was not successful. Do you want to continue?"
-    fi
+    retry $@
 }
 
 function run_echo_allow_fail() {
@@ -55,6 +51,28 @@ function run_echo_allow_fail() {
     print_green "$@"
     $@ || true
 }
+
+function retry() {
+    # Retry an unsuccessful user command, per request
+    while true
+    do
+        $@
+        retval=$?
+        if [[ "${retval}" == "0" ]]; then
+            return
+        fi
+        print_blue "That command was not successful. Do you want to try again? 🤔️"
+        read -p " (yes/no) " answer
+        case ${answer} in
+	       yes ) continue;;
+           no ) echo exiting...;
+	            exit;;
+	       * )  echo invalid response;
+		        exit 1;;
+        esac
+    done
+}
+
 
 function prompt() {
     # Prompt the user with a yes/no command to continue or exit

@@ -26,10 +26,9 @@ Code is under development and will be added soon! In the meantime, for early doc
  - should have generic template provided by library
  - cloud-select could estimate the cost?
  - command mode that only shows commands?
- - check if cluster already exists before create/delete
  - automated container build
- - linting and checks
- - pretty documentation
+ - linting and checks, contributor workflow
+ - run and add more cluster examples
 
 ## 😁️ Contributors 😁️
 

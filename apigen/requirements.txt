@@ -1,0 +1,10 @@
+cloud-fluxcloud
+sphinx
+sphinxcontrib-napoleon
+sphinx-argparse
+sphinx_rtd_theme
+docutils
+recommonmark
+configargparse
+appdirs
+Jinja2
