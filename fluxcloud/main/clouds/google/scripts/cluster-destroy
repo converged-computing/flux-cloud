@@ -1,7 +1,7 @@
 #!/bin/bash
 
-SHORT="c:,z:,h"
-LONG="cluster:,zone:,help"
+SHORT="c:,z:,f,h"
+LONG="cluster:,zone:,force-cluster,help"
 OPTS=$(getopt -a -n create --options $SHORT --longoptions $LONG -- "$@")
 
 eval set -- "$OPTS"
@@ -13,6 +13,7 @@ HERE=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 # Defaults
 CLUSTER_NAME="flux-cluster"
+FORCE_CLUSTER="false"
 ZONE="us-central1-a"
 
 function usage() {
@@ -35,6 +36,10 @@ do
       usage
       exit 2
       ;;
+    -f | --force-cluster)
+        FORCE_CLUSTER="true"
+        shift 1
+        ;;
     --)
       shift;
       break
@@ -54,6 +59,7 @@ echo "   cluster  : ${CLUSTER_NAME}"
 echo "     zone   : ${ZONE}"
 
 is_installed gcloud
+is_installed yes || FORCE_CLUSTER="false"
 
 # Check if it already exists
 gcloud container clusters list --zone ${ZONE} | grep ${CLUSTER_NAME}
@@ -65,4 +71,8 @@ if [[ "${retval}" != "0" ]]; then
 fi
 
 # This command has a confirmation already
-run_echo gcloud container clusters delete --zone ${ZONE} ${CLUSTER_NAME}
+if [[ "${FORCE_CLUSTER}" == "true" ]]; then
+    yes | gcloud container clusters delete --zone ${ZONE} ${CLUSTER_NAME}
+else
+    run_echo gcloud container clusters delete --zone ${ZONE} ${CLUSTER_NAME}
+fi

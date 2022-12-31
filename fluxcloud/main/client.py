@@ -31,7 +31,12 @@ class ExperimentClient:
 
     @timed
     def run_timed(self, name, cmd):
-        return utils.run_command(cmd)
+        """
+        Run a timed command, and handle nonzero exit codes.
+        """
+        res = utils.run_command(cmd)
+        if res.returncode != 0:
+            raise ValueError("nonzero exit code, exiting.")
 
     def __str__(self):
         return "[flux-cloud-client]"
@@ -69,7 +74,7 @@ class ExperimentClient:
                 return False
         return True
 
-    def run(self, setup, force=False):
+    def run(self, setup):
         """
         Run Flux Operator experiments in GKE
 
@@ -81,14 +86,14 @@ class ExperimentClient:
         for experiment in setup.matrices:
 
             # Don't bring up a cluster if experiments already run!
-            if not force and self.experiment_is_run(setup, experiment):
+            if not setup.force and self.experiment_is_run(setup, experiment):
                 logger.info(
                     f"Experiment {experiment['id']} was already run and force is False, skipping."
                 )
                 continue
 
             self.up(setup, experiment=experiment)
-            self.apply(setup, force=force, experiment=experiment)
+            self.apply(setup, experiment=experiment)
             self.down(setup, experiment=experiment)
 
     def down(self, *args, **kwargs):

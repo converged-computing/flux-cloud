@@ -14,7 +14,12 @@ def main(args, parser, extra, subparser):
 
     cli = get_experiment_client(args.cloud)
     setup = ExperimentSetup(
-        args.experiments, template=args.template, outdir=args.output_dir, test=args.test
+        args.experiments,
+        template=args.template,
+        outdir=args.output_dir,
+        test=args.test,
+        force_cluster=args.force_cluster,
+        force=args.force,
     )
 
     # Update config settings on the fly
@@ -22,6 +27,6 @@ def main(args, parser, extra, subparser):
     setup.settings.update_params(args.config_params)
 
     try:
-        cli.run(setup, force=args.force)
+        cli.run(setup)
     except Exception as e:
         logger.exit(f"Issue with run: {e}")

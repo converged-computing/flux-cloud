@@ -20,7 +20,7 @@ class GoogleCloud(ExperimentClient):
     name = "google"
 
     def __init__(self, **kwargs):
-        super(GoogleCloud, self).__init__(settings_file=kwargs.get("settings_file"))
+        super(GoogleCloud, self).__init__(**kwargs)
         self.zone = kwargs.get("zone") or "us-central1-a"
         self.project = kwargs.get("project") or self.settings.google["project"]
 
@@ -30,7 +30,7 @@ class GoogleCloud(ExperimentClient):
                 "Please provide your Google Cloud project in your settings.yml or flux-cloud set google:project <project>"
             )
 
-    def apply(self, setup, experiment, force=False):
+    def apply(self, setup, experiment):
         """
         Apply a CRD to run the experiment and wait for output.
 
@@ -61,12 +61,12 @@ class GoogleCloud(ExperimentClient):
             logfile = os.path.join(job_output, "log.out")
 
             # Do we have output?
-            if os.path.exists(logfile) and not force:
+            if os.path.exists(logfile) and not setup.force:
                 logger.warning(
                     f"{logfile} already exists and force is False, skipping."
                 )
                 continue
-            elif os.path.exists(logfile) and force:
+            elif os.path.exists(logfile) and setup.force:
                 logger.warning(f"Cleaning up previous run in {job_output}.")
                 shutil.rmtree(job_output)
 
@@ -105,6 +105,7 @@ class GoogleCloud(ExperimentClient):
         meta_file = os.path.join(experiment_dir, "meta.json")
         utils.write_json(meta, meta_file)
         self.clear_minicluster_times()
+        return meta
 
     def clear_minicluster_times(self):
         """
@@ -143,6 +144,8 @@ class GoogleCloud(ExperimentClient):
             "--size",
             setup.get_size(experiment),
         ]
+        if setup.force_cluster:
+            cmd.append("--force-cluster")
         if tags:
             cmd += ["--tags", ",".join(tags)]
         return self.run_timed("create-cluster", cmd)
@@ -155,13 +158,13 @@ class GoogleCloud(ExperimentClient):
         destroy_script = self.get_script("cluster-destroy")
 
         # Create the cluster with creation script
-        return self.run_timed(
-            "destroy-cluster",
-            [
-                destroy_script,
-                "--zone",
-                self.zone,
-                "--cluster",
-                setup.get_cluster_name(experiment),
-            ],
-        )
+        cmd = [
+            destroy_script,
+            "--zone",
+            self.zone,
+            "--cluster",
+            setup.get_cluster_name(experiment),
+        ]
+        if setup.force_cluster:
+            cmd.append("--force-cluster")
+        return self.run_timed("destroy-cluster", cmd)

@@ -25,9 +25,7 @@ Code is under development and will be added soon! In the meantime, for early doc
 
  - should have generic template provided by library
  - cloud-select could estimate the cost?
- - command mode that only shows commands?
  - run and add more cluster examples
- - add check in run that we don't bring up/down clusters if all jobs run (and force is False)
 
 ## 😁️ Contributors 😁️
 

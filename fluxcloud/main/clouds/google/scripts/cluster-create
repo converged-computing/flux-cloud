@@ -1,7 +1,7 @@
 #!/bin/bash
 
-SHORT="p:,c:,z:,v:,m:,t:,s:,b:,r:,h"
-LONG="project:,cluster:,zone:,cluster-version:,machine:,tags:,size:,branch:,repository:,help"
+SHORT="p:,c:,z:,v:,m:,t:,s:,b:,r:,f:,h"
+LONG="project:,cluster:,zone:,cluster-version:,machine:,tags:,size:,branch:,repository:,force-cluster,help"
 OPTS=$(getopt -a -n create --options $SHORT --longoptions $LONG -- "$@")
 
 eval set -- "$OPTS"
@@ -16,6 +16,7 @@ CLUSTER_NAME="flux-cluster"
 ZONE="us-central1-a"
 CLUSTER_VERSION="1.23"
 MACHINE_TYPE="n1-standard-1"
+FORCE_CLUSTER="false"
 SIZE=4
 TAGS=flux-cluster
 REPOSITORY="flux-framework/flux-operator"
@@ -52,6 +53,10 @@ do
     -t | --tags)
         TAGS=$2
         shift 2
+        ;;
+    -f | --force-cluster)
+        FORCE_CLUSTER="true"
+        shift 1
         ;;
     -s | --size)
         SIZE=$2
@@ -110,7 +115,9 @@ if [[ "${retval}" == "0" ]]; then
     exit 0
 fi
 
-prompt "Do you want to create this cluster?"
+if [[ "${FORCE_CLUSTER}" != "true" ]]; then
+    prompt "Do you want to create this cluster?"
+fi
 
 # Create the cluster
 run_echo gcloud container clusters create ${CLUSTER_NAME} --project $GOOGLE_PROJECT \

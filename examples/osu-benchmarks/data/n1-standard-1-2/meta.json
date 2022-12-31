@@ -36,6 +36,15 @@
     },
     "id": "n1-standard-1-2",
     "times": {
-        "create-cluster": 29.76644015312195
+        "create-cluster": 356.4845640659332,
+        "minicluster-run-osu_get_latency": 538.4266033172607,
+        "minicluster-run-osu_acc_latency": 346.2248685359955,
+        "minicluster-run-osu_fop_latency": 30.376757621765137,
+        "minicluster-run-osu_get_bw": 69.91457080841064,
+        "minicluster-run-osu_put_bibw": 121.5233302116394,
+        "minicluster-run-osu_put_latency": 347.232608795166,
+        "minicluster-run-osu_cas_latency": 30.295669078826904,
+        "minicluster-run-osu_get_acc_latency": 675.3228597640991,
+        "minicluster-run-osu_put_bw": 65.65373682975769
     }
 }
