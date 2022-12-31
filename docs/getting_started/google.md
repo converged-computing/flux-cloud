@@ -61,37 +61,5 @@ for output). To just run the first entry in the matrix (test mode) do:
 $ flux-cloud run experiments.yaml --test
 ```
 
+Note that you can also use the other commands in place of a single run, notably "up" "apply" and "down."
 By default, results will be written to a temporary output directory, but you can customize this with `--outdir`.
-
-## Partial Commands
-
-Instead of a "run" command that does the following:
-
-1. Creates the cluster
-2. Runs each of the experiments, saving output and timing
-3. Brings down the cluster
-
-If you want to have more control, you can run one step at a time,
-each of "up" "apply" and "down."
-
-### up
-
-Here is how to bring up a cluster (with the operator installed).
-
-```bash
-$ flux-cloud up
-```
-
-And then run experiments (as you feel):
-
-```bash
-$ flux-cloud apply
-```
-
-And then bring down your cluster:
-
-```bash
-$ flux-cloud down
-```
-
-And that's it! More docs / examples coming soon.

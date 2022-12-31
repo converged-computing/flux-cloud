@@ -30,7 +30,7 @@ class GoogleCloud(ExperimentClient):
                 "Please provide your Google Cloud project in your settings.yml or flux-cloud set google:project <project>"
             )
 
-    def apply(self, setup, force=False):
+    def apply(self, setup, experiment, force=False):
         """
         Apply a CRD to run the experiment and wait for output.
 
@@ -43,83 +43,87 @@ class GoogleCloud(ExperimentClient):
             )
         apply_script = self.get_script("minicluster-run")
 
-        results = []
-        for experiment in setup.matrices:
+        # One run per job (command)
+        jobs = experiment.get("jobs", [])
+        minicluster = setup.get_minicluster(experiment)
+        if not jobs:
+            logger.warning(f"Experiment {experiment} has no jobs, nothing to run.")
+            return
 
-            # Save times on the level of the experiment
-            times = {}
+        # The experiment is defined by the machine type and size
+        experiment_dir = os.path.join(setup.outdir, experiment["id"])
 
-            # One run per job (command)
-            jobs = experiment.get("jobs", [])
-            minicluster = setup.get_minicluster(experiment)
-            if not jobs:
-                logger.warning(f"Experiment {experiment} has no jobs, nothing to run.")
+        # Jobname is used for output
+        for jobname, job in jobs.items():
+
+            # Job specific output directory
+            job_output = os.path.join(experiment_dir, jobname)
+            logfile = os.path.join(job_output, "log.out")
+
+            # Do we have output?
+            if os.path.exists(logfile) and not force:
+                logger.warning(
+                    f"{logfile} already exists and force is False, skipping."
+                )
                 continue
+            elif os.path.exists(logfile) and force:
+                logger.warning(f"Cleaning up previous run in {job_output}.")
+                shutil.rmtree(job_output)
 
-            # The experiment is defined by the machine type and size
-            experiment_prefix = "%s-%s" % (experiment["machine"], experiment["size"])
-            experiment_dir = os.path.join(setup.outdir, experiment_prefix)
+            # Create job directory anew
+            utils.mkdir_p(job_output)
 
-            # Jobname is used for output
-            for jobname, job in jobs.items():
+            # Generate the populated crd from the template
+            template = setup.generate_crd(experiment, job)
 
-                # Job specific output directory
-                job_output = os.path.join(experiment_dir, jobname)
-                logfile = os.path.join(job_output, "log.out")
+            # Write to a temporary file
+            crd = utils.get_tmpfile(prefix="minicluster-", suffix=".yaml")
+            utils.write_file(template, crd)
 
-                # Do we have output?
-                if os.path.exists(logfile) and not force:
-                    logger.warning(
-                        f"{logfile} already exists and force is False, skipping."
-                    )
-                    continue
-                elif os.path.exists(logfile) and force:
-                    logger.warning(f"Cleaning up previous run in {job_output}.")
-                    shutil.rmtree(job_output)
+            # Apply the job, and save to output directory
+            cmd = [
+                apply_script,
+                "--apply",
+                crd,
+                "--logfile",
+                logfile,
+                "--namespace",
+                minicluster["namespace"],
+                "--job",
+                minicluster["name"],
+            ]
+            self.run_timed(f"{self.job_prefix}-{jobname}", cmd)
 
-                # Create job directory anew
-                utils.mkdir_p(job_output)
+            # Clean up temporary crd if we get here
+            if os.path.exists(crd):
+                os.remove(crd)
 
-                # Generate the populated crd from the template
-                template = setup.generate_crd(experiment, job)
+        # Save times and experiment metadata to file
+        # TODO we could add cost estimation here - data from cloud select
+        meta = copy.deepcopy(experiment)
+        meta["times"] = self.times
+        meta_file = os.path.join(experiment_dir, "meta.json")
+        utils.write_json(meta, meta_file)
+        self.clear_minicluster_times()
 
-                # Write to a temporary file
-                crd = utils.get_tmpfile(prefix="minicluster-", suffix=".yaml")
-                utils.write_file(template, crd)
+    def clear_minicluster_times(self):
+        """
+        Update times to not include jobs
+        """
+        times = {}
+        for key, value in self.times.items():
 
-                # Apply the job, and save to output directory
-                cmd = [
-                    apply_script,
-                    "--apply",
-                    crd,
-                    "--logfile",
-                    logfile,
-                    "--namespace",
-                    minicluster["namespace"],
-                    "--job",
-                    minicluster["name"],
-                ]
-                self.run_timed_append(f"minicluster-run-{jobname}", cmd, times)
+            # Don't add back a job that was already saved
+            if key.startswith(self.job_prefix):
+                continue
+            times[key] = value
+        self.times = times
 
-                # Clean up temporary crd if we get here
-                if os.path.exists(crd):
-                    os.remove(crd)
-
-            # Save times to file
-            # TODO we could add cost estimation here - data from cloud select
-            meta = copy.deepcopy(experiment)
-            times.update(self.times)
-            meta["times"] = times
-            results.append(meta)
-
-        meta_file = os.path.join(setup.outdir, "meta.json")
-        utils.write_json(results, meta_file)
-
-    def up(self, setup):
+    def up(self, setup, experiment=None):
         """
         Bring up a cluster
         """
-        experiment = setup.get_single_experiment()
+        experiment = experiment or setup.get_single_experiment()
         create_script = self.get_script("cluster-create")
         tags = setup.get_tags(experiment)
 
@@ -143,11 +147,11 @@ class GoogleCloud(ExperimentClient):
             cmd += ["--tags", ",".join(tags)]
         return self.run_timed("create-cluster", cmd)
 
-    def down(self, setup):
+    def down(self, setup, experiment=None):
         """
         Destroy a cluster
         """
-        experiment = setup.get_single_experiment()
+        experiment = experiment or setup.get_single_experiment()
         destroy_script = self.get_script("cluster-destroy")
 
         # Create the cluster with creation script
