@@ -1,0 +1,18 @@
+[
+    {
+        "size": 2,
+        "machine": "n1-standard-1",
+        "minicluster": {
+            "name": "lammps-job",
+            "namespace": "flux-operator"
+        },
+        "jobs": {
+            "osu_get_latency": {
+                "command": "lmp -v x 2 -v y 2 -v z 2 -in in.reaxc.hns -nocite"
+            }
+        },
+        "times": {
+            "minicluster-run-osu_get_latency": 5.595403432846069
+        }
+    }
+]

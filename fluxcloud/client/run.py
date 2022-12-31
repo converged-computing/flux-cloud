@@ -20,6 +20,6 @@ def main(args, parser, extra, subparser):
     setup.settings.update_params(args.config_params)
 
     try:
-        cli.up(setup)
+        cli.run(setup, force=args.force)
     except Exception as e:
-        logger.exit(f"Issue with up: {e}")
+        logger.exit(f"Issue with run: {e}")

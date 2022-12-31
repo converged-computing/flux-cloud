@@ -23,14 +23,10 @@ Code is under development and will be added soon! In the meantime, for early doc
 
 ## TODO
 
- - up should also install operator (separate function)
- - should be separate command to just apply
  - should have generic template provided by library
  - cloud-select could estimate the cost?
  - command mode that only shows commands?
- - check if something already exists before create/delete
- - make experiment attributes more easily accessible (class? functions?)
- - script confirmation should look nicer (bash colors and better spacing?)
+ - check if cluster already exists before create/delete
  - automated container build
  - linting and checks
  - pretty documentation

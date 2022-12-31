@@ -6,21 +6,20 @@
 import fluxcloud.utils as utils
 from fluxcloud.logger import logger
 from fluxcloud.main import get_experiment_client
+from fluxcloud.main.experiment import ExperimentSetup
 
 
 def main(args, parser, extra, subparser):
     utils.ensure_no_extra(extra)
 
-    cli = get_experiment_client(
-        quiet=args.quiet,
-        settings_file=args.settings_file,
-        cloud=args.cloud,
-    )
+    cli = get_experiment_client(args.cloud)
+    setup = ExperimentSetup(args.experiments)
 
     # Update config settings on the fly
     cli.settings.update_params(args.config_params)
+    setup.settings.update_params(args.config_params)
 
     try:
-        cli.down(args.experiments)
+        cli.down(setup)
     except Exception as e:
-        logger.exit(f"Issue with up: {e}")
+        logger.exit(f"Issue with down: {e}")

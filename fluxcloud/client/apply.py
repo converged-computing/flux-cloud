@@ -13,13 +13,15 @@ def main(args, parser, extra, subparser):
     utils.ensure_no_extra(extra)
 
     cli = get_experiment_client(args.cloud)
-    setup = ExperimentSetup(args.experiments)
+    setup = ExperimentSetup(
+        args.experiments, template=args.template, outdir=args.output_dir, test=args.test
+    )
 
     # Update config settings on the fly
     cli.settings.update_params(args.config_params)
     setup.settings.update_params(args.config_params)
 
     try:
-        cli.up(setup)
+        cli.apply(setup, force=args.force)
     except Exception as e:
-        logger.exit(f"Issue with up: {e}")
+        logger.exit(f"Issue with apply: {e}")

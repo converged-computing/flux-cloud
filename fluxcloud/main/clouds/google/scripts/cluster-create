@@ -1,7 +1,7 @@
 #!/bin/bash
 
-SHORT="p:,c:,z:,v:,m:,t:,s:,h"
-LONG="project:,cluster:,zone:,cluster-version:,machine:,tags:,size:,help"
+SHORT="p:,c:,z:,v:,m:,t:,s:,b:,r:,h"
+LONG="project:,cluster:,zone:,cluster-version:,machine:,tags:,size:,branch:,repository:,help"
 OPTS=$(getopt -a -n create --options $SHORT --longoptions $LONG -- "$@")
 
 eval set -- "$OPTS"
@@ -18,6 +18,8 @@ CLUSTER_VERSION="1.23"
 MACHINE_TYPE="n1-standard-1"
 SIZE=4
 TAGS=flux-cluster
+REPOSITORY="flux-framework/flux-operator"
+BRANCH="main"
 
 function usage() {
    echo "This is the Google Cloud kubernetes cluster creator."
@@ -85,16 +87,19 @@ if [ -z ${MACHINE_TYPE+x} ]; then
     exit 1
 fi
 
-echo "   cluster  : ${CLUSTER_NAME}"
-echo "     version: ${CLUSTER_VERSION}"
-echo "  project   : ${GOOGLE_PROJECT}"
-echo "  machine   : ${MACHINE_TYPE}"
-echo "     zone   : ${ZONE}"
-echo "     tags   : ${TAGS}"
-echo "     size   : ${SIZE}"
+print_magenta "   cluster  : ${CLUSTER_NAME}"
+print_magenta "    version : ${CLUSTER_VERSION}"
+print_magenta "  project   : ${GOOGLE_PROJECT}"
+print_magenta "  machine   : ${MACHINE_TYPE}"
+print_magenta "     zone   : ${ZONE}"
+print_magenta "     tags   : ${TAGS}"
+print_magenta "     size   : ${SIZE}"
+print_magenta "repository  : ${REPOSITORY}"
+print_magenta "     branch : ${BRANCH}"
 
 is_installed kubectl
 is_installed gcloud
+is_installed wget
 
 prompt "Do you want to create this cluster?"
 
@@ -110,12 +115,12 @@ run_echo kubectl create clusterrolebinding cluster-admin-binding --clusterrole c
 # Show nodes
 run_echo kubectl get nodes
 
-exit 0
+# Deploy the operator TODO should be variables here
+tmpfile=$(mktemp /tmp/flux-operator.XXXXXX.yaml)
+rm -rf $tmpfile
+run_echo wget -O $tmpfile https://raw.githubusercontent.com/${REPOSITORY}/${BRANCH}/examples/dist/flux-operator.yaml
+kubectl apply -f $tmpfile
+rm -rf $tmpfile
 
-# TODO need easy way to deploy operator - likely not requiring complete download of the repo here
-
-# git clone https://github.com/flux-framework/flux-operator
-# cd flux-operator
-# make deploy
 run_echo kubectl get namespace
 run_echo kubectl describe namespace operator-system

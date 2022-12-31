@@ -1,4 +1,0 @@
-# Minimum required to bring up a cluster
-experiment:
-  size: 2
-  machine: n1-standard-1

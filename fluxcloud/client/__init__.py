@@ -12,6 +12,7 @@ import sys
 import fluxcloud
 import fluxcloud.main.clouds as clouds
 from fluxcloud.logger import setup_logger
+from fluxcloud.main.settings import setup_settings
 
 
 def get_parser():
@@ -129,28 +130,10 @@ flux-cloud config add cloud aws""",
         description="Main run command to run experiments",
         formatter_class=argparse.RawTextHelpFormatter,
     )
-    run.add_argument(
-        "-o",
-        "--output-dir",
-        help="directory to write output to",
-        default=os.path.join(os.getcwd(), "data"),
-    )
-    run.add_argument(
-        "--test",
-        help="Only run first experiment in matrix (test mode)",
-        default=False,
-        action="store_true",
-    )
-    run.add_argument(
-        "--template",
-        help="minicluster yaml template to populate for experiments (defaults to minicluster-template.yaml",
-        default="minicluster-template.yaml",
-    )
-    run.add_argument(
-        "--force",
-        help="force re-run if experiment already exists.",
-        default=False,
-        action="store_true",
+    apply = subparsers.add_parser(
+        "apply",
+        description="Apply experiments (CRDs) to the cluster.",
+        formatter_class=argparse.RawTextHelpFormatter,
     )
     up = subparsers.add_parser(
         "up",
@@ -162,7 +145,7 @@ flux-cloud config add cloud aws""",
         description="Bring down or destroy a cluster",
         formatter_class=argparse.RawTextHelpFormatter,
     )
-    for command in run, up, down:
+    for command in run, up, down, apply:
         command.add_argument(
             "experiments",
             default="experiments.yaml",
@@ -170,13 +153,36 @@ flux-cloud config add cloud aws""",
             nargs="?",
         )
         command.add_argument("--cluster-version", help="GKE version", type=float)
-
-    for command in run, up, down:
         command.add_argument(
             "-c",
             "--cloud",
             help="cloud to use",
             choices=clouds.cloud_names,
+        )
+
+    for command in run, apply:
+        command.add_argument(
+            "-o",
+            "--output-dir",
+            help="directory to write output to",
+            default=os.path.join(os.getcwd(), "data"),
+        )
+        command.add_argument(
+            "--test",
+            help="Only run first experiment in matrix (test mode)",
+            default=False,
+            action="store_true",
+        )
+        command.add_argument(
+            "--template",
+            help="minicluster yaml template to populate for experiments (defaults to minicluster-template.yaml",
+            default="minicluster-template.yaml",
+        )
+        command.add_argument(
+            "--force",
+            help="force re-run if experiment already exists.",
+            default=False,
+            action="store_true",
         )
 
     return parser
@@ -207,10 +213,8 @@ def run():
         print(fluxcloud.__version__)
         sys.exit(0)
 
-    setup_logger(
-        quiet=args.quiet,
-        debug=args.debug,
-    )
+    setup_logger(quiet=args.quiet, debug=args.debug)
+    setup_settings(args.settings_file)
 
     # retrieve subparser (with help) from parser
     helper = None
@@ -226,7 +230,9 @@ def run():
                 break
 
     # Does the user want a shell?
-    if args.command == "run":
+    if args.command == "apply":
+        from .apply import main
+    elif args.command == "run":
         from .run import main
     elif args.command == "config":
         from .config import main

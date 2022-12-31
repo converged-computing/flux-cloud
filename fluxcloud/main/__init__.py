@@ -4,21 +4,19 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
-def get_experiment_client(quiet=False, settings_file=None, cloud=None, **kwargs):
+def get_experiment_client(cloud):
     """
     Create the cloud experiment client.
     """
+    import fluxcloud.main.client as clients
     import fluxcloud.main.clouds as clouds
     import fluxcloud.main.settings as settings
-    from fluxcloud.main.client import ExperimentClient
 
-    validate = kwargs.get("validate", True) or True
-    settings = settings.Settings(kwargs.get("settings_file"), validate)
-    cloud = cloud or settings.default_cloud
+    cloud = cloud or settings.Settings.default_cloud
 
     # Create the cloud client
     if cloud:
         cloud = clouds.get_cloud(cloud)
     else:
-        cloud = ExperimentClient
-    return cloud(quiet=quiet, settings_file=settings_file)
+        cloud = clients.ExperimentClient
+    return cloud()

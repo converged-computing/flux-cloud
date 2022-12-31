@@ -41,8 +41,17 @@ $ flux-cloud config edit
 ## Google Cloud GKE
 
 The main functionality that flux-cloud provides are easy wrappers (and templates) to running
-the Flux Operator on GKE. We use "run" for that, and require a few scripts available on your
-system to interact with Kubernetes.
+the Flux Operator on GKE. The main steps of running experiments are:
+
+ - **up** to bring up a cluster
+ - **apply** to apply one or more experiments defined by an experiments.yaml
+ - **down** to destroy a cluster
+
+Each of these commands can be run in isolation, and we provide a single command **run** to
+automate the entire thing. We emphasize the term "wrapper" as we are using scripts on your
+machine to do the work (e.g., kubectl and gcloud) and importantly, for every step we show
+you the command, and if it fails, give you a chance to bail out. We do this so if you
+want to remove the abstraction at any point and run the commands on your own, you can.
 
 ### Pre-requisites
 
@@ -106,3 +115,21 @@ each of "up" "apply" and "down."
 ### up
 
 Here is how to bring up a cluster (with the operator installed).
+
+```bash
+$ flux-cloud up
+```
+
+And then run experiments (as you feel):
+
+```bash
+$ flux-cloud apply
+```
+
+And then bring down your cluster:
+
+```bash
+$ flux-cloud down
+```
+
+And that's it! More docs / examples coming soon.

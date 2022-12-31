@@ -3,7 +3,11 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-import fluxcloud.defaults as defaults
+import copy
+import os
+import shutil
+
+import fluxcloud.utils as utils
 from fluxcloud.logger import logger
 from fluxcloud.main.client import ExperimentClient
 
@@ -20,31 +24,100 @@ class GoogleCloud(ExperimentClient):
         self.zone = kwargs.get("zone") or "us-central1-a"
         self.project = kwargs.get("project") or self.settings.google["project"]
 
-    def run(self, experiments, template, outdir, test=False):
-        """
-        Run Flux Operator experiments in GKE
-        """
-        matrices = self.prepare_matrices(experiments, test=test)
-        for experiment in matrices:
-            self.run_experiment(experiment, template, outdir)
+        # No project, no go
+        if not self.project:
+            raise ValueError(
+                "Please provide your Google Cloud project in your settings.yml or flux-cloud set google:project <project>"
+            )
 
-    def up(self, experiments):
+    def apply(self, setup, force=False):
+        """
+        Apply a CRD to run the experiment and wait for output.
+
+        This is really just running the setup!
+        """
+        # Here is where we need a template!
+        if not setup.template or not os.path.exists(setup.template):
+            logger.exit(
+                "You cannot run experiments without a minicluster-template.yaml"
+            )
+        apply_script = self.get_script("minicluster-run")
+
+        results = []
+        for experiment in setup.matrices:
+
+            # Save times on the level of the experiment
+            times = {}
+
+            # One run per job (command)
+            jobs = experiment.get("jobs", [])
+            minicluster = setup.get_minicluster(experiment)
+            if not jobs:
+                logger.warning(f"Experiment {experiment} has no jobs, nothing to run.")
+                continue
+
+            # Jobname is used for output
+            for jobname, job in jobs.items():
+
+                # Job specific output directory
+                job_output = os.path.join(setup.outdir, jobname)
+                logfile = os.path.join(job_output, "log.out")
+
+                # Do we have output?
+                if os.path.exists(logfile) and not force:
+                    logger.warning(
+                        f"{logfile} already exists and force is False, skipping."
+                    )
+                    continue
+                elif os.path.exists(logfile) and force:
+                    logger.warning(f"Cleaning up previous run in {job_output}.")
+                    shutil.rmtree(job_output)
+
+                # Create job directory anew
+                utils.mkdir_p(job_output)
+
+                # Generate the populated crd from the template
+                template = setup.generate_crd(experiment, job)
+
+                # Write to a temporary file
+                crd = utils.get_tmpfile(prefix="minicluster-", suffix=".yaml")
+                utils.write_file(template, crd)
+
+                # Apply the job, and save to output directory
+                cmd = [
+                    apply_script,
+                    "--apply",
+                    crd,
+                    "--logfile",
+                    logfile,
+                    "--namespace",
+                    minicluster["namespace"],
+                    "--job",
+                    minicluster["name"],
+                ]
+                self.run_timed_append(f"minicluster-run-{jobname}", cmd, times)
+
+                # Clean up temporary crd if we get here
+                if os.path.exists(crd):
+                    os.remove(crd)
+
+            # Save times to file
+            # TODO we could add cost estimation here - data from cloud select
+            meta = copy.deepcopy(experiment)
+            times.update(self.times)
+            meta["times"] = times
+            results.append(meta)
+
+        meta_file = os.path.join(setup.outdir, "meta.json")
+        utils.write_json(results, meta_file)
+
+    def up(self, setup):
         """
         Bring up a cluster
         """
-        if "matrix" in experiments:
-            logger.warning("Matrix found - will bring up cluster for first entry.")
-        experiment = self.prepare_matrices(experiments, test=True)[0]
-
-        # TODO if these are to be shared, make more easily accessible
-        size = experiment.get("size") or self.settings.google["size"]
-        machine = experiment.get("machine") or self.settings.google["machine"]
-        tags = experiment.get("cluster", {}).get("tags")
-
-        cluster_name = (
-            experiment.get("cluster", {}).get("name") or defaults.default_cluster_name
-        )
+        experiment = setup.get_single_experiment()
         create_script = self.get_script("cluster-create")
+        tags = setup.get_tags(experiment)
 
         # Create the cluster with creation script
         cmd = [
@@ -54,69 +127,33 @@ class GoogleCloud(ExperimentClient):
             "--zone",
             self.zone,
             "--machine",
-            machine,
+            setup.get_machine(experiment),
             "--cluster",
-            cluster_name,
+            setup.get_cluster_name(experiment),
             "--cluster-version",
-            self.settings.kubernetes["version"],
+            setup.settings.kubernetes["version"],
             "--size",
-            str(size),
+            setup.get_size(experiment),
         ]
         if tags:
             cmd += ["--tags", ",".join(tags)]
         return self.run_timed("create-cluster", cmd)
 
-    def down(self, experiments):
+    def down(self, setup):
         """
         Destroy a cluster
         """
-        if "matrix" in experiments:
-            logger.warning("Matrix found - will bring up cluster for first entry.")
-        experiment = self.prepare_matrices(experiments, test=True)[0]
-
-        cluster_name = (
-            experiment.get("cluster", {}).get("name") or defaults.default_cluster_name
-        )
+        experiment = setup.get_single_experiment()
         destroy_script = self.get_script("cluster-destroy")
 
         # Create the cluster with creation script
         return self.run_timed(
             "destroy-cluster",
-            [destroy_script, "--zone", self.zone, "--cluster", cluster_name],
+            [
+                destroy_script,
+                "--zone",
+                self.zone,
+                "--cluster",
+                setup.get_cluster_name(experiment),
+            ],
         )
-
-    def apply(self, experiment):
-        """
-        Apply a CRD to run the experiment and wait for output.
-        """
-        namespace = (
-            experiment.get("", {}).get("namespace") or defaults.default_namespace
-        )
-        assert namespace
-        print("TODO need to apply yaml to run experiment, collect output.")
-        import IPython
-
-        IPython.embed()
-
-    def run_experiment(self, experiment, template, outdir):
-        """
-        Run a single experiment
-
-        1. create the cluster
-        2. run each command and save output
-        3. bring down the cluster
-        """
-        self.up(experiment)
-
-        # For each command:
-        # generate the crd from template
-        # create named output dir
-        # write to temporary file
-        # apply script
-        # wait for log output (with workdir)
-        #
-
-        if not self.project:
-            raise ValueError(
-                "Please provide your Google Cloud project in your settings.yml or flux-cloud set google:project <project>"
-            )

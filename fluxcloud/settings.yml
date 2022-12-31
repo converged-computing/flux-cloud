@@ -9,6 +9,16 @@ config_editor: vim
 # Backend specific settings
 default_cloud: google
 
+# operator defaults
+operator:
+  repository: flux-framework/flux-operator
+  branch: main
+
+# default mini-cluster name and namespace
+minicluster:
+  name: flux-sample
+  namespace: flux-operator
+
 kubernetes:
   version: '1.23'
 

@@ -31,7 +31,7 @@ def OrderedList(*listing):
     return ret
 
 
-class Settings:
+class UserSettings:
     def __init__(self, settings_file=None, validate=True):
         """
         Create a new settings object not requiring a settings file.
@@ -385,3 +385,11 @@ class Settings:
         elif command == "remove":
             self.remove(key, value)
             logger.info("Removed %s from %s" % (key, value))
+
+
+Settings = UserSettings()
+
+
+def setup_settings(settings_file, validate=True):
+    global Settings
+    Settings = UserSettings(settings_file, validate=validate)

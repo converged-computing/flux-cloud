@@ -19,6 +19,24 @@ keyvals = {
     },
 }
 
+job_spec = {
+    "type": "object",
+    "properties": {
+        "command": {"type": "string"},
+        "workdir": {"type": "string"},
+        "image": {"type": "string"},
+    },
+    "required": ["command"],
+}
+
+jobs_properties = {
+    "type": "object",
+    "patternProperties": {
+        "\\w[\\w-]*": job_spec,
+    },
+}
+
+
 single_experiment_properties = {
     "machine": {"type": "string"},
     "size": {"type": "integer"},
@@ -37,7 +55,18 @@ minicluster_properties = {
     "name": {"type": "string"},
     "namespace": {"type": "string"},
 }
+minicluster = {
+    "type": "object",
+    "properties": minicluster_properties,
+    "additionalProperties": False,
+    "required": ["name", "namespace"],
+}
 
+
+operator_properties = {
+    "repository": {"type": "string"},
+    "branch": {"type": "string"},
+}
 
 # Currently all of these are required
 settings_properties = {
@@ -49,11 +78,18 @@ settings_properties = {
         "additionalProperties": False,
         "required": ["zone", "machine", "project"],
     },
+    "minicluster": minicluster,
     "kubernetes": {
         "type": "object",
         "properties": kubernetes_properties,
         "additionalProperties": False,
         "required": ["version"],
+    },
+    "operator": {
+        "type": "object",
+        "properties": operator_properties,
+        "additionalProperties": False,
+        "required": ["repository", "branch"],
     },
     "clouds": {
         "type": "array",
@@ -61,16 +97,12 @@ settings_properties = {
     },
 }
 
-
-variables = copy.deepcopy(keyvals)
-variables["required"] = ["commands", "ids"]
-
 experiment_schema = {
     "$schema": schema_url,
     "title": "Experiment Schema",
     "type": "object",
     "properties": {
-        "commands": keyvals,
+        "jobs": jobs_properties,
         "variables": keyvals,
         "experiment": {
             "type": "object",
@@ -78,11 +110,7 @@ experiment_schema = {
             "additionalProperties": False,
             "required": ["machine", "size"],
         },
-        "minicluster": {
-            "type": "object",
-            "properties": minicluster_properties,
-            "additionalProperties": False,
-        },
+        "minicluster": minicluster,
         "cluster": {
             "type": "object",
             "properties": kubernetes_cluster_properties,
@@ -108,6 +136,8 @@ settings = {
     "title": "Settings Schema",
     "type": "object",
     "required": [
+        "minicluster",
+        "operator",
         "clouds",
         "google",
         "kubernetes",

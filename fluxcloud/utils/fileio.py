@@ -108,7 +108,7 @@ def remove_to_base(path, base_path):
         path = os.path.dirname(path)
 
 
-def get_tmpfile(tmpdir=None, prefix="fluxcloud-"):
+def get_tmpfile(tmpdir=None, prefix="fluxcloud-", suffix=None):
     """
     Get a temporary file with an optional prefix.
     """
@@ -120,7 +120,7 @@ def get_tmpfile(tmpdir=None, prefix="fluxcloud-"):
     if tmpdir:
         prefix = os.path.join(tmpdir, os.path.basename(prefix))
 
-    fd, tmp_file = tempfile.mkstemp(prefix=prefix)
+    fd, tmp_file = tempfile.mkstemp(prefix=prefix, suffix=suffix)
     os.close(fd)
 
     return tmp_file
@@ -187,7 +187,7 @@ def copyfile(source, destination, force=True):
     return destination
 
 
-def write_file(filename, content, mode="w", exec=False):
+def write_file(content, filename, mode="w", exec=False):
     """
     Write content to a filename
     """
