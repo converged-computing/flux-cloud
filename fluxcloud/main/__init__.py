@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
-def get_experiment_client(cloud=None):
+def get_experiment_client(cloud=None, force_cluster=False):
     """
     Create the cloud experiment client.
     """
@@ -19,4 +19,4 @@ def get_experiment_client(cloud=None):
         cloud = clouds.get_cloud(cloud)
     else:
         cloud = clients.ExperimentClient
-    return cloud()
+    return cloud(force_cluster=force_cluster)

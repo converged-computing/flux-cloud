@@ -14,7 +14,7 @@ and it's lammps!
 
 Here is a quick demo from the [up-apply-down](https://github.com/converged-computing/flux-cloud/tree/main/examples/up-apply-down) in the repository.
 
-<script id="asciicast-548839" src="https://asciinema.org/a/548839.js" data-speed="2" async></script>
+<script id="asciicast-548847" src="https://asciinema.org/a/548847.js" data-speed="2" async></script>
 
 which was actually run as:
 

@@ -17,6 +17,7 @@ def main(args, parser, extra, subparser):
     cli = get_experiment_client(args.cloud)
     setup = ExperimentSetup(
         args.experiments,
+        force_cluster=args.force_cluster,
         template=args.template,
         outdir=args.output_dir,
         test=args.test,
@@ -29,6 +30,6 @@ def main(args, parser, extra, subparser):
     experiment = select_experiment(setup, args.experiment_id)
 
     try:
-        cli.apply(setup, force=args.force, experiment=experiment)
+        cli.apply(setup, experiment=experiment)
     except Exception as e:
         logger.exit(f"Issue with apply: {e}")

@@ -17,6 +17,7 @@ function usage() {
 }
 
 NAMESPACE="flux-operator"
+FORCE_CLUSTER="false"
 
 while :
 do

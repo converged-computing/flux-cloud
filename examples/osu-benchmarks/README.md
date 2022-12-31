@@ -1,7 +1,7 @@
 # OSU Benchmarks on Google Kubernetes Engine
 
-In this set of experiments we will run the Flux Operator on Google Cloud at a few
-sizes and machine types.
+In this set of experiments we will run the Flux Operator on Google Cloud at size N=2
+(the benchmarks require this) and multiple machine types.
 
 ## Pre-requisites
 
@@ -24,10 +24,17 @@ or just [on your own](https://kubernetes.io/docs/tasks/tools/).
 Each experiment here is defined by the matrix and variables in [experiments.yaml](experiment.yaml) that is used to
 populate a [minicluster-template.yaml](minicluster-template.yaml) and launch a Kubernetes cluster.
 You can read the documentation for flux-cloud to understand the variables available.
-This tutorial assumes you have flux-cloud installed and configured. You can either run all at once:
+This tutorial assumes you have flux-cloud installed and configured. See all unique Kubernetes clusters
+we will run the jobs on:
 
 ```bash
-$ flux-cloud run
+$ flux-cloud list
+```
+
+Then you can either run all at once:
+
+```bash
+$ flux-cloud run --force-cluster
 ```
 
 Or (for testing) to bring up just the first cluster and then manually apply:
@@ -37,6 +44,15 @@ $ flux-cloud up
 $ flux-cloud apply
 $ flux-cloud down
 ```
+
+or do the same for a targeted Kubernetes cluster:
+
+```bash
+$ flux-cloud up -e n1-standard-2-2
+$ flux-cloud apply -e n1-standard-2-2
+$ flux-cloud down -e n1-standard-2-2
+```
+
 
 The latter will either use a single experiment you've defined under `experiment` in your experiments.yaml file,
 or select the first in your matrix (as we have here).

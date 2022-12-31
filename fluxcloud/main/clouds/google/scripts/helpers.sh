@@ -63,10 +63,11 @@ function retry() {
         fi
         print_blue "That command was not successful. Do you want to try again? 🤔️"
         read -p " (yes/no) " answer
+        # Exit with non-zero response so we know to stop in script.
         case ${answer} in
 	       yes ) continue;;
            no ) echo exiting...;
-	            exit;;
+	            exit 1;;
 	       * )  echo invalid response;
 		        exit 1;;
         esac
@@ -81,9 +82,9 @@ function prompt() {
     case ${answer} in
 	    yes ) echo ok, we will proceed;;
         no ) echo exiting...;
-	         exit;;
-	    * ) echo invalid response;
-		    exit 1;;
+	         exit 1;;
+	    * )  echo invalid response;
+		     exit 1;;
     esac
 }
 

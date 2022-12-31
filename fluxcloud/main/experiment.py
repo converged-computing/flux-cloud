@@ -25,6 +25,7 @@ class ExperimentSetup:
         validate=True,
         test=False,
         quiet=False,
+        **kwargs,
     ):
         """
         An experiment setup.
@@ -32,9 +33,15 @@ class ExperimentSetup:
         self.experiment_file = os.path.abspath(experiments)
         self.template = os.path.abspath(template) if template else None
         self._outdir = outdir
-        self.test = None
+        self.test = test
         self.settings = settings.Settings
         self.quiet = quiet
+
+        # Rewrite existing outputs
+        self.force = kwargs.get("force") or False
+        # Don't ask for confirmation to create/destroy
+        self.force_cluster = kwargs.get("force_cluster") or False
+
         if validate:
             self.validate()
         # Prepare the matrices for the setup

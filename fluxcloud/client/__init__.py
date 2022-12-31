@@ -174,6 +174,15 @@ flux-cloud config add cloud aws""",
             choices=clouds.cloud_names,
         )
 
+    for command in apply, up, down, run:
+        command.add_argument(
+            "--force-cluster",
+            dest="force_cluster",
+            help="force cluster create (up and down) and do not prompt",
+            action="store_true",
+            default=False,
+        )
+
     for command in apply, up, down:
         command.add_argument(
             "--id",

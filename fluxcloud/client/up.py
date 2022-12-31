@@ -15,7 +15,9 @@ def main(args, parser, extra, subparser):
     utils.ensure_no_extra(extra)
 
     cli = get_experiment_client(args.cloud)
-    setup = ExperimentSetup(args.experiments, quiet=True)
+    setup = ExperimentSetup(
+        args.experiments, quiet=True, force_cluster=args.force_cluster
+    )
 
     # Update config settings on the fly
     cli.settings.update_params(args.config_params)
