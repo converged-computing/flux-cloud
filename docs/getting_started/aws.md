@@ -1,9 +1,9 @@
-# Google Cloud
+# AWS
 
-> Running on Google Kubernetes Engine, GKE
+> Running on Amazon Elastic Kubernetes Service EKS
 
-The main functionality that flux-cloud provides are easy wrappers (and templates) to running
-the Flux Operator on GKE. The main steps of running experiments are:
+The flux-cloud software provides are easy wrappers (and templates) to running
+the Flux Operator on Amazon. The main steps of running experiments are:
 
  - **up** to bring up a cluster
  - **apply** to apply one or more experiments defined by an experiments.yaml
@@ -17,27 +17,39 @@ want to remove the abstraction at any point and run the commands on your own, yo
 
 ## Pre-requisites
 
-You should first [install gcloud](https://cloud.google.com/sdk/docs/quickstarts)
-and ensure you are logged in and have kubectl installed:
+You should first [install eksctrl](https://github.com/weaveworks/eksctl) and make sure you have access to an AWS cloud (e.g.,
+with credentials or similar in your environment). E.g.,:
 
 ```bash
-$ gcloud auth login
+export AWS_ACCESS_KEY_ID=xxxxxxxxxxxxxxxxxxx
+export AWS_SECRET_ACCESS_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+export AWS_SESSION_TOKEN=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
-Depending on your install, you can either install with gcloud:
+The last session token may not be required depending on your setup.
+We assume you also have [kubectl](https://kubernetes.io/docs/tasks/tools/).
+
+### Setup SSH
+
+You'll need an ssh key for EKS. Here is how to generate it:
 
 ```bash
-$ gcloud components install kubectl
+ssh-keygen
+# Ensure you enter the path to ~/.ssh/id_eks
 ```
-or just [on your own](https://kubernetes.io/docs/tasks/tools/).
 
-## Cloud
+This is used so you can ssh (connect) to your workers!
 
-Finally, ensure that google is either your default cloud (the `default_cloud` in your settings.yml)
+### Cloud
+
+Finally, ensure that aws is either your default cloud (the `default_cloud` in your settings.yml)
 or you specify it with `--cloud` when you do run.
 
-
 ## Run Experiments
+
+**IMPORTANT** for any experiment when you choose an instance type, you absolutely
+need to choose a size that has [IsTrunkingCompatible](https://github.com/aws/amazon-vpc-resource-controller-k8s/blob/master/pkg/aws/vpc/limits.go)
+true. E.g., `m5.large` has it set to true so it would work.
 
 Each experiment is defined by the matrix and variables in an `experiment.yaml` that is used to
 populate a `minicluster-template.yaml` that you can either provide, or use a template provided by the

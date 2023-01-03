@@ -7,9 +7,10 @@ OPTS=$(getopt -a -n create --options $SHORT --longoptions $LONG -- "$@")
 eval set -- "$OPTS"
 
 HERE=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+ROOT=$(dirname $(dirname ${HERE}))
 
 # Source shared helper scripts
-. ${HERE}/helpers.sh
+. $ROOT/shared/scripts/helpers.sh
 
 function usage() {
    echo "This is the Google Cloud Flux MiniCluster job runner, where we apply a custom resource definition (CRD)."

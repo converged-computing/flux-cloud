@@ -3,26 +3,21 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+import os
+
 from fluxcloud.main.client import ExperimentClient
 
 
-class GoogleCloud(ExperimentClient):
+class AmazonCloud(ExperimentClient):
     """
-    A Google Cloud GKE experiment runner.
+    An Amazon EKS (Elastic Kubernetes Service) experiment runner.
     """
 
-    name = "google"
+    name = "aws"
 
     def __init__(self, **kwargs):
-        super(GoogleCloud, self).__init__(**kwargs)
-        self.zone = kwargs.get("zone") or "us-central1-a"
-        self.project = kwargs.get("project") or self.settings.google["project"]
-
-        # No project, no go
-        if not self.project:
-            raise ValueError(
-                "Please provide your Google Cloud project in your settings.yml or flux-cloud set google:project <project>"
-            )
+        super(AmazonCloud, self).__init__(**kwargs)
+        self.region = kwargs.get("region") or "us-east-1"
 
     def up(self, setup, experiment=None):
         """
@@ -32,13 +27,14 @@ class GoogleCloud(ExperimentClient):
         create_script = self.get_script("cluster-create")
         tags = setup.get_tags(experiment)
 
+        # AWS tags are key value pairs k=v
+        self.check_tags(tags)
+
         # Create the cluster with creation script
         cmd = [
             create_script,
-            "--project",
-            self.project,
-            "--zone",
-            self.zone,
+            "--region",
+            self.region,
             "--machine",
             setup.get_machine(experiment),
             "--cluster",
@@ -52,7 +48,25 @@ class GoogleCloud(ExperimentClient):
             cmd.append("--force-cluster")
         if tags:
             cmd += ["--tags", ",".join(tags)]
+
+        # ssh key if provided must exist
+        ssh_key = self.settings.aws.get("ssh_key")
+        if ssh_key:
+            if not os.path.exists(ssh_key):
+                raise ValueError("ssh_key defined and does not exist: {ssh_key}")
+            cmd += ["--ssh-key", ssh_key]
+
         return self.run_timed("create-cluster", cmd)
+
+    def check_tags(self, tags):
+        """
+        Ensure tags are in format key=value
+        """
+        for tag in tags or []:
+            if "=" not in tag:
+                raise ValueError(
+                    f"Cluster tags must be provided in format key=value, found {tag}"
+                )
 
     def down(self, setup, experiment=None):
         """
@@ -64,8 +78,8 @@ class GoogleCloud(ExperimentClient):
         # Create the cluster with creation script
         cmd = [
             destroy_script,
-            "--zone",
-            self.zone,
+            "--region",
+            self.region,
             "--cluster",
             setup.get_cluster_name(experiment),
         ]

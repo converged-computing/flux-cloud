@@ -1,7 +1,7 @@
 #!/bin/bash
 
-SHORT="p:,c:,z:,v:,m:,t:,s:,b:,r:,f:,h"
-LONG="project:,cluster:,zone:,cluster-version:,machine:,tags:,size:,branch:,repository:,force-cluster,help"
+SHORT="p:,c:,r:,v:,m:,t:,s:,b:,e:,f:,h"
+LONG="project:,cluster:,region:,cluster-version:,machine:,tags:,size:,branch:,repository:,force-cluster,ssh-key,help"
 OPTS=$(getopt -a -n create --options $SHORT --longoptions $LONG -- "$@")
 
 eval set -- "$OPTS"
@@ -14,9 +14,9 @@ ROOT=$(dirname $(dirname ${HERE}))
 
 # Defaults
 CLUSTER_NAME="flux-cluster"
-ZONE="us-central1-a"
+REGION="us-east-1"
 CLUSTER_VERSION="1.23"
-MACHINE_TYPE="n1-standard-1"
+MACHINE_TYPE="m5.large"
 FORCE_CLUSTER="false"
 SIZE=4
 TAGS=flux-cluster
@@ -24,23 +24,23 @@ REPOSITORY="flux-framework/flux-operator"
 BRANCH="main"
 
 function usage() {
-   echo "This is the Google Cloud kubernetes cluster creator."
-   echo "usage: cluster-create --project <project> --machine <machine> --cluster <cluster-name> --size <size> --zone <zone>"
+   echo "This is the Amazon EKS (elastic kubernetes service) cluster creator."
+   echo "usage: cluster-create --machine <machine> --cluster <cluster-name> --size <size> --region <region>"
 }
 
 while :
 do
   case "$1" in
-    -p | --project)
-        GOOGLE_PROJECT=$2
+    --ssh-key)
+        SSH_KEY=$2
         shift 2
         ;;
     -c | --cluster)
         CLUSTER_NAME=$2
         shift 2
         ;;
-    -z | --zone)
-        ZONE=$2
+    -r | --region)
+        REGION=$2
         shift 2
         ;;
     -v | --cluster-version)
@@ -59,16 +59,16 @@ do
         FORCE_CLUSTER="true"
         shift 1
         ;;
-    -s | --size)
-        SIZE=$2
-        shift 2
-        ;;
     -b | --branch)
         BRANCH=$2
         shift 2
         ;;
-    -r | --repository)
+    -e | --repository)
         REPOSITORY=$2
+        shift 2
+        ;;
+    -s | --size)
+        SIZE=$2
         shift 2
         ;;
     -h | --help)
@@ -86,40 +86,35 @@ do
 done
 
 # Required arguments
-if [ -z ${GOOGLE_PROJECT+x} ]; then
-    echo "Please provide your Google Project with --project";
-    exit 1
-fi
-
-if [ -z ${ZONE+x} ]; then
-    echo "Please provide your Google Cloud zone with --zone";
+if [ -z ${REGION+x} ]; then
+    echo "Please provide your AWS region with --region";
     exit 1
 fi
 
 if [ -z ${MACHINE_TYPE+x} ]; then
-    echo "Please provide your Google Cloud machine type with --machine";
+    echo "Please provide your Amazon EKS machine type with --machine";
     exit 1
 fi
 
 print_magenta "   cluster  : ${CLUSTER_NAME}"
 print_magenta "    version : ${CLUSTER_VERSION}"
-print_magenta "  project   : ${GOOGLE_PROJECT}"
 print_magenta "  machine   : ${MACHINE_TYPE}"
-print_magenta "     zone   : ${ZONE}"
+print_magenta "   region   : ${REGION}"
 print_magenta "     tags   : ${TAGS}"
 print_magenta "     size   : ${SIZE}"
 print_magenta "repository  : ${REPOSITORY}"
 print_magenta "     branch : ${BRANCH}"
+print_magenta "   ssh-key  : ${SSH_KEY}"
 
 is_installed kubectl
-is_installed gcloud
+is_installed eksctl
 is_installed wget
 
 # Check if it already exists
-gcloud container clusters list --zone ${ZONE} | grep ${CLUSTER_NAME}
+eksctl get clusters --name ${CLUSTER_NAME} --region ${REGION} --color fabulous
 retval=$?
 if [[ "${retval}" == "0" ]]; then
-    print_blue "${CLUSTER_NAME} in ${ZONE} already exists."
+    print_blue "${CLUSTER_NAME} in ${REGION} already exists."
     echo
     exit 0
 fi
@@ -128,14 +123,19 @@ if [[ "${FORCE_CLUSTER}" != "true" ]]; then
     prompt "Do you want to create this cluster?"
 fi
 
-# Create the cluster
-run_echo gcloud container clusters create ${CLUSTER_NAME} --project $GOOGLE_PROJECT \
-    --zone ${ZONE} --cluster-version ${CLUSTER_VERSION} --machine-type ${MACHINE_TYPE} \
-    --num-nodes=${SIZE} --enable-network-policy --tags=${TAGS} --enable-intra-node-visibility
+# Note, we can optionally add --zones but I chose not to --zones ["us-east-1a", "us-east-1b", "us-east-1d"]
+# Not clear if comma separated or other, haven't tested yet
+# Note that node-min and node-max can also be better support, this is the same as doing --nodes <int>
+cmd="eksctl create cluster --name=${CLUSTER_NAME} --tags=${TAGS} \
+    --region=${REGION} --version=${KUBERNETES_VERSION} --nodegroup-name=workers \
+    --node-type=${MACHINE_TYPE} --nodes-min=${SIZE} --nodes-max=${SIZE} --color fabulous"
 
-# Get credentials so kubectl will work
-run_echo gcloud container clusters get-credentials ${CLUSTER_NAME} --zone ${ZONE} --project $GOOGLE_PROJECT
-run_echo kubectl create clusterrolebinding cluster-admin-binding --clusterrole cluster-admin --user $(gcloud config get-value core/account)
+# If an ssh key is defined, add it
+if [ ! -z ${SSH_KEY+x} ]; then
+    cmd="${cmd} --ssh access --ssh-public-key ${SSH_KEY}"
+fi
+
+run_echo ${cmd}
 
 # Show nodes
 run_echo kubectl get nodes

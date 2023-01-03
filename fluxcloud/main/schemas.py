@@ -46,10 +46,19 @@ single_experiment_properties = {
 cloud_properties = {"zone": {"type": "string"}, "machine": {"type": "string"}}
 google_cloud_properties = copy.deepcopy(cloud_properties)
 google_cloud_properties["project"] = {"type": ["null", "string"]}
+aws_cloud_properties = {
+    "region": {"type": "string"},
+    "machine": {"type": "string"},
+    "ssh_key": {"type": ["string", "null"]},
+}
 
 kubernetes_properties = {"version": {"type": "string"}}
 kubernetes_cluster_properties = {
-    "tags": {"type": "array", "items": {"type": "string"}},
+    "tags": {
+        "type": "array",
+        "items": {"type": "string"},
+        "version": {"type": "string"},
+    },
 }
 
 minicluster_properties = {
@@ -73,6 +82,12 @@ operator_properties = {
 settings_properties = {
     "default_cloud": {"type": "string"},
     "config_editor": {"type": "string"},
+    "aws": {
+        "type": "object",
+        "properties": aws_cloud_properties,
+        "additionalProperties": False,
+        "required": ["region", "machine"],
+    },
     "google": {
         "type": "object",
         "properties": google_cloud_properties,
@@ -146,6 +161,7 @@ settings = {
         "minicluster",
         "operator",
         "clouds",
+        "aws",
         "google",
         "kubernetes",
     ],

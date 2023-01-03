@@ -12,4 +12,5 @@ examples
 experiments
 settings
 google
+aws
 ```
