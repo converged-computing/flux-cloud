@@ -43,7 +43,6 @@ class GoogleCloud(ExperimentClient):
             )
         apply_script = self.get_script("minicluster-run")
 
-        # One run per job (command)
         jobs = experiment.get("jobs", [])
         minicluster = setup.get_minicluster(experiment)
         if not jobs:
@@ -56,7 +55,6 @@ class GoogleCloud(ExperimentClient):
         # Jobname is used for output
         for jobname, job in jobs.items():
 
-            # Job specific output directory
             job_output = os.path.join(experiment_dir, jobname)
             logfile = os.path.join(job_output, "log.out")
 

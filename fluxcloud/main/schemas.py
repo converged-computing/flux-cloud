@@ -23,6 +23,7 @@ job_spec = {
     "type": "object",
     "properties": {
         "command": {"type": "string"},
+        "repeats": {"type": "number"},
         "workdir": {"type": "string"},
         "image": {"type": "string"},
     },
