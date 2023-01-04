@@ -50,6 +50,10 @@ The following settings are available for Flux Cloud
 | google.zone | string | The default zone to use in Google Cloud | us-central1-a | true |
 | google.machine | string | The default machine to use | n2-standard-1 | true |
 | google.project | string | The default google project to use | unset | true |
+| aws | object | A group of settings for Amazon EKS | NA | true |
+| aws.region | string | The default region to use in Amazon EKS | us-east1 | true |
+| aws.machine | string | The default machine to use | m5.large | true |
+| aws.ssh_key | string | If ssh access is desired, provide an ssh key you've generated | unset | false |
 
 For the above, you'll notice the only setting you really need to define (per the user guide)
-is your Google Cloud project.
+is your Google Cloud project. AWS gets everything from the environment.

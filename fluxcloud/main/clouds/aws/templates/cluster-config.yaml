@@ -1,0 +1,23 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: {{ cluster_name }}
+  region: {{ region }}
+  version: "{{ kubernetes_version }}"
+  {% if tags %}tags:{% for tag in tags %}
+    "{{ tag[0] }}": "{{ tag[1] }}"
+    {% endfor %}{% endif %}
+
+# availabilityZones: ["us-east-1a", "us-east-1b", "us-east-1d"]
+managedNodeGroups:
+  - name: workers
+    instanceType: {{ machine }}
+    minSize: {{ size }}
+    maxSize: {{ size }}
+    labels: { "fluxoperator": "true" }
+    {% if ssh_key %}ssh:
+      allow: true
+      publicKeyPath: {{ ssh_key }}{% endif %}
+    {% if private_networking %}privateNetworking: true{% endif %}
+    {% if efa_enabled %}efaEnabled: true{% endif %}

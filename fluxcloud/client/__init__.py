@@ -182,8 +182,6 @@ flux-cloud config add cloud aws""",
             action="store_true",
             default=False,
         )
-
-    for command in apply, up, down:
         command.add_argument(
             "--id",
             "-e",

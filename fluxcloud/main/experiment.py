@@ -31,11 +31,15 @@ class ExperimentSetup:
         An experiment setup.
         """
         self.experiment_file = os.path.abspath(experiments)
-        self.template = os.path.abspath(template) if template else None
+        self.template = os.path.abspath(template) if template is not None else None
         self._outdir = outdir
         self.test = test
         self.settings = settings.Settings
         self.quiet = quiet
+
+        # Show the user the template file
+        if template:
+            logger.debug(f"Using template {self.template}")
 
         # Rewrite existing outputs
         self.force = kwargs.get("force") or False
@@ -136,11 +140,11 @@ class ExperimentSetup:
         Validate that all paths exist (create output if it does not)
         """
         if self.template is not None and not os.path.exists(self.template):
-            logger.exit(f"Template file {self.template} does not exist.")
+            raise ValueError(f"Template file {self.template} does not exist.")
 
         # This file must always be provided and exist
         if not os.path.exists(self.experiment_file):
-            logger.exit(f"Experiments file {self.experiment_file} does not exist.")
+            raise ValueError(f"Experiments file {self.experiment_file} does not exist.")
 
 
 def expand_experiments(experiments):
@@ -163,7 +167,7 @@ def expand_experiments(experiments):
     elif "experiment" in experiments:
         matrix = expand_single_experiment(experiments)
     elif "experiments" in experiments:
-        matrix = expand_single_experiment(experiments)
+        matrix = expand_experiment_list(experiments)
     else:
         raise ValueError(
             'The key "experiment" or "experiments" or "matrix" is required.'
@@ -182,6 +186,43 @@ def add_experiment_ids(matrix):
     return matrix
 
 
+def expand_jobs(jobs):
+    """
+    Expand out jobs based on repeats
+    """
+    final = {}
+    for jobname, job in jobs.items():
+        if "repeats" in job:
+            repeats = job["repeats"]
+            if repeats < 1:
+                raise ValueError(
+                    f'"repeats" must be a positive number greater than 0. Found {repeats} for {job["command"]}'
+                )
+
+            # Start at 1 and not 0
+            for i in range(1, repeats + 1):
+                final[f"{jobname}-{i}"] = job
+        else:
+            final[jobname] = job
+    return final
+
+
+def expand_experiment_list(experiments):
+    """
+    Given a list of experiments, expand out jobs
+    """
+    listing = experiments["experiments"]
+    for entry in listing:
+        for key in experiments:
+            if key == "experiments":
+                continue
+            if key == "jobs":
+                entry[key] = expand_jobs(experiments[key])
+                continue
+            entry[key] = experiments[key]
+    return listing
+
+
 def expand_single_experiment(experiments):
     """
     Expand a single experiment, ensuring to add the rest of the config.
@@ -189,6 +230,9 @@ def expand_single_experiment(experiments):
     experiment = experiments["experiment"]
     for key in experiments:
         if key == "experiment":
+            continue
+        if key == "jobs":
+            experiment[key] = expand_jobs(experiments[key])
             continue
         experiment[key] = experiments[key]
     return [experiment]
@@ -206,6 +250,9 @@ def expand_experiment_matrix(experiments):
         for key in experiments:
             if key == "matrix":
                 continue
+            if key == "jobs":
+                experiment[key] = expand_jobs(experiments[key])
+                continue
             # This is an ordered dict
             experiment[key] = experiments[key]
         matrix.append(experiment)
@@ -220,22 +267,3 @@ def validate_experiments(experiments):
 
     if jsonschema.validate(experiments, schema=schemas.experiment_schema) is not None:
         raise ValueError("Invalid experiments schema.")
-
-
-def run_experiment(experiment, outdir, args):
-    """
-    Given one or more experiments, run them.
-    """
-    print("RUN EXPERIMENT")
-    # First bring up the cluster
-    import IPython
-
-    IPython.embed()
-    # TODO vsoch, this should be a shared function
-
-    # template = Template(read_file(template_file))
-
-    # Run this many commands
-    # for command in experiment["commands"]:
-    #    experiment["command"] = command
-    #    render = template.render(**experiment)
