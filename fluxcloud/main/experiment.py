@@ -31,11 +31,15 @@ class ExperimentSetup:
         An experiment setup.
         """
         self.experiment_file = os.path.abspath(experiments)
-        self.template = os.path.abspath(template) if template else None
+        self.template = os.path.abspath(template) if template is not None else None
         self._outdir = outdir
         self.test = test
         self.settings = settings.Settings
         self.quiet = quiet
+
+        # Show the user the template file
+        if template:
+            logger.debug(f"Using template {self.template}")
 
         # Rewrite existing outputs
         self.force = kwargs.get("force") or False
@@ -136,11 +140,11 @@ class ExperimentSetup:
         Validate that all paths exist (create output if it does not)
         """
         if self.template is not None and not os.path.exists(self.template):
-            logger.exit(f"Template file {self.template} does not exist.")
+            raise ValueError(f"Template file {self.template} does not exist.")
 
         # This file must always be provided and exist
         if not os.path.exists(self.experiment_file):
-            logger.exit(f"Experiments file {self.experiment_file} does not exist.")
+            raise ValueError(f"Experiments file {self.experiment_file} does not exist.")
 
 
 def expand_experiments(experiments):

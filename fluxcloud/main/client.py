@@ -123,8 +123,8 @@ class ExperimentClient:
         This is really just running the setup!
         """
         # Here is where we need a template!
-        if not setup.template or not os.path.exists(setup.template):
-            logger.exit(
+        if setup.template is None or not os.path.exists(setup.template):
+            raise ValueError(
                 "You cannot run experiments without a minicluster-template.yaml"
             )
         apply_script = self.get_shared_script("minicluster-run")
