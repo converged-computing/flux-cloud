@@ -25,6 +25,17 @@ $ flux-cloud config get google:project
 google:project                 dinosaur
 ```
 
+Ensure your default cloud is set to the one you want!
+
+```bash
+$ flux-cloud config get default_cloud
+default_cloud                 aws
+
+$ flux-cloud config set default_cloud google
+default_cloud                 google
+```
+
+We don't discriminate or judge about clouds, we like them all!
 Also set your editor of choice, and then you can edit in it (it defaults to vim)
 
 ```bash

@@ -68,7 +68,7 @@
   <link href="../_static/favicon.ico" rel="shortcut icon"/>
   <link href="../genindex.html" rel="index" title="Index"/>
   <link href="../search.html" rel="search" title="Search"/>
-  <link href="../contributing.html" rel="next" title="Contributing"/>
+  <link href="aws.html" rel="next" title="AWS"/>
   <link href="settings.html" rel="prev" title="Settings"/>
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
   <!-- Social: Facebook / Open Graph -->
@@ -329,6 +329,11 @@
                    </a>
                   </li>
                   <li class="md-nav__item">
+                   <a class="md-nav__link" href="#cloud">
+                    Cloud
+                   </a>
+                  </li>
+                  <li class="md-nav__item">
                    <a class="md-nav__link" href="#run-experiments">
                     Run Experiments
                    </a>
@@ -343,6 +348,11 @@
                </li>
               </ul>
              </nav>
+            </li>
+            <li class="md-nav__item">
+             <a class="md-nav__link" href="aws.html">
+              AWS
+             </a>
             </li>
            </ul>
           </li>
@@ -385,6 +395,11 @@
              <li class="md-nav__item">
               <a class="md-nav__link" href="#pre-requisites">
                Pre-requisites
+              </a>
+             </li>
+             <li class="md-nav__item">
+              <a class="md-nav__link" href="#cloud">
+               Cloud
               </a>
              </li>
              <li class="md-nav__item">
@@ -480,7 +495,7 @@ want to remove the abstraction at any point and run the commands on your own, yo
          </p>
          <div class="highlight-bash notranslate">
           <div class="highlight">
-           <pre><span></span>$ gcloud auth login
+           <pre><span></span>$<span class="w"> </span>gcloud<span class="w"> </span>auth<span class="w"> </span>login
 </pre>
           </div>
          </div>
@@ -489,7 +504,7 @@ want to remove the abstraction at any point and run the commands on your own, yo
          </p>
          <div class="highlight-bash notranslate">
           <div class="highlight">
-           <pre><span></span>$ gcloud components install kubectl
+           <pre><span></span>$<span class="w"> </span>gcloud<span class="w"> </span>components<span class="w"> </span>install<span class="w"> </span>kubectl
 </pre>
           </div>
          </div>
@@ -499,6 +514,30 @@ want to remove the abstraction at any point and run the commands on your own, yo
            on your own
           </a>
           .
+         </p>
+        </section>
+        <section id="cloud">
+         <h2 id="cloud">
+          Cloud
+          <a class="headerlink" href="#cloud" title="Permalink to this heading">
+           ¶
+          </a>
+         </h2>
+         <p>
+          Finally, ensure that google is either your default cloud (the
+          <code class="docutils literal notranslate">
+           <span class="pre">
+            default_cloud
+           </span>
+          </code>
+          in your settings.yml)
+or you specify it with
+          <code class="docutils literal notranslate">
+           <span class="pre">
+            --cloud
+           </span>
+          </code>
+          when you do run.
          </p>
         </section>
         <section id="run-experiments">
@@ -535,7 +574,7 @@ in your settings.
          </p>
          <div class="highlight-bash notranslate">
           <div class="highlight">
-           <pre><span></span>$ flux-cloud run experiments.yaml
+           <pre><span></span>$<span class="w"> </span>flux-cloud<span class="w"> </span>run<span class="w"> </span>experiments.yaml
 </pre>
           </div>
          </div>
@@ -544,7 +583,7 @@ in your settings.
          </p>
          <div class="highlight-bash notranslate">
           <div class="highlight">
-           <pre><span></span>$ flux-cloud run
+           <pre><span></span>$<span class="w"> </span>flux-cloud<span class="w"> </span>run
 </pre>
           </div>
          </div>
@@ -562,7 +601,7 @@ for output). To just run the first entry in the matrix (test mode) do:
          </p>
          <div class="highlight-bash notranslate">
           <div class="highlight">
-           <pre><span></span>$ flux-cloud run experiments.yaml --test
+           <pre><span></span>$<span class="w"> </span>flux-cloud<span class="w"> </span>run<span class="w"> </span>experiments.yaml<span class="w"> </span>--test
 </pre>
           </div>
          </div>
@@ -600,13 +639,13 @@ By default, results will be written to a temporary output directory, but you can
        </span>
       </div>
      </a>
-     <a class="md-flex md-footer-nav__link md-footer-nav__link--next" href="../contributing.html" rel="next" title="Contributing">
+     <a class="md-flex md-footer-nav__link md-footer-nav__link--next" href="aws.html" rel="next" title="AWS">
       <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
        <span class="md-flex__ellipsis">
         <span class="md-footer-nav__direction">
          Next
         </span>
-        Contributing
+        AWS
        </span>
       </div>
       <div class="md-flex__cell md-flex__cell--shrink">
@@ -623,7 +662,7 @@ By default, results will be written to a temporary output directory, but you can
        © Copyright 2022, Flux Developers.
       </div>
       Last updated on
-              Dec 31, 2022.
+              Jan 04, 2023.
       <br/>
       Created using
       <a href="http://www.sphinx-doc.org/">

@@ -28,8 +28,8 @@ when you are developing, you can run "apply" and then easily debug until you are
 down.
 
 This project is currently 🚧️ Under Construction! 🚧️ and optimized for the creator @vsoch's use case
-to run experiments in Google Cloud. We likely will add more features and clouds as they are needed
-or requested. This is a *converged computing* project that aims
+to run experiments in Google Cloud (GKS) and Amazon Web Services (EKS). We likely will add more features
+and clouds as they are needed or requested. This is a *converged computing* project that aims
 to unite the worlds and technologies typical of cloud computing and
 high performance computing.
 

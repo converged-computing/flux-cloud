@@ -70,6 +70,30 @@ minicluster:
   namespace: flux-operator
 ```
 
+### Kubernetes
+
+While it's recommended to define defaults for Kubernetes (e.g., version) in your `settings.yml`, you can one-off edit them
+via a "cluster" attribute in your `experiments.yaml`. Unlike settings, this supports a field for "tags" that should be a list of strings:
+
+```yaml
+cluster:
+  version: "1.23"
+  tags:
+    - lammps
+```
+
+Note that the above is for a Google GKE cluster - tags is a single list of tags. For AWS EKS, you need to provide key value pairs:
+
+```yaml
+cluster:
+  version: "1.22"
+  tags:
+    - analysis=lammps
+```
+
+This is validated at runtime when you create the cluster. For both, they are converted to comma separated values to provide
+to the command line client.
+
 ### Jobs
 
 The jobs specification defines what commands (required) you want run across each Kubernetes cluster.
@@ -86,17 +110,21 @@ jobs:
 ```
 
 If you have different working directories or container images, you can define that here:
+Note that each job can have a command (required) and working directory, image,
+and repeats (optional).
 
 ```yaml
-# Each job can have a command and working directory
 jobs:
   osu_get_latency:
     command: './osu_get_latency'
     image: ghcr.io/awesome/science:latest
     workdir: /path/to/science
+    repeats: 3
 ```
 
-Note that likely in the future we can provide a default template and require all these variables
+For repeats, we add another level to the output directory, and represent the result data as
+subdirectories of the machine and size from 1..N. Note also that likely in the future we
+can provide a default template and require all these variables
 defined. For now we require you to provide the template.
 
 ### Custom Resource Definition

@@ -332,6 +332,11 @@
                     down
                    </a>
                   </li>
+                  <li class="md-nav__item">
+                   <a class="md-nav__link" href="#debug">
+                    debug
+                   </a>
+                  </li>
                  </ul>
                 </nav>
                </li>
@@ -361,6 +366,11 @@
             <li class="md-nav__item">
              <a class="md-nav__link" href="google.html">
               Google Cloud
+             </a>
+            </li>
+            <li class="md-nav__item">
+             <a class="md-nav__link" href="aws.html">
+              AWS
              </a>
             </li>
            </ul>
@@ -430,6 +440,11 @@
                down
               </a>
              </li>
+             <li class="md-nav__item">
+              <a class="md-nav__link" href="#debug">
+               debug
+              </a>
+             </li>
             </ul>
            </nav>
           </li>
@@ -470,7 +485,7 @@ clusters. To see all identifiers generated, you can use list:
          </p>
          <div class="highlight-bash notranslate">
           <div class="highlight">
-           <pre><span></span>$ flux-cloud list
+           <pre><span></span>$<span class="w"> </span>flux-cloud<span class="w"> </span>list
 n1-standard-1-2
 n1-standard-2-2
 n1-standard-1-4
@@ -491,10 +506,10 @@ n1-standard-2-6
          </p>
          <div class="highlight-yaml notranslate">
           <div class="highlight">
-           <pre><span></span><span class="c1"># This can obviously be expanded to more sizes or machines,</span><span class="w"></span>
-<span class="nt">matrix</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">size</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">2</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">4</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">6</span><span class="p p-Indicator">]</span><span class="w"></span>
-<span class="w">  </span><span class="nt">machine</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"n1-standard-1"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"n1-standard-2"</span><span class="p p-Indicator">]</span><span class="w"></span>
+           <pre><span></span><span class="c1"># This can obviously be expanded to more sizes or machines,</span>
+<span class="nt">matrix</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">size</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">2</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">4</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">6</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">machine</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"n1-standard-1"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"n1-standard-2"</span><span class="p p-Indicator">]</span>
 </pre>
           </div>
          </div>
@@ -547,14 +562,14 @@ know which cluster you want to interact with.
          </p>
          <div class="highlight-bash notranslate">
           <div class="highlight">
-           <pre><span></span>$ tree ./data/
-├── meta.json
-├── n1-standard-1-2
-│   └── reaxc-hns
-│       └── log.out
-└── n1-standard-1-4
-    └── reaxc-hns
-        └── log.out
+           <pre><span></span>$<span class="w"> </span>tree<span class="w"> </span>./data/
+├──<span class="w"> </span>meta.json
+├──<span class="w"> </span>n1-standard-1-2
+│<span class="w">   </span>└──<span class="w"> </span>reaxc-hns
+│<span class="w">       </span>└──<span class="w"> </span>log.out
+└──<span class="w"> </span>n1-standard-1-4
+<span class="w">    </span>└──<span class="w"> </span>reaxc-hns
+<span class="w">        </span>└──<span class="w"> </span>log.out
 </pre>
           </div>
          </div>
@@ -563,7 +578,7 @@ know which cluster you want to interact with.
          </p>
          <div class="highlight-bash notranslate">
           <div class="highlight">
-           <pre><span></span>$ flux-cloud run
+           <pre><span></span>$<span class="w"> </span>flux-cloud<span class="w"> </span>run
 </pre>
           </div>
          </div>
@@ -572,7 +587,7 @@ know which cluster you want to interact with.
          </p>
          <div class="highlight-bash notranslate">
           <div class="highlight">
-           <pre><span></span>$ flux-cloud run --force-cluster
+           <pre><span></span>$<span class="w"> </span>flux-cloud<span class="w"> </span>run<span class="w"> </span>--force-cluster
 </pre>
           </div>
          </div>
@@ -581,7 +596,7 @@ know which cluster you want to interact with.
          </p>
          <div class="highlight-bash notranslate">
           <div class="highlight">
-           <pre><span></span>$ flux-cloud run -e n1-standard-1-2 --force
+           <pre><span></span>$<span class="w"> </span>flux-cloud<span class="w"> </span>run<span class="w"> </span>-e<span class="w"> </span>n1-standard-1-2<span class="w"> </span>--force
 </pre>
           </div>
          </div>
@@ -591,9 +606,9 @@ each of “up” “apply” and “down”:
          </p>
          <div class="highlight-bash notranslate">
           <div class="highlight">
-           <pre><span></span>$ flux-cloud up -e n1-standard-1-2
-$ flux-cloud apply -e n1-standard-1-2
-$ flux-cloud down -e n1-standard-1-2
+           <pre><span></span>$<span class="w"> </span>flux-cloud<span class="w"> </span>up<span class="w"> </span>-e<span class="w"> </span>n1-standard-1-2
+$<span class="w"> </span>flux-cloud<span class="w"> </span>apply<span class="w"> </span>-e<span class="w"> </span>n1-standard-1-2
+$<span class="w"> </span>flux-cloud<span class="w"> </span>down<span class="w"> </span>-e<span class="w"> </span>n1-standard-1-2
 </pre>
           </div>
          </div>
@@ -613,7 +628,7 @@ we will either select the first in the matrix (default):
           </p>
           <div class="highlight-bash notranslate">
            <div class="highlight">
-            <pre><span></span>$ flux-cloud up
+            <pre><span></span>$<span class="w"> </span>flux-cloud<span class="w"> </span>up
 </pre>
            </div>
           </div>
@@ -628,7 +643,7 @@ we will either select the first in the matrix (default):
           </p>
           <div class="highlight-bash notranslate">
            <div class="highlight">
-            <pre><span></span>$ flux-cloud up -e n1-standard-1-2
+            <pre><span></span>$<span class="w"> </span>flux-cloud<span class="w"> </span>up<span class="w"> </span>-e<span class="w"> </span>n1-standard-1-2
 </pre>
            </div>
           </div>
@@ -643,7 +658,7 @@ we will either select the first in the matrix (default):
           </p>
           <div class="highlight-bash notranslate">
            <div class="highlight">
-            <pre><span></span>$ flux-cloud up -e n1-standard-1-2 --force-cluster
+            <pre><span></span>$<span class="w"> </span>flux-cloud<span class="w"> </span>up<span class="w"> </span>-e<span class="w"> </span>n1-standard-1-2<span class="w"> </span>--force-cluster
 </pre>
            </div>
           </div>
@@ -661,7 +676,7 @@ we will either select the first in the matrix (default):
          </p>
          <div class="highlight-bash notranslate">
           <div class="highlight">
-           <pre><span></span>$ flux-cloud apply
+           <pre><span></span>$<span class="w"> </span>flux-cloud<span class="w"> </span>apply
 </pre>
           </div>
          </div>
@@ -671,7 +686,7 @@ first entry, otherwise we use the identifier you provide.
          </p>
          <div class="highlight-bash notranslate">
           <div class="highlight">
-           <pre><span></span>$ flux-cloud apply -e n1-standard-1-2
+           <pre><span></span>$<span class="w"> </span>flux-cloud<span class="w"> </span>apply<span class="w"> </span>-e<span class="w"> </span>n1-standard-1-2
 </pre>
           </div>
          </div>
@@ -680,7 +695,7 @@ first entry, otherwise we use the identifier you provide.
          </p>
          <div class="highlight-bash notranslate">
           <div class="highlight">
-           <pre><span></span>$ flux-cloud apply -e n1-standard-1-2 --force
+           <pre><span></span>$<span class="w"> </span>flux-cloud<span class="w"> </span>apply<span class="w"> </span>-e<span class="w"> </span>n1-standard-1-2<span class="w"> </span>--force
 </pre>
           </div>
          </div>
@@ -697,8 +712,8 @@ first entry, otherwise we use the identifier you provide.
          </p>
          <div class="highlight-bash notranslate">
           <div class="highlight">
-           <pre><span></span>$ flux-cloud down
-$ flux-cloud down -e n1-standard-1-2
+           <pre><span></span>$<span class="w"> </span>flux-cloud<span class="w"> </span>down
+$<span class="w"> </span>flux-cloud<span class="w"> </span>down<span class="w"> </span>-e<span class="w"> </span>n1-standard-1-2
 </pre>
           </div>
          </div>
@@ -707,7 +722,7 @@ $ flux-cloud down -e n1-standard-1-2
          </p>
          <div class="highlight-bash notranslate">
           <div class="highlight">
-           <pre><span></span>$ flux-cloud down --all
+           <pre><span></span>$<span class="w"> </span>flux-cloud<span class="w"> </span>down<span class="w"> </span>--all
 </pre>
           </div>
          </div>
@@ -722,7 +737,53 @@ $ flux-cloud down -e n1-standard-1-2
          </p>
          <div class="highlight-bash notranslate">
           <div class="highlight">
-           <pre><span></span>$ flux-cloud down --force-cluster
+           <pre><span></span>$<span class="w"> </span>flux-cloud<span class="w"> </span>down<span class="w"> </span>--force-cluster
+</pre>
+          </div>
+         </div>
+        </section>
+        <section id="debug">
+         <h2 id="debug">
+          debug
+          <a class="headerlink" href="#debug" title="Permalink to this heading">
+           ¶
+          </a>
+         </h2>
+         <p>
+          For any command, you can add
+          <code class="docutils literal notranslate">
+           <span class="pre">
+            --debug
+           </span>
+          </code>
+          as a main client argument to see additional information. E.g.,
+the cluster config created for eksctl:
+         </p>
+         <div class="highlight-bash notranslate">
+          <div class="highlight">
+           <pre><span></span>$<span class="w"> </span>flux-cloud<span class="w"> </span>--debug<span class="w"> </span>up
+</pre>
+          </div>
+         </div>
+         <div class="highlight-console notranslate">
+          <div class="highlight">
+           <pre><span></span><span class="go">No experiment ID provided, assuming first experiment m5.large-2.</span>
+<span class="go">apiVersion: eksctl.io/v1alpha5</span>
+<span class="go">kind: ClusterConfig</span>
+
+<span class="go">metadata:</span>
+<span class="go">  name: flux-cluster</span>
+<span class="go">  region: us-east-1</span>
+<span class="go">  version: 1.23</span>
+
+<span class="gp"># </span>availabilityZones:<span class="w"> </span><span class="o">[</span><span class="s2">"us-east-1a"</span>,<span class="w"> </span><span class="s2">"us-east-1b"</span>,<span class="w"> </span><span class="s2">"us-east-1d"</span><span class="o">]</span>
+<span class="go">managedNodeGroups:</span>
+<span class="go">  - name: workers</span>
+<span class="go">    instanceType: m5.large</span>
+<span class="go">    minSize: 2</span>
+<span class="go">    maxSize: 2</span>
+<span class="go">    labels: { "fluxoperator": "true" }</span>
+<span class="go">...</span>
 </pre>
           </div>
          </div>
@@ -777,7 +838,7 @@ however if the user decides to launch more than one, it might be harder. More th
        © Copyright 2022, Flux Developers.
       </div>
       Last updated on
-              Dec 31, 2022.
+              Jan 04, 2023.
       <br/>
       Created using
       <a href="http://www.sphinx-doc.org/">

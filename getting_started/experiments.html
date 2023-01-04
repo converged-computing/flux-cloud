@@ -343,6 +343,11 @@
                    </a>
                   </li>
                   <li class="md-nav__item">
+                   <a class="md-nav__link" href="#kubernetes">
+                    Kubernetes
+                   </a>
+                  </li>
+                  <li class="md-nav__item">
                    <a class="md-nav__link" href="#jobs">
                     Jobs
                    </a>
@@ -371,6 +376,11 @@
             <li class="md-nav__item">
              <a class="md-nav__link" href="google.html">
               Google Cloud
+             </a>
+            </li>
+            <li class="md-nav__item">
+             <a class="md-nav__link" href="aws.html">
+              AWS
              </a>
             </li>
            </ul>
@@ -438,6 +448,11 @@
              <li class="md-nav__item">
               <a class="md-nav__link" href="#minicluster-definition">
                MiniCluster Definition
+              </a>
+             </li>
+             <li class="md-nav__item">
+              <a class="md-nav__link" href="#kubernetes">
+               Kubernetes
               </a>
              </li>
              <li class="md-nav__item">
@@ -547,9 +562,9 @@ Let’s get started with talking about experiments. Your experiments will typica
           </p>
           <div class="highlight-yaml notranslate">
            <div class="highlight">
-            <pre><span></span><span class="nt">matrix</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">size</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">2</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">4</span><span class="p p-Indicator">]</span><span class="w"></span>
-<span class="w">  </span><span class="nt">machine</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"n1-standard-1"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"n1-standard-2"</span><span class="p p-Indicator">]</span><span class="w"></span>
+            <pre><span></span><span class="nt">matrix</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">size</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">2</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">4</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">machine</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"n1-standard-1"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"n1-standard-2"</span><span class="p p-Indicator">]</span>
 </pre>
            </div>
           </div>
@@ -571,9 +586,9 @@ The idea here is that we might want to run multiple jobs in the same container, 
           </p>
           <div class="highlight-yaml notranslate">
            <div class="highlight">
-            <pre><span></span><span class="nt">experiment</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span><span class="w"></span>
-<span class="w">  </span><span class="nt">machine</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">n1-standard-1</span><span class="w"></span>
+            <pre><span></span><span class="nt">experiment</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+<span class="w">  </span><span class="nt">machine</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">n1-standard-1</span>
 </pre>
            </div>
           </div>
@@ -591,9 +606,9 @@ to run (e.g., multiple Kubernetes cluster setups.)
           </p>
           <div class="highlight-yaml notranslate">
            <div class="highlight">
-            <pre><span></span><span class="nt">experiments</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span><span class="w"></span>
-<span class="w">    </span><span class="nt">machine</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">n1-standard-1</span><span class="w"></span>
+            <pre><span></span><span class="nt">experiments</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+<span class="w">    </span><span class="nt">machine</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">n1-standard-1</span>
 </pre>
            </div>
           </div>
@@ -615,13 +630,62 @@ As an example, here is setting a custom name and namespace:
          </p>
          <div class="highlight-yaml notranslate">
           <div class="highlight">
-           <pre><span></span><span class="c1"># Flux Mini Cluster experiment attributes</span><span class="w"></span>
-<span class="nt">minicluster</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">osu-benchmarks</span><span class="w"></span>
-<span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">flux-operator</span><span class="w"></span>
+           <pre><span></span><span class="c1"># Flux Mini Cluster experiment attributes</span>
+<span class="nt">minicluster</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">osu-benchmarks</span>
+<span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">flux-operator</span>
 </pre>
           </div>
          </div>
+        </section>
+        <section id="kubernetes">
+         <h2 id="kubernetes">
+          Kubernetes
+          <a class="headerlink" href="#kubernetes" title="Permalink to this heading">
+           ¶
+          </a>
+         </h2>
+         <p>
+          While it’s recommended to define defaults for Kubernetes (e.g., version) in your
+          <code class="docutils literal notranslate">
+           <span class="pre">
+            settings.yml
+           </span>
+          </code>
+          , you can one-off edit them
+via a “cluster” attribute in your
+          <code class="docutils literal notranslate">
+           <span class="pre">
+            experiments.yaml
+           </span>
+          </code>
+          . Unlike settings, this supports a field for “tags” that should be a list of strings:
+         </p>
+         <div class="highlight-yaml notranslate">
+          <div class="highlight">
+           <pre><span></span><span class="nt">cluster</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">"1.23"</span>
+<span class="w">  </span><span class="nt">tags</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lammps</span>
+</pre>
+          </div>
+         </div>
+         <p>
+          Note that the above is for a Google GKE cluster - tags is a single list of tags. For AWS EKS, you need to provide key value pairs:
+         </p>
+         <div class="highlight-yaml notranslate">
+          <div class="highlight">
+           <pre><span></span><span class="nt">cluster</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">"1.22"</span>
+<span class="w">  </span><span class="nt">tags</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">analysis=lammps</span>
+</pre>
+          </div>
+         </div>
+         <p>
+          This is validated at runtime when you create the cluster. For both, they are converted to comma separated values to provide
+to the command line client.
+         </p>
         </section>
         <section id="jobs">
          <h2 id="jobs">
@@ -639,29 +703,33 @@ where minimally “command” is required.
          </p>
          <div class="highlight-yaml notranslate">
           <div class="highlight">
-           <pre><span></span><span class="c1"># Each job can have a command and working directory</span><span class="w"></span>
-<span class="nt">jobs</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">osu_get_latency</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="s">'./osu_get_latency'</span><span class="w"></span>
+           <pre><span></span><span class="c1"># Each job can have a command and working directory</span>
+<span class="nt">jobs</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">osu_get_latency</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="s">'./osu_get_latency'</span>
 </pre>
           </div>
          </div>
          <p>
           If you have different working directories or container images, you can define that here:
+Note that each job can have a command (required) and working directory, image,
+and repeats (optional).
          </p>
          <div class="highlight-yaml notranslate">
           <div class="highlight">
-           <pre><span></span><span class="c1"># Each job can have a command and working directory</span><span class="w"></span>
-<span class="nt">jobs</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">osu_get_latency</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="s">'./osu_get_latency'</span><span class="w"></span>
-<span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ghcr.io/awesome/science:latest</span><span class="w"></span>
-<span class="w">    </span><span class="nt">workdir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/science</span><span class="w"></span>
+           <pre><span></span><span class="nt">jobs</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">osu_get_latency</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="s">'./osu_get_latency'</span>
+<span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ghcr.io/awesome/science:latest</span>
+<span class="w">    </span><span class="nt">workdir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/science</span>
+<span class="w">    </span><span class="nt">repeats</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
 </pre>
           </div>
          </div>
          <p>
-          Note that likely in the future we can provide a default template and require all these variables
+          For repeats, we add another level to the output directory, and represent the result data as
+subdirectories of the machine and size from 1..N. Note also that likely in the future we
+can provide a default template and require all these variables
 defined. For now we require you to provide the template.
          </p>
         </section>
@@ -687,29 +755,29 @@ for the command:
          </p>
          <div class="highlight-yaml notranslate">
           <div class="highlight">
-           <pre><span></span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">flux-framework.org/v1alpha1</span><span class="w"></span>
-<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MiniCluster</span><span class="w"></span>
-<span class="nt">metadata</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="w"> </span><span class="nv">minicluster.name</span><span class="w"> </span><span class="p p-Indicator">}}</span><span class="w"></span>
-<span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="w"> </span><span class="nv">minicluster.namespace</span><span class="w"> </span><span class="p p-Indicator">}}</span><span class="w"></span>
-<span class="nt">spec</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="c1"># localDeploy needs to be false</span><span class="w"></span>
-<span class="w">  </span><span class="nt">localDeploy</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w"></span>
+           <pre><span></span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">flux-framework.org/v1alpha1</span>
+<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MiniCluster</span>
+<span class="nt">metadata</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="w"> </span><span class="nv">minicluster.name</span><span class="w"> </span><span class="p p-Indicator">}}</span>
+<span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="w"> </span><span class="nv">minicluster.namespace</span><span class="w"> </span><span class="p p-Indicator">}}</span>
+<span class="nt">spec</span><span class="p">:</span>
+<span class="w">  </span><span class="c1"># localDeploy needs to be false</span>
+<span class="w">  </span><span class="nt">localDeploy</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
 
-<span class="w">  </span><span class="c1"># Number of pods to create for MiniCluster</span><span class="w"></span>
-<span class="w">  </span><span class="nt">size</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="w"> </span><span class="nv">size</span><span class="w"> </span><span class="p p-Indicator">}}</span><span class="w"></span>
+<span class="w">  </span><span class="c1"># Number of pods to create for MiniCluster</span>
+<span class="w">  </span><span class="nt">size</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="w"> </span><span class="nv">size</span><span class="w"> </span><span class="p p-Indicator">}}</span>
 
-<span class="w">  </span><span class="c1"># Disable verbose output</span><span class="w"></span>
-<span class="w">  </span><span class="nt">test</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"></span>
+<span class="w">  </span><span class="c1"># Disable verbose output</span>
+<span class="w">  </span><span class="nt">test</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 
-<span class="w">  </span><span class="c1"># This is a list because a pod can support multiple containers</span><span class="w"></span>
-<span class="w">  </span><span class="nt">containers</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="c1"># The container URI to pull (currently needs to be public)</span><span class="w"></span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ghcr.io/rse-ops/lammps:flux-sched-focal-v0.24.0</span><span class="w"></span>
+<span class="w">  </span><span class="c1"># This is a list because a pod can support multiple containers</span>
+<span class="w">  </span><span class="nt">containers</span><span class="p">:</span>
+<span class="w">    </span><span class="c1"># The container URI to pull (currently needs to be public)</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ghcr.io/rse-ops/lammps:flux-sched-focal-v0.24.0</span>
 
-<span class="w">      </span><span class="c1"># You can set the working directory if your container WORKDIR is not correct.</span><span class="w"></span>
-<span class="w">      </span><span class="nt">workingDir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/home/flux/examples/reaxff/HNS</span><span class="w"></span>
-<span class="w">      </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="w"> </span><span class="nv">job.command</span><span class="w"> </span><span class="p p-Indicator">}}</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># You can set the working directory if your container WORKDIR is not correct.</span>
+<span class="w">      </span><span class="nt">workingDir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/home/flux/examples/reaxff/HNS</span>
+<span class="w">      </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="w"> </span><span class="nv">job.command</span><span class="w"> </span><span class="p p-Indicator">}}</span>
 </pre>
           </div>
          </div>
@@ -760,7 +828,7 @@ for the command:
        © Copyright 2022, Flux Developers.
       </div>
       Last updated on
-              Dec 31, 2022.
+              Jan 04, 2023.
       <br/>
       Created using
       <a href="http://www.sphinx-doc.org/">
