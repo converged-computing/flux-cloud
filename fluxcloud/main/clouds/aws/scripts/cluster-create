@@ -129,7 +129,7 @@ if [[ "${FORCE_CLUSTER}" != "true" ]]; then
     prompt "Do you want to create this cluster?"
 fi
 
-run_echo eksctl create cluster --color fabulous -f ${CONFIG_FILE}
+run_echo eksctl create cluster -f ${CONFIG_FILE}
 
 # Show nodes
 run_echo kubectl get nodes

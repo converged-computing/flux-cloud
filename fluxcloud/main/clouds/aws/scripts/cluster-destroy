@@ -74,5 +74,5 @@ if [[ "${FORCE_CLUSTER}" != "true" ]]; then
     prompt "Are you sure you want to delete this cluster?"
 fi
 
-cmd="eksctl delete cluster --name=${CLUSTER_NAME} --region=${REGION} --wait --color=fabulous --force"
+cmd="eksctl delete cluster --name=${CLUSTER_NAME} --region=${REGION} --wait --force"
 run_echo ${cmd}

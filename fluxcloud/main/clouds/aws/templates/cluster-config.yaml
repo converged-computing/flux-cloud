@@ -20,4 +20,4 @@ managedNodeGroups:
       allow: true
       publicKeyPath: {{ ssh_key }}{% endif %}
     {% if private_networking %}privateNetworking: true{% endif %}
-    {% if efa_enabled }efaEnabled: true{% endif %}
+    {% if efa_enabled %}efaEnabled: true{% endif %}
