@@ -108,6 +108,9 @@ class AmazonCloud(ExperimentClient):
         values["size"] = setup.get_size(experiment)
         values["ssh_key"] = self.settings.aws.get("ssh_key")
 
+        # All extra custom variables
+        values["variables"] = experiment.get("variables", {})
+
         # Optional booleans
         for key in ["private_networking", "efa_enabled"]:
             value = self.settings.aws.get("private_networking")

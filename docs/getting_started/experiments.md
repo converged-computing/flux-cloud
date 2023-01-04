@@ -58,6 +58,20 @@ experiments:
 
 Note that it's a yaml list.
 
+### Custom Variables
+
+Each cloud provider is allowed to specify any number of custom variables, and these
+are available in the "variables" section. As an example, let's say we want to customize networking
+arguments for aws:
+
+```yaml
+variables:
+    private_networking: true
+    efa_enabled: true
+```
+
+You can look at each cloud page here to see what variables are known.
+
 ### MiniCluster Definition
 
 The minicluster is suggested to be defined, although it's not required (by default we will use the name and namespace in your settings).

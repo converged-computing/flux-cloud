@@ -19,5 +19,5 @@ managedNodeGroups:
     {% if ssh_key %}ssh:
       allow: true
       publicKeyPath: {{ ssh_key }}{% endif %}
-    {% if private_networking %}privateNetworking: true{% endif %}
-    {% if efa_enabled %}efaEnabled: true{% endif %}
+    {% if variables["private_networking"] %}privateNetworking: true{% endif %}
+    {% if variables["efa_enabled"] %}efaEnabled: true{% endif %}

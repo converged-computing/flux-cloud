@@ -15,7 +15,7 @@ schema_url = "http://json-schema.org/draft-07/schema"
 keyvals = {
     "type": "object",
     "patternProperties": {
-        "\\w[\\w-]*": {"type": "string"},
+        "\\w[\\w-]*": {"type": ["string", "number", "integer", "array"]},
     },
 }
 
