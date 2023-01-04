@@ -190,7 +190,6 @@ def expand_jobs(jobs):
     for jobname, job in jobs.items():
         if "repeats" in job:
             repeats = job["repeats"]
-            del job["repeats"]
             if repeats < 1:
                 raise ValueError(
                     f'"repeats" must be a positive number greater than 0. Found {repeats} for {job["command"]}'
