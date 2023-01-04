@@ -150,5 +150,33 @@ You can also use `--force-cluster` here:
 $ flux-cloud down --force-cluster
 ```
 
+## debug
+
+For any command, you can add `--debug` as a main client argument to see additional information. E.g.,
+the cluster config created for eksctl:
+
+```bash
+$ flux-cloud --debug up
+```
+```console
+No experiment ID provided, assuming first experiment m5.large-2.
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: flux-cluster
+  region: us-east-1
+  version: 1.23
+
+# availabilityZones: ["us-east-1a", "us-east-1b", "us-east-1d"]
+managedNodeGroups:
+  - name: workers
+    instanceType: m5.large
+    minSize: 2
+    maxSize: 2
+    labels: { "fluxoperator": "true" }
+...
+```
+
 And that's it! I think there might be a more elegant way to determine what cluster is running,
 however if the user decides to launch more than one, it might be harder. More thinking / docs / examples coming soon.

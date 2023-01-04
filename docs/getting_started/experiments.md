@@ -72,7 +72,7 @@ minicluster:
 
 ### Kubernetes
 
-While it's recommended to define defaults for Kuberentes (e.g., version) in your `settings.yml`, you can one-off edit them
+While it's recommended to define defaults for Kubernetes (e.g., version) in your `settings.yml`, you can one-off edit them
 via a "cluster" attribute in your `experiments.yaml`. Unlike settings, this supports a field for "tags" that should be a list of strings:
 
 ```yaml

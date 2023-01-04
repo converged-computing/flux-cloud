@@ -49,6 +49,8 @@ google_cloud_properties["project"] = {"type": ["null", "string"]}
 aws_cloud_properties = {
     "region": {"type": "string"},
     "machine": {"type": "string"},
+    "private_networking": {"type": ["null", "boolean"]},
+    "efa_enabled": {"type": ["null", "boolean"]},
     "ssh_key": {"type": ["string", "null"]},
 }
 

@@ -27,7 +27,8 @@ google:
   machine: n2-standard-1
   project: null
 
-
 aws:
   region: us-east-1
   machine: m5.large
+  private_networking: false
+  efa_enabled: false

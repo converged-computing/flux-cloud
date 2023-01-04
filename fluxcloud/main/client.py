@@ -32,11 +32,16 @@ class ExperimentClient:
         return str(self)
 
     @timed
-    def run_timed(self, name, cmd):
+    def run_timed(self, name, cmd, cleanup_func=None):
         """
         Run a timed command, and handle nonzero exit codes.
         """
         res = utils.run_command(cmd)
+
+        # An optional cleanup function (also can run if not successful)
+        if cleanup_func is not None:
+            cleanup_func()
+
         if res.returncode != 0:
             raise ValueError("nonzero exit code, exiting.")
 
