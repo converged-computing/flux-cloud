@@ -338,6 +338,11 @@
                    </nav>
                   </li>
                   <li class="md-nav__item">
+                   <a class="md-nav__link" href="#custom-variables">
+                    Custom Variables
+                   </a>
+                  </li>
+                  <li class="md-nav__item">
                    <a class="md-nav__link" href="#minicluster-definition">
                     MiniCluster Definition
                    </a>
@@ -444,6 +449,11 @@
                 </li>
                </ul>
               </nav>
+             </li>
+             <li class="md-nav__item">
+              <a class="md-nav__link" href="#custom-variables">
+               Custom Variables
+              </a>
              </li>
              <li class="md-nav__item">
               <a class="md-nav__link" href="#minicluster-definition">
@@ -616,6 +626,30 @@ to run (e.g., multiple Kubernetes cluster setups.)
            Note that it’s a yaml list.
           </p>
          </section>
+        </section>
+        <section id="custom-variables">
+         <h2 id="custom-variables">
+          Custom Variables
+          <a class="headerlink" href="#custom-variables" title="Permalink to this heading">
+           ¶
+          </a>
+         </h2>
+         <p>
+          Each cloud provider is allowed to specify any number of custom variables, and these
+are available in the “variables” section. As an example, let’s say we want to customize networking
+arguments for aws:
+         </p>
+         <div class="highlight-yaml notranslate">
+          <div class="highlight">
+           <pre><span></span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">private_networking</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">    </span><span class="nt">efa_enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</pre>
+          </div>
+         </div>
+         <p>
+          You can look at each cloud page here to see what variables are known.
+         </p>
         </section>
         <section id="minicluster-definition">
          <h2 id="minicluster-definition">
@@ -828,7 +862,7 @@ for the command:
        © Copyright 2022, Flux Developers.
       </div>
       Last updated on
-              Jan 04, 2023.
+              Jan 05, 2023.
       <br/>
       Created using
       <a href="http://www.sphinx-doc.org/">
