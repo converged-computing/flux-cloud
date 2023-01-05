@@ -188,13 +188,22 @@ class ExperimentClient:
         """
         # The experiment is defined by the machine type and size
         experiment_dir = os.path.join(setup.outdir, experiment["id"])
+        if not os.path.exists(experiment_dir):
+            utils.mkdir_p(experiment_dir)
+
         meta_file = os.path.join(experiment_dir, "meta.json")
 
         # Load existing metadata, if we have it
         meta = {"times": self.times}
         if os.path.exists(meta_file):
             meta = utils.read_json(meta_file)
-            meta["times"].update(self.times)
+
+            # Don't update cluster-up/down if already here
+            frozen_keys = ["create-cluster", "destroy-cluster"]
+            for timekey, timevalue in self.times.items():
+                if timekey in meta and timekey in frozen_keys:
+                    continue
+                meta["times"][timekey] = timevalue
 
         # TODO we could add cost estimation here - data from cloud select
         for key, value in experiment.items():
