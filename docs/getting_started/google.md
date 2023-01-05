@@ -42,7 +42,7 @@ or you specify it with `--cloud` when you do run.
 Each experiment is defined by the matrix and variables in an `experiment.yaml` that is used to
 populate a `minicluster-template.yaml` that you can either provide, or use a template provided by the
 library. One of the goals of the Flux Cloud Experiment runner is not just to run things, but to
-provide this library for you to easily edit and use! Take a look at the [examples](../examples)
+provide this library for you to easily edit and use! Take a look at the [examples](https://github.com/converged-computing/flux-cloud/tree/main/examples)
 directory for a few that we provide. We will walk through a generic one here to launch
 an experiment on a Kubernetes cluster. Note that before doing this step you should
 have installed flux-cloud, along with kubectl and gcloud, and set your defaults (e.g., project zone)

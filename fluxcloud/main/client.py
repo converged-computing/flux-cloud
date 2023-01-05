@@ -3,13 +3,12 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-import copy
 import os
 import shutil
 
 import fluxcloud.utils as utils
 from fluxcloud.logger import logger
-from fluxcloud.main.decorator import timed
+from fluxcloud.main.decorator import save_meta, timed
 
 here = os.path.dirname(os.path.abspath(__file__))
 
@@ -116,6 +115,7 @@ class ExperimentClient:
         """
         raise NotImplementedError
 
+    @save_meta
     def apply(self, setup, experiment):
         """
         Apply a CRD to run the experiment and wait for output.
@@ -182,11 +182,32 @@ class ExperimentClient:
             if os.path.exists(crd):
                 os.remove(crd)
 
-        # Save times and experiment metadata to file
-        # TODO we could add cost estimation here - data from cloud select
-        meta = copy.deepcopy(experiment)
-        meta["times"] = self.times
+    def save_experiment_metadata(self, setup, experiment):
+        """
+        Save experiment metadata, loading an existing meta.json, if present.
+        """
+        # The experiment is defined by the machine type and size
+        experiment_dir = os.path.join(setup.outdir, experiment["id"])
+        if not os.path.exists(experiment_dir):
+            utils.mkdir_p(experiment_dir)
+
         meta_file = os.path.join(experiment_dir, "meta.json")
+
+        # Load existing metadata, if we have it
+        meta = {"times": self.times}
+        if os.path.exists(meta_file):
+            meta = utils.read_json(meta_file)
+
+            # Don't update cluster-up/down if already here
+            frozen_keys = ["create-cluster", "destroy-cluster"]
+            for timekey, timevalue in self.times.items():
+                if timekey in meta and timekey in frozen_keys:
+                    continue
+                meta["times"][timekey] = timevalue
+
+        # TODO we could add cost estimation here - data from cloud select
+        for key, value in experiment.items():
+            meta[key] = value
         utils.write_json(meta, meta_file)
         self.clear_minicluster_times()
         return meta

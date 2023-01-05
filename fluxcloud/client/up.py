@@ -16,7 +16,10 @@ def main(args, parser, extra, subparser):
 
     cli = get_experiment_client(args.cloud)
     setup = ExperimentSetup(
-        args.experiments, quiet=True, force_cluster=args.force_cluster
+        args.experiments,
+        quiet=True,
+        force_cluster=args.force_cluster,
+        outdir=args.output_dir,
     )
 
     # Update config settings on the fly

@@ -4,6 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from fluxcloud.main.client import ExperimentClient
+from fluxcloud.main.decorator import save_meta
 
 
 class GoogleCloud(ExperimentClient):
@@ -24,6 +25,7 @@ class GoogleCloud(ExperimentClient):
                 "Please provide your Google Cloud project in your settings.yml or flux-cloud set google:project <project>"
             )
 
+    @save_meta
     def up(self, setup, experiment=None):
         """
         Bring up a cluster
@@ -54,6 +56,7 @@ class GoogleCloud(ExperimentClient):
             cmd += ["--tags", ",".join(tags)]
         return self.run_timed("create-cluster", cmd)
 
+    @save_meta
     def down(self, setup, experiment=None):
         """
         Destroy a cluster
