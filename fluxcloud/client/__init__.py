@@ -189,7 +189,7 @@ flux-cloud config add cloud aws""",
             help="experiment ID to apply to (<machine>-<size>)",
         )
 
-    for command in run, apply:
+    for command in run, apply, up, down:
         command.add_argument(
             "-o",
             "--output-dir",

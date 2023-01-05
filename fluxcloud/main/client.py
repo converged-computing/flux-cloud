@@ -201,6 +201,7 @@ class ExperimentClient:
             meta[key] = value
         utils.write_json(meta, meta_file)
         self.clear_minicluster_times()
+        return meta
 
     def clear_minicluster_times(self):
         """
