@@ -3,7 +3,6 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-import copy
 import os
 import shutil
 
@@ -182,14 +181,27 @@ class ExperimentClient:
             if os.path.exists(crd):
                 os.remove(crd)
 
-        # Save times and experiment metadata to file
-        # TODO we could add cost estimation here - data from cloud select
-        meta = copy.deepcopy(experiment)
-        meta["times"] = self.times
+        return self.save_experiment_metadata(setup, experiment)
+
+    def save_experiment_metadata(self, setup, experiment):
+        """
+        Save experiment metadata, loading an existing meta.json, if present.
+        """
+        # The experiment is defined by the machine type and size
+        experiment_dir = os.path.join(setup.outdir, experiment["id"])
         meta_file = os.path.join(experiment_dir, "meta.json")
+
+        # Load existing metadata, if we have it
+        meta = {"times": self.times}
+        if os.path.exists(meta_file):
+            meta = utils.read_json(meta_file)
+            meta["times"].update(self.times)
+
+        # TODO we could add cost estimation here - data from cloud select
+        for key, value in experiment.items():
+            meta[key] = value
         utils.write_json(meta, meta_file)
         self.clear_minicluster_times()
-        return meta
 
     def clear_minicluster_times(self):
         """
