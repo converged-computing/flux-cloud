@@ -10,6 +10,7 @@ import jinja2
 import fluxcloud.utils as utils
 from fluxcloud.logger import logger
 from fluxcloud.main.client import ExperimentClient
+from fluxcloud.main.decorator import save_meta
 
 here = os.path.dirname(os.path.abspath(__file__))
 
@@ -28,6 +29,7 @@ class AmazonCloud(ExperimentClient):
         # This could eventually just be provided
         self.config_template = os.path.join(here, "templates", "cluster-config.yaml")
 
+    @save_meta
     def up(self, setup, experiment=None):
         """
         Bring up a cluster
@@ -121,6 +123,7 @@ class AmazonCloud(ExperimentClient):
         logger.debug(result)
         return result
 
+    @save_meta
     def down(self, setup, experiment=None):
         """
         Destroy a cluster
@@ -138,4 +141,5 @@ class AmazonCloud(ExperimentClient):
         ]
         if setup.force_cluster:
             cmd.append("--force-cluster")
-        return self.run_timed("destroy-cluster", cmd)
+        self.run_timed("destroy-cluster", cmd)
+        return self.save_experiment_metadata(setup, experiment)

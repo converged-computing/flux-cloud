@@ -8,7 +8,7 @@ import shutil
 
 import fluxcloud.utils as utils
 from fluxcloud.logger import logger
-from fluxcloud.main.decorator import timed
+from fluxcloud.main.decorator import save_meta, timed
 
 here = os.path.dirname(os.path.abspath(__file__))
 
@@ -115,6 +115,7 @@ class ExperimentClient:
         """
         raise NotImplementedError
 
+    @save_meta
     def apply(self, setup, experiment):
         """
         Apply a CRD to run the experiment and wait for output.
@@ -180,8 +181,6 @@ class ExperimentClient:
             # Clean up temporary crd if we get here
             if os.path.exists(crd):
                 os.remove(crd)
-
-        return self.save_experiment_metadata(setup, experiment)
 
     def save_experiment_metadata(self, setup, experiment):
         """
