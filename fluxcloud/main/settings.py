@@ -98,7 +98,7 @@ class UserSettings:
                 "No editors found! Update with fluxcloud config set config_editor:<name>"
             )
 
-        utils.run_command([editor, settings_file], stream=True)
+        utils.run_command([editor, settings_file])
 
     def _find_editor(self, path):
         """
