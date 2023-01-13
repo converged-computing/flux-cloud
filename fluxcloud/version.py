@@ -1,7 +1,7 @@
-# Copyright 2022 Lawrence Livermore National Security, LLC
+# Copyright 2022-2023 Lawrence Livermore National Security, LLC
 # SPDX-License-Identifier: Apache-2.0
 
-__version__ = "0.0.13"
+__version__ = "0.1.0"
 AUTHOR = "Vanessa Sochat"
 EMAIL = "vsoch@users.noreply.github.com"
 NAME = "flux-cloud"

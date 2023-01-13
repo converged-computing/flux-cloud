@@ -1,4 +1,4 @@
-# Copyright 2022 Lawrence Livermore National Security, LLC and other
+# Copyright 2022-2023 Lawrence Livermore National Security, LLC and other
 # This is part of Flux Framework. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: Apache-2.0
@@ -80,7 +80,7 @@ class ExperimentSetup:
             logger.warning("Matrix found - will use first entry.")
         return self.matrices[0]
 
-    def generate_crd(self, experiment, job):
+    def generate_crd(self, experiment, job, minicluster_size):
         """
         Given an experiment, generate the custom resource definition for it.
         """
@@ -90,12 +90,22 @@ class ExperimentSetup:
         # If the experiment doesn't define a minicluster, add our default
         if "minicluster" not in experiment:
             experiment["minicluster"] = self.settings.minicluster
+
+        # Update minicluster size to the one we want
+        experiment["minicluster"]["size"] = minicluster_size
+
         if "jobs" in experiment:
             del experiment["jobs"]
         experiment["job"] = job
         result = template.render(**experiment)
         logger.debug(result)
         return result
+
+    def get_experiment_directory(self, experiment):
+        """
+        Consistent means to get experiment.
+        """
+        return os.path.join(self.outdir, experiment["id"])
 
     @property
     def outdir(self):
@@ -122,6 +132,8 @@ class ExperimentSetup:
         minicluster = experiment.get("minicluster") or self.settings.minicluster
         if "namespace" not in minicluster or not minicluster["namespace"]:
             minicluster["namespace"] = defaults.default_namespace
+        if "size" not in minicluster:
+            minicluster["size"] = [experiment["size"]]
         return minicluster
 
     def get_machine(self, experiment):
@@ -179,10 +191,15 @@ def expand_experiments(experiments):
 
 def add_experiment_ids(matrix):
     """
-    Add experiment identifiers based on machine and size.
+    Add experiment identifiers based on machine.
+
+    The size is for the kubernetes cluster
     """
     for entry in matrix:
-        entry["id"] = f"{entry['machine']}-{entry['size']}"
+        if "machine" not in entry:
+            entry["id"] = f"k8s-size-{entry['size']}-local"
+        else:
+            entry["id"] = f"k8s-size-{entry['size']}-{entry['machine']}"
     return matrix
 
 

@@ -1,4 +1,4 @@
-# Copyright 2022 Lawrence Livermore National Security, LLC and other
+# Copyright 2022-2023 Lawrence Livermore National Security, LLC and other
 # This is part of Flux Framework. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: Apache-2.0
@@ -67,7 +67,8 @@ class ExperimentClient:
         Determine if all jobs are already run in an experiment
         """
         # The experiment is defined by the machine type and size
-        experiment_dir = os.path.join(setup.outdir, experiment["id"])
+        experiment_dir = setup.get_experiment_directory(experiment)
+        minicluster = setup.get_minicluster(experiment)
 
         # One run per job (command)
         jobs = experiment.get("jobs", [])
@@ -78,13 +79,19 @@ class ExperimentClient:
             return True
 
         # If all job output files exist, experiment is considered run
-        for jobname, _ in jobs.items():
-            job_output = os.path.join(experiment_dir, jobname)
-            logfile = os.path.join(job_output, "log.out")
+        for size in minicluster["size"]:
 
-            # Do we have output?
-            if not os.path.exists(logfile):
-                return False
+            # Jobname is used for output
+            for jobname, _ in jobs.items():
+
+                # Add the size
+                jobname = f"{jobname}-minicluster-size-{size}"
+                job_output = os.path.join(experiment_dir, jobname)
+                logfile = os.path.join(job_output, "log.out")
+
+                # Do we have output?
+                if not os.path.exists(logfile):
+                    return False
         return True
 
     def run(self, setup):
@@ -101,7 +108,7 @@ class ExperimentClient:
             # Don't bring up a cluster if experiments already run!
             if not setup.force and self.experiment_is_run(setup, experiment):
                 logger.info(
-                    f"Experiment {experiment['id']} was already run and force is False, skipping."
+                    f"Experiment on machine {experiment['id']} was already run and force is False, skipping."
                 )
                 continue
 
@@ -130,67 +137,78 @@ class ExperimentClient:
         apply_script = self.get_shared_script("minicluster-run")
 
         jobs = experiment.get("jobs", [])
+
+        # The MiniCluster can vary on size
         minicluster = setup.get_minicluster(experiment)
         if not jobs:
             logger.warning(f"Experiment {experiment} has no jobs, nothing to run.")
             return
 
         # The experiment is defined by the machine type and size
-        experiment_dir = os.path.join(setup.outdir, experiment["id"])
+        experiment_dir = setup.get_experiment_directory(experiment)
 
-        # Jobname is used for output
-        for jobname, job in jobs.items():
+        # Iterate through all the cluster sizes
+        # NOTE if this changes here, also check self.experiment_is_run
+        for size in minicluster["size"]:
 
-            job_output = os.path.join(experiment_dir, jobname)
-            logfile = os.path.join(job_output, "log.out")
+            # Jobname is used for output
+            for jobname, job in jobs.items():
 
-            # Do we have output?
-            if os.path.exists(logfile) and not setup.force:
-                logger.warning(
-                    f"{logfile} already exists and force is False, skipping."
-                )
-                continue
-            elif os.path.exists(logfile) and setup.force:
-                logger.warning(f"Cleaning up previous run in {job_output}.")
-                shutil.rmtree(job_output)
+                # Add the size
+                jobname = f"{jobname}-minicluster-size-{size}"
+                job_output = os.path.join(experiment_dir, jobname)
+                logfile = os.path.join(job_output, "log.out")
 
-            # Create job directory anew
-            utils.mkdir_p(job_output)
+                # Any custom commands to run first?
+                if hasattr(self, "pre_apply"):
+                    self.pre_apply(experiment, jobname, job)
 
-            # Generate the populated crd from the template
-            template = setup.generate_crd(experiment, job)
+                # Do we have output?
+                if os.path.exists(logfile) and not setup.force:
+                    logger.warning(
+                        f"{logfile} already exists and force is False, skipping."
+                    )
+                    continue
+                elif os.path.exists(logfile) and setup.force:
+                    logger.warning(f"Cleaning up previous run in {job_output}.")
+                    shutil.rmtree(job_output)
 
-            # Write to a temporary file
-            crd = utils.get_tmpfile(prefix="minicluster-", suffix=".yaml")
-            utils.write_file(template, crd)
+                # Create job directory anew
+                utils.mkdir_p(job_output)
 
-            # Apply the job, and save to output directory
-            cmd = [
-                apply_script,
-                "--apply",
-                crd,
-                "--logfile",
-                logfile,
-                "--namespace",
-                minicluster["namespace"],
-                "--job",
-                minicluster["name"],
-            ]
-            self.run_timed(f"{self.job_prefix}-{jobname}", cmd)
+                # Generate the populated crd from the template
+                template = setup.generate_crd(experiment, job, size)
 
-            # Clean up temporary crd if we get here
-            if os.path.exists(crd):
-                os.remove(crd)
+                # Write to a temporary file
+                crd = utils.get_tmpfile(prefix="minicluster-", suffix=".yaml")
+                utils.write_file(template, crd)
+
+                # Apply the job, and save to output directory
+                cmd = [
+                    apply_script,
+                    "--apply",
+                    crd,
+                    "--logfile",
+                    logfile,
+                    "--namespace",
+                    minicluster["namespace"],
+                    "--job",
+                    minicluster["name"],
+                ]
+                self.run_timed(f"{self.job_prefix}-{jobname}", cmd)
+
+                # Clean up temporary crd if we get here
+                if os.path.exists(crd):
+                    os.remove(crd)
 
     def save_experiment_metadata(self, setup, experiment):
         """
         Save experiment metadata, loading an existing meta.json, if present.
         """
         # The experiment is defined by the machine type and size
-        experiment_dir = os.path.join(setup.outdir, experiment["id"])
+        experiment_dir = setup.get_experiment_directory(experiment)
         if not os.path.exists(experiment_dir):
             utils.mkdir_p(experiment_dir)
-
         meta_file = os.path.join(experiment_dir, "meta.json")
 
         # Load existing metadata, if we have it

@@ -1,4 +1,4 @@
-# Copyright 2022 Lawrence Livermore National Security, LLC and other
+# Copyright 2022-2023 Lawrence Livermore National Security, LLC and other
 # This is part of Flux Framework. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: Apache-2.0
@@ -52,6 +52,7 @@ aws_cloud_properties = {
     "private_networking": {"type": ["null", "boolean"]},
     "efa_enabled": {"type": ["null", "boolean"]},
     "ssh_key": {"type": ["string", "null"]},
+    "availability_zones": {"type": "array", "items": {"type": "string"}},
 }
 
 kubernetes_properties = {"version": {"type": "string"}}
@@ -66,6 +67,7 @@ kubernetes_cluster_properties = {
 minicluster_properties = {
     "name": {"type": "string"},
     "namespace": {"type": "string"},
+    "size": {"items": {"type": "number"}, "type": "array"},
 }
 minicluster = {
     "type": "object",
@@ -73,7 +75,6 @@ minicluster = {
     "additionalProperties": False,
     "required": ["name", "namespace"],
 }
-
 
 operator_properties = {
     "repository": {"type": "string"},
@@ -119,7 +120,7 @@ single_experiment = {
     "type": "object",
     "properties": single_experiment_properties,
     "additionalProperties": False,
-    "required": ["machine", "size"],
+    "required": ["size"],
 }
 
 experiment_schema = {
@@ -148,7 +149,7 @@ experiment_schema = {
                     "items": {"type": ["number", "boolean", "string"]},
                 }
             },
-            "required": ["machine", "size"],
+            "required": ["size"],
         },
     },
     "additionalProperties": False,

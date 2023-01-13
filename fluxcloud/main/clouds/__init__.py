@@ -1,8 +1,14 @@
 from .aws import AmazonCloud
 from .google import GoogleCloud
+from .local import MiniKube
 
 # backends = {"aws": AmazonCloud}
-clouds = {"google": GoogleCloud, "gcp": GoogleCloud, "aws": AmazonCloud}
+clouds = {
+    "google": GoogleCloud,
+    "gcp": GoogleCloud,
+    "aws": AmazonCloud,
+    "minikube": MiniKube,
+}
 cloud_names = list(clouds)
 
 

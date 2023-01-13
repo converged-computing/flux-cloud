@@ -14,6 +14,9 @@ and **Merged pull requests**. Critical items to know are:
 The versions coincide with releases on pip. Only major versions will be released as tags on Github.
 
 ## [0.0.x](https://github.com/converged-computing/flux-cloud/tree/main) (0.0.x)
+ - bug with config edit, and adding support for settings availability zones (0.1.0)
+   - refactor of experiment design to handle separate minicluster size
+   - add support for running experiments with local (MiniKube)
  - support for custom cloud variables in the experiments config (0.0.13)
  - support for Amazon EKS and running commands over iterations (0.0.12)
  - better control of exit codes, addition of force cluster (0.0.11)

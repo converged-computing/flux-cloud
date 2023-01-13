@@ -24,7 +24,9 @@ class AmazonCloud(ExperimentClient):
 
     def __init__(self, **kwargs):
         super(AmazonCloud, self).__init__(**kwargs)
-        self.region = kwargs.get("region") or "us-east-1"
+        self.region = (
+            kwargs.get("region") or self.settings.aws.get("region") or "us-east-1"
+        )
 
         # This could eventually just be provided
         self.config_template = os.path.join(here, "templates", "cluster-config.yaml")
@@ -109,6 +111,7 @@ class AmazonCloud(ExperimentClient):
         values["kubernetes_version"] = setup.settings.kubernetes["version"]
         values["size"] = setup.get_size(experiment)
         values["ssh_key"] = self.settings.aws.get("ssh_key")
+        values["availability_zones"] = self.settings.aws.get("availability_zones") or []
 
         # All extra custom variables
         values["variables"] = experiment.get("variables", {})

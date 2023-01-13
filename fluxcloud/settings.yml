@@ -1,7 +1,7 @@
 # Defaults for flux-cloud
 
-# clouds that are supported
-clouds: [google, aws]
+# clouds (or backends) that are supported
+clouds: [google, aws, local]
 
 # config editor
 config_editor: vim
@@ -28,7 +28,8 @@ google:
   project: null
 
 aws:
-  region: us-east-1
+  region: us-east-2
   machine: m5.large
   private_networking: false
   efa_enabled: false
+  availability_zones: ["us-east-2a", "us-east-2b"]

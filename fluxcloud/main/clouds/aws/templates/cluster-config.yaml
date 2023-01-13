@@ -9,7 +9,7 @@ metadata:
     "{{ tag[0] }}": "{{ tag[1] }}"
     {% endfor %}{% endif %}
 
-# availabilityZones: ["us-east-1a", "us-east-1b", "us-east-1d"]
+availabilityZones: [{% for zone in availability_zones %}"{{ zone }}"{% if loop.last %}{% else %}.{% endif %}{% endfor %}]
 managedNodeGroups:
   - name: workers
     instanceType: {{ machine }}
