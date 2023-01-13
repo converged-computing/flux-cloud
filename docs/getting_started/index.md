@@ -13,4 +13,5 @@ experiments
 settings
 google
 aws
+minikube
 ```

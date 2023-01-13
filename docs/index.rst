@@ -1,6 +1,9 @@
-# Flux-Cloud
+:hide-navigation:
 
-![Flux Cloud Logo](images/logo-transparent.png)
+Flux-Cloud
+==========
+
+.. image:: images/logo-transparent.png
 
 Welcome to the Flux Cloud Documentation!
 
@@ -17,11 +20,12 @@ and save the output, and bring it down. This is what flux cloud does! With Flux 
 
 For all of the above, you can either run with one command `flux-cloud run` or break into three:
 
-```bash
-$ flux-cloud up
-$ flux-cloud apply
-$ flux-cloud down
-```
+.. code-block:: console
+
+    $ flux-cloud up
+    $ flux-cloud apply
+    $ flux-cloud down
+
 
 And given any failure of a command, you are given the option to try again or exit and cancel. E.g.,
 when you are developing, you can run "apply" and then easily debug until you are done and ready to bring the cluster
@@ -37,15 +41,16 @@ To get started, check out the links below!
 Would you like to request a feature or contribute?
 [Open an issue](https://github.com/flux-framework/flux-cloud/issues).
 
-```{toctree}
-:caption: Getting Started
-:maxdepth: 1
-getting_started/index.md
-```
 
-```{toctree}
-:caption: About
-:maxdepth: 1
-contributing.md
-about/license
-```
+.. toctree::
+  :caption: Getting Started
+  :maxdepth: 1
+
+  getting_started/index.md
+
+.. toctree::
+  :caption: About
+  :maxdepth: 1
+
+  contributing.md
+  about/license

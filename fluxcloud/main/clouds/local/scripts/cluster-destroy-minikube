@@ -1,0 +1,58 @@
+#!/bin/bash
+
+SHORT="f,h"
+LONG="force-cluster,help"
+OPTS=$(getopt -a -n create --options $SHORT --longoptions $LONG -- "$@")
+
+eval set -- "$OPTS"
+
+HERE=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+ROOT=$(dirname $(dirname ${HERE}))
+
+# Source shared helper scripts
+. $ROOT/shared/scripts/helpers.sh
+
+# Defaults
+FORCE_CLUSTER="false"
+
+function usage() {
+   echo "This is the MiniKube cluster destroyer."
+   echo "usage: cluster-destroy-minikube"
+}
+
+while :
+do
+  case "$1" in
+    -h | --help)
+      usage
+      exit 2
+      ;;
+    -f | --force-cluster)
+        FORCE_CLUSTER="true"
+        shift 1
+        ;;
+    --)
+      shift;
+      break
+      ;;
+    *)
+      echo "Unexpected option: $1"
+      ;;
+  esac
+done
+
+
+is_installed minikube
+is_installed yes
+
+# Check if it already exists
+minikube status
+retval=$?
+if [[ "${retval}" != "0" ]]; then
+    print_blue "There is no MiniKube cluster running."
+    echo
+    exit 0
+fi
+
+# No force option here
+run_echo minikube delete

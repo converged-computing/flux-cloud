@@ -16,7 +16,7 @@ We will walk through example experiment files here, along with a full set of fie
 
 You can choose one of the following:
 
- - A matrix of experiments, with sizes by machines
+ - A matrix of experiments, with sizes for machines and MiniClusters
  - A single experiment (ideal for a demo or one-off run)
  - A list of experiments (when you want >1 but not a matrix)
 
@@ -29,8 +29,8 @@ matrix:
   size: [2, 4]
   machine: ["n1-standard-1", "n1-standard-2"]
 ```
-
-This would run each size across each machine, for a total of 4 Kubernetes clusters created.
+Note that the sizes at this level indicate *the size of the Kubernetes cluster*. We
+will expand on this idea later. This would run each size across each machine, for a total of 4 Kubernetes clusters created.
 The number of custom resource (CRD) definitions applied to each one would vary based on the number of jobs.
 The idea here is that we might want to run multiple jobs in the same container, and size, and machine.
 
@@ -83,6 +83,28 @@ minicluster:
   name: osu-benchmarks
   namespace: flux-operator
 ```
+
+If you want your MiniCluster to use the full size of your cluster, then you can use the above. However, in many cases we
+might want to do the following
+
+1. Bring up a cluster of size 32
+2. For each of MiniCluster sizes `[2, 4, 8, 16, 32]` run an experiment.
+
+For the above, we would only want to bring up the Kubernetes cluster once,
+and then just vary the experiment size that we provide. To do this, we would
+add the size variable to our MiniCluster:
+
+```yaml
+# Flux Mini Cluster experiment attributes
+minicluster:
+  name: osu-benchmarks
+  namespace: flux-operator
+  size: [2, 4, 8, 16, 32]
+```
+
+And in fact this is an expected practice for an experiment where you want to be making
+comparisons across your MiniCluster sizes, as once you bring down a cluster it cannot
+be compared to another cluster that you bring up.
 
 ### Kubernetes
 
@@ -161,7 +183,7 @@ spec:
   localDeploy: false
 
   # Number of pods to create for MiniCluster
-  size: {{ size }}
+  size: {{ minicluster.size }}
 
   # Disable verbose output
   test: true
