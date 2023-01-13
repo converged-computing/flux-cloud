@@ -1,7 +1,7 @@
 # Defaults for flux-cloud
 
 # clouds (or backends) that are supported
-clouds: [google, aws, local]
+clouds: [google, aws, minikube]
 
 # config editor
 config_editor: vim
