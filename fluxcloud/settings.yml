@@ -7,7 +7,7 @@ clouds: [google, aws, minikube]
 config_editor: vim
 
 # Backend specific settings
-default_cloud: aws
+default_cloud: minikube
 
 # operator defaults
 operator:
