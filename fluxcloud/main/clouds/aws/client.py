@@ -111,7 +111,13 @@ class AmazonCloud(ExperimentClient):
         values["kubernetes_version"] = setup.settings.kubernetes["version"]
         values["size"] = setup.get_size(experiment)
         values["ssh_key"] = self.settings.aws.get("ssh_key")
-        values["availability_zones"] = self.settings.aws.get("availability_zones") or []
+        zones = self.settings.aws.get("availability_zones")
+
+        # If we don't have availability zones, provide a and b (min)
+        if not zones:
+            zones = ["%sa" % self.region, "%sb" % self.region]
+
+        values["availability_zones"] = zones
 
         # All extra custom variables
         values["variables"] = experiment.get("variables", {})
