@@ -3,6 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+import fluxcloud.utils as utils
 from fluxcloud.logger import logger
 from fluxcloud.main.client import ExperimentClient
 from fluxcloud.main.decorator import save_meta
@@ -45,14 +46,16 @@ class MiniKube(ExperimentClient):
             logger.warning('"image" not found in job, cannot pre-pull for MiniKube')
             return
 
-        cmd = ["minikube", "ssh", "docker", "pull", job["image"]]
-        pull_id = "pull-minikube-image-" + job["image"].replace("/", "-")
+        # Does minikube already have the image pulled?
+        existing = utils.run_capture(['minikube', 'image', 'ls'], True)
+        if job['image'] in existing['message']:
+            return
+
+        # cmd = ["minikube", "ssh", "docker", "pull", job["image"]]
+        cmd = ['minikube', 'image', 'load', job['image']]
 
         # Don't pull again if we've done it once
-        if pull_id in self.times:
-            logger.warning("Image already marked as pulled in run metadata.")
-            return
-        return self.run_timed(pull_id, cmd)
+        return self.run_command(cmd, capture=True)
 
     @save_meta
     def down(self, setup, experiment=None):

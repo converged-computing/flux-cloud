@@ -14,6 +14,7 @@ and **Merged pull requests**. Critical items to know are:
 The versions coincide with releases on pip. Only major versions will be released as tags on Github.
 
 ## [0.0.x](https://github.com/converged-computing/flux-cloud/tree/main) (0.0.x)
+ - support for adding a job size to a job (to only run on that minicluster size) (0.1.1)
  - bug with config edit, and adding support for settings availability zones (0.1.0)
    - refactor of experiment design to handle separate minicluster size
    - add support for running experiments with local (MiniKube)

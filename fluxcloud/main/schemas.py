@@ -26,6 +26,10 @@ job_spec = {
         "repeats": {"type": "number"},
         "workdir": {"type": "string"},
         "image": {"type": "string"},
+        "machine": {"type": "string"},
+        "machines": {"type": "array", "items": {"type": "string"}},
+        "size": {"type": "number"},
+        "sizes": {"type": "array", "items": {"type": "number"}},
     },
     "required": ["command"],
 }
