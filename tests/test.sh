@@ -35,9 +35,15 @@ output=$(mktemp -d -t ${name}-data-XXXXXX)
 # Quick helper script to run a test
 echo "flux-cloud run --cloud minikube --output ${output} --force-cluster"
 flux-cloud run --cloud minikube --output ${output} --force-cluster
+retval=$?
+
+if [[ "${retval}" != "0" ]]; then
+    echo "Issue running Flux Cloud, return value ${retval}"
+    exit ${retval}
+fi
 
 # Check output
-for filename in $(find ./data -type f -print); do 
+for filename in $(find ./data -type f -print); do
     echo "Checking $filename";
     suffix=$(echo ${filename:7})
     outfile="$output/$suffix"

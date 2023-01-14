@@ -109,7 +109,9 @@ class ExperimentClient:
 
                 # Do we want to run this job for this size and machine?
                 if not self.check_job_run(job, size, experiment):
-                    logger.debug(f'Skipping job {jobname} as does not match inclusion criteria.')
+                    logger.debug(
+                        f"Skipping job {jobname} as does not match inclusion criteria."
+                    )
                     continue
 
                 # Add the size
@@ -154,13 +156,21 @@ class ExperimentClient:
         """
         Determine if a job is marked for a MiniCluster size.
         """
-        if "sizes" in job and size not in job['sizes']:
+        if "sizes" in job and size not in job["sizes"]:
             return False
-        if "size" in job and job['size'] != size:
+        if "size" in job and job["size"] != size:
             return False
-        if "machine" in job and "machine" in experiment and job['machine'] != experiment['machine']:
+        if (
+            "machine" in job
+            and "machine" in experiment
+            and job["machine"] != experiment["machine"]
+        ):
             return False
-        if "machines" in job and "machine" in experiment and experiment['machine'] not in job['machines']:
+        if (
+            "machines" in job
+            and "machine" in experiment
+            and experiment["machine"] not in job["machines"]
+        ):
             return False
         return True
 
@@ -205,7 +215,9 @@ class ExperimentClient:
 
                 # Do we want to run this job for this size and machine?
                 if not self.check_job_run(job, size, experiment):
-                    logger.debug(f'Skipping job {jobname} as does not match inclusion criteria.')
+                    logger.debug(
+                        f"Skipping job {jobname} as does not match inclusion criteria."
+                    )
                     continue
 
                 # Add the size
@@ -220,7 +232,6 @@ class ExperimentClient:
                 # Do we have output?
                 if os.path.exists(logfile) and not setup.force:
                     logger.warning(
-
                         f"{logfile} already exists and force is False, skipping."
                     )
                     continue

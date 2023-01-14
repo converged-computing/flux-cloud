@@ -47,15 +47,15 @@ class MiniKube(ExperimentClient):
             return
 
         # Does minikube already have the image pulled?
-        existing = utils.run_capture(['minikube', 'image', 'ls'], True)
-        if job['image'] in existing['message']:
+        existing = utils.run_capture(["minikube", "image", "ls"], True)
+        if job["image"] in existing["message"]:
             return
 
         # cmd = ["minikube", "ssh", "docker", "pull", job["image"]]
-        cmd = ['minikube', 'image', 'load', job['image']]
+        cmd = ["minikube", "image", "load", job["image"]]
 
         # Don't pull again if we've done it once
-        return self.run_command(cmd, capture=True)
+        return self.run_command(cmd)
 
     @save_meta
     def down(self, setup, experiment=None):
