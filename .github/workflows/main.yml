@@ -40,6 +40,13 @@ jobs:
       with:
         go-version: ^1.18
 
+    - name: Install flux-cloud
+      run: |
+        conda create --quiet --name fc jinja2
+        echo "/usr/share/miniconda/bin" >> ${GITHUB_PATH}
+        source activate fc
+        pip install .[all]
+
     - name: Start minikube
       uses: medyagh/setup-minikube@697f2b7aaed5f70bf2a94ee21a4ec3dde7b12f92 # v0.0.9
 
