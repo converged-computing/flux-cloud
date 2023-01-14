@@ -45,6 +45,20 @@ class ExperimentClient:
         if res.returncode != 0:
             raise ValueError("nonzero exit code, exiting.")
 
+    def run_command(self, cmd, cleanup_func=None):
+        """
+        Run a timed command, and handle nonzero exit codes.
+        """
+        logger.debug("\nRunning Command:" + " ".join(cmd))
+        res = utils.run_command(cmd)
+
+        # An optional cleanup function (also can run if not successful)
+        if cleanup_func is not None:
+            cleanup_func()
+
+        if res.returncode != 0:
+            raise ValueError("nonzero exit code, exiting.")
+
     def __str__(self):
         return "[flux-cloud-client]"
 
@@ -91,7 +105,14 @@ class ExperimentClient:
                 continue
 
             # Jobname is used for output
-            for jobname, _ in jobs.items():
+            for jobname, job in jobs.items():
+
+                # Do we want to run this job for this size and machine?
+                if not self.check_job_run(job, size, experiment):
+                    logger.debug(
+                        f"Skipping job {jobname} as does not match inclusion criteria."
+                    )
+                    continue
 
                 # Add the size
                 jobname = f"{jobname}-minicluster-size-{size}"
@@ -131,6 +152,28 @@ class ExperimentClient:
         """
         raise NotImplementedError
 
+    def check_job_run(self, job, size, experiment):
+        """
+        Determine if a job is marked for a MiniCluster size.
+        """
+        if "sizes" in job and size not in job["sizes"]:
+            return False
+        if "size" in job and job["size"] != size:
+            return False
+        if (
+            "machine" in job
+            and "machine" in experiment
+            and job["machine"] != experiment["machine"]
+        ):
+            return False
+        if (
+            "machines" in job
+            and "machine" in experiment
+            and experiment["machine"] not in job["machines"]
+        ):
+            return False
+        return True
+
     @save_meta
     def apply(self, setup, experiment):
         """
@@ -169,6 +212,13 @@ class ExperimentClient:
 
             # Jobname is used for output
             for jobname, job in jobs.items():
+
+                # Do we want to run this job for this size and machine?
+                if not self.check_job_run(job, size, experiment):
+                    logger.debug(
+                        f"Skipping job {jobname} as does not match inclusion criteria."
+                    )
+                    continue
 
                 # Add the size
                 jobname = f"{jobname}-minicluster-size-{size}"

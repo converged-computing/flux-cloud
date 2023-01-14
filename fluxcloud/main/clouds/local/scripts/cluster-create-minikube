@@ -12,6 +12,14 @@ ROOT=$(dirname $(dirname ${HERE}))
 # Source shared helper scripts
 . $ROOT/shared/scripts/helpers.sh
 
+function install_operator() {
+    tmpfile=$(mktemp /tmp/flux-operator.XXXXXX.yaml)
+    rm -rf $tmpfile
+    run_echo wget -O $tmpfile https://raw.githubusercontent.com/${REPOSITORY}/${BRANCH}/examples/dist/flux-operator.yaml
+    kubectl apply -f $tmpfile
+    rm -rf $tmpfile
+}
+
 # Defaults
 CLUSTER_NAME="flux-cluster"
 CLUSTER_VERSION="1.23"
@@ -86,6 +94,7 @@ minikube status
 retval=$?
 if [[ "${retval}" == "0" ]]; then
     print_blue "A MiniKube cluster already exists."
+    install_operator
     echo
     exit 0
 fi
@@ -96,16 +105,10 @@ fi
 
 # Create the cluster
 run_echo minikube start --nodes=${SIZE}
+install_operator
 
 # Show nodes
 run_echo kubectl get nodes
-
-# Deploy the operator TODO should be variables here
-tmpfile=$(mktemp /tmp/flux-operator.XXXXXX.yaml)
-rm -rf $tmpfile
-run_echo wget -O $tmpfile https://raw.githubusercontent.com/${REPOSITORY}/${BRANCH}/examples/dist/flux-operator.yaml
-kubectl apply -f $tmpfile
-rm -rf $tmpfile
 
 run_echo kubectl get namespace
 run_echo kubectl describe namespace operator-system

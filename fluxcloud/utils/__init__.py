@@ -25,5 +25,6 @@ from .terminal import (
     confirm_uninstall,
     ensure_no_extra,
     get_installdir,
+    run_capture,
     run_command,
 )

@@ -34,7 +34,7 @@ def check_install(software, quiet=True, command="--version"):
     """
     cmd = [software, command]
     try:
-        version = run_command(cmd, software)
+        version = run_command(cmd)
     except Exception:
         return False
     if version:
