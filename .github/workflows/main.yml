@@ -43,7 +43,7 @@ jobs:
     - name: Install flux-cloud
       run: |
         conda create --quiet --name fc jinja2
-        echo "/usr/share/miniconda/bin" >> ${GITHUB_PATH}
+        export PATH="/usr/share/miniconda/bin:$PATH"
         source activate fc
         pip install .[all]
 
@@ -54,6 +54,8 @@ jobs:
       env:
         name: ${{ matrix.test }}
       run: |
+        export PATH="/usr/share/miniconda/bin:$PATH"
+        source activate fc
         export SHELL=/bin/bash
         eval $(minikube -p minikube docker-env)
         /bin/bash ./tests/test.sh ${name}
