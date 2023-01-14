@@ -35,7 +35,7 @@ class ExperimentClient:
         """
         Run a timed command, and handle nonzero exit codes.
         """
-        logger.debug(" ".join(cmd))
+        logger.debug("\nRunning Timed Command:" + " ".join(cmd))
         res = utils.run_command(cmd)
 
         # An optional cleanup function (also can run if not successful)
