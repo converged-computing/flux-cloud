@@ -35,6 +35,7 @@ class ExperimentClient:
         """
         Run a timed command, and handle nonzero exit codes.
         """
+        logger.debug(" ".join(cmd))
         res = utils.run_command(cmd)
 
         # An optional cleanup function (also can run if not successful)
@@ -54,6 +55,7 @@ class ExperimentClient:
         cloud = cloud or self.name
         script = os.path.join(here, "clouds", cloud, "scripts", name)
         if os.path.exists(script):
+            logger.debug(f"Found template script {script}")
             return script
 
     def get_shared_script(self, name):
@@ -80,6 +82,13 @@ class ExperimentClient:
 
         # If all job output files exist, experiment is considered run
         for size in minicluster["size"]:
+
+            # We can't run if the minicluster > the experiment size
+            if size > experiment["size"]:
+                logger.warning(
+                    f"Cluster of size {experiment['size']} cannot handle a MiniCluster of size {size}, not considering."
+                )
+                continue
 
             # Jobname is used for output
             for jobname, _ in jobs.items():
@@ -150,6 +159,13 @@ class ExperimentClient:
         # Iterate through all the cluster sizes
         # NOTE if this changes here, also check self.experiment_is_run
         for size in minicluster["size"]:
+
+            # We can't run if the minicluster > the experiment size
+            if size > experiment["size"]:
+                logger.warning(
+                    f"Cluster of size {experiment['size']} cannot handle a MiniCluster of size {size}, skipping."
+                )
+                continue
 
             # Jobname is used for output
             for jobname, job in jobs.items():
