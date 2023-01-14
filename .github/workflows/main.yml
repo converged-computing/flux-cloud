@@ -58,4 +58,6 @@ jobs:
         source activate fc
         export SHELL=/bin/bash
         eval $(minikube -p minikube docker-env)
+        # We need to delete the minikube cluster to bring it up again
+        flux-cloud down --force-cluster --cloud minikube
         /bin/bash ./tests/test.sh ${name}
