@@ -4,7 +4,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import fluxcloud.utils as utils
-from fluxcloud.logger import logger
 from fluxcloud.main import get_experiment_client
 from fluxcloud.main.experiment import ExperimentSetup
 
@@ -25,8 +24,4 @@ def main(args, parser, extra, subparser):
     # Update config settings on the fly
     cli.settings.update_params(args.config_params)
     setup.settings.update_params(args.config_params)
-
-    try:
-        cli.run(setup)
-    except Exception as e:
-        logger.exit(f"Issue with run: {e}")
+    cli.run(setup)

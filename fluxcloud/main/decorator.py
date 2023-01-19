@@ -34,8 +34,10 @@ class save_meta(Decorator):
         # experiment is either the second argument or a kwarg
         if "experiment" in kwargs:
             experiment = kwargs["experiment"]
-        else:
+        elif len(args) > 1:
             experiment = args[idx]
+        else:
+            experiment = None
 
         res = self.func(cls, *args, **kwargs)
         experiment = experiment or setup.get_single_experiment()
