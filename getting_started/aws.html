@@ -708,6 +708,9 @@ for Amazon in an <code class="docutils literal notranslate"><span class="pre">ex
 
 <span class="w">    </span><span class="c1"># Enable efa (requires efa also set under the container limits)</span>
 <span class="w">    </span><span class="nt">efa_enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+
+<span class="w">    </span><span class="c1"># Add a custom placement group name to your workers managed node group</span>
+<span class="w">    </span><span class="nt">placement_group</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">eks-efa-testing</span>
 </code></pre></div>
 </div>
 <p>Note that we currently take a simple approach for boolean values - if it’s present (e.g., the examples)
@@ -747,7 +750,7 @@ By default, results will be written to a temporary output directory, but you can
   <small>
     
       Last update:
-      Jan 14, 2023
+      Jan 19, 2023
     
   </small>
 </div>

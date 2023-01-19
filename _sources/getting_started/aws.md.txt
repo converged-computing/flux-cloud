@@ -57,7 +57,11 @@ variables:
 
     # Enable efa (requires efa also set under the container limits)
     efa_enabled: true
+
+    # Add a custom placement group name to your workers managed node group
+    placement_group: eks-efa-testing
 ```
+
 Note that we currently take a simple approach for boolean values - if it's present (e.g., the examples)
 above) it will be rendered as true. Don't put False in there, but rather just delete the key.
 
