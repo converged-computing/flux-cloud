@@ -110,8 +110,7 @@ class AmazonCloud(ExperimentClient):
         values["region"] = self.region
         values["machine"] = setup.get_machine(experiment)
         values["kubernetes_version"] = (
-            setup.get_cluster_version(experiment)
-            or self.settings.kubernetes["version"],
+            setup.get_cluster_version(experiment) or self.settings.kubernetes["version"]
         )
         values["size"] = setup.get_size(experiment)
         values["ssh_key"] = self.settings.aws.get("ssh_key")
