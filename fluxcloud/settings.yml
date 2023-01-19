@@ -20,7 +20,7 @@ minicluster:
   namespace: flux-operator
 
 kubernetes:
-  version: '1.22'
+  version: '1.23'
 
 google:
   zone: us-central1-a
@@ -32,4 +32,4 @@ aws:
   machine: m5.large
   private_networking: false
   efa_enabled: false
-  availability_zones: ["us-east-2a", "us-east-2b"]
+  availability_zones: ["us-east-2b", "us-east-2c"]
