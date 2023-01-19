@@ -21,3 +21,6 @@ managedNodeGroups:
       publicKeyPath: {{ ssh_key }}{% endif %}
     {% if variables["private_networking"] %}privateNetworking: true{% endif %}
     {% if variables["efa_enabled"] %}efaEnabled: true{% endif %}
+    # Assume for now we just have a placement group name
+    {% if variables["placement_group"] %}placement:
+      groupName: {{ variables["placement_group"] }}{% endif %}

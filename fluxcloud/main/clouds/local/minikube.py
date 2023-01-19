@@ -30,13 +30,14 @@ class MiniKube(ExperimentClient):
             "--cluster",
             setup.get_cluster_name(experiment),
             "--cluster-version",
-            setup.settings.kubernetes["version"],
+            setup.get_cluster_version(experiment)
+            or self.settings.kubernetes["version"],
             "--size",
             setup.get_size(experiment),
         ]
         if setup.force_cluster:
             cmd.append("--force-cluster")
-        return self.run_timed("create-cluster-minikube", cmd)
+        return self.run_timed("create-cluster", cmd)
 
     def pre_apply(self, experiment, jobname, job):
         """
@@ -73,4 +74,4 @@ class MiniKube(ExperimentClient):
         ]
         if setup.force_cluster:
             cmd.append("--force-cluster")
-        return self.run_timed("destroy-cluster-minikube", cmd)
+        return self.run_timed("destroy-cluster", cmd)

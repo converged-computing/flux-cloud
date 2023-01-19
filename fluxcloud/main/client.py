@@ -124,6 +124,7 @@ class ExperimentClient:
                     return False
         return True
 
+    @save_meta
     def run(self, setup):
         """
         Run Flux Operator experiments in GKE
@@ -146,6 +147,7 @@ class ExperimentClient:
             self.apply(setup, experiment=experiment)
             self.down(setup, experiment=experiment)
 
+    @save_meta
     def down(self, *args, **kwargs):
         """
         Destroy a cluster implemented by underlying cloud.
@@ -309,6 +311,7 @@ class ExperimentClient:
             times[key] = value
         self.times = times
 
+    @save_meta
     def up(self, *args, **kwargs):
         """
         Bring up a cluster implemented by underlying cloud.
