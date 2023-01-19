@@ -140,12 +140,16 @@ class ExperimentSetup:
         return experiment.get("machine") or self.settings.google["machine"]
 
     def get_tags(self, experiment):
-        return experiment.get("cluster", {}).get("tags")
+        return experiment.get("kubernetes", {}).get("tags")
 
     def get_cluster_name(self, experiment):
         return (
-            experiment.get("cluster", {}).get("name") or defaults.default_cluster_name
+            experiment.get("kubernetes", {}).get("name")
+            or defaults.default_cluster_name
         )
+
+    def get_cluster_version(self, experiment):
+        return experiment.get("kubernetes", {}).get("version")
 
     def validate(self):
         """

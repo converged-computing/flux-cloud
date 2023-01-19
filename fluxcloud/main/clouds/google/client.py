@@ -46,7 +46,8 @@ class GoogleCloud(ExperimentClient):
             "--cluster",
             setup.get_cluster_name(experiment),
             "--cluster-version",
-            setup.settings.kubernetes["version"],
+            setup.get_cluster_version(experiment)
+            or self.settings.kubernetes["version"],
             "--size",
             setup.get_size(experiment),
         ]

@@ -23,6 +23,8 @@ Code is under development and will be added soon! In the meantime, for early doc
 
 ## TODO
 
+ - we should not have bash scripts, generate templates instead.
+ - add avail zones to debug output
  - should have generic template provided by library
  - cloud-select could estimate the cost?
  - run and add more cluster examples

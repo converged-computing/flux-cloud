@@ -64,8 +64,8 @@ kubernetes_cluster_properties = {
     "tags": {
         "type": "array",
         "items": {"type": "string"},
-        "version": {"type": "string"},
     },
+    "version": {"type": "string"},
 }
 
 minicluster_properties = {
@@ -140,7 +140,7 @@ experiment_schema = {
         },
         "experiment": single_experiment,
         "minicluster": minicluster,
-        "cluster": {
+        "kubernetes": {
             "type": "object",
             "properties": kubernetes_cluster_properties,
             "additionalProperties": False,

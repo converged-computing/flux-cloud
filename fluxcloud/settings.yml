@@ -20,7 +20,7 @@ minicluster:
   namespace: flux-operator
 
 kubernetes:
-  version: '1.23'
+  version: '1.22'
 
 google:
   zone: us-central1-a
