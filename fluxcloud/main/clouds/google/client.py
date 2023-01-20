@@ -35,10 +35,16 @@ class GoogleCloud(ExperimentClient):
             "experiment": experiment,
             "setup": setup,
             "project": self.project,
-            "zone": self.zone,
+            "zone": self.get_zone(experiment),
         }
         create_script = experiment.get_script("cluster-create", self.name, kwargs)
         return self.run_timed("create-cluster", ["/bin/bash", create_script])
+
+    def get_zone(self, experiment):
+        """
+        Get the region - using the experiment first and defaulting to settings
+        """
+        return experiment.variables.get("zone") or self.zone
 
     @save_meta
     def down(self, setup, experiment=None):
@@ -46,6 +52,10 @@ class GoogleCloud(ExperimentClient):
         Destroy a cluster
         """
         experiment = experiment or setup.get_single_experiment()
-        kwargs = {"experiment": experiment, "setup": setup, "zone": self.zone}
+        kwargs = {
+            "experiment": experiment,
+            "setup": setup,
+            "zone": self.get_zone(experiment),
+        }
         destroy_script = experiment.get_script("cluster-destroy", self.name, kwargs)
         return self.run_timed("destroy-cluster", ["/bin/bash", destroy_script])

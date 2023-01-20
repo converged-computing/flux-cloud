@@ -15,6 +15,10 @@ The versions coincide with releases on pip. Only major versions will be released
 
 ## [0.0.x](https://github.com/converged-computing/flux-cloud/tree/main) (0.0.x)
  - add support for custom placement group name (0.1.12)
+   - experiment class to support better template rendering
+   - scripts are generated from templates (jinja2) without getopt
+   - scripts are saved to `<experiment-dir>/.scripts` unless `--cleanup` set
+   - more verbose debug about template generation
  - support for adding a job size to a job (to only run on that minicluster size) (0.1.1)
  - bug with config edit, and adding support for settings availability zones (0.1.0)
    - refactor of experiment design to handle separate minicluster size
