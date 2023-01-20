@@ -1,3 +1,6 @@
+#!/bin/bash
+
+# Source shared helper scripts
 # Colors
 red='\033[0;31m'
 green='\033[0;32m'
@@ -39,12 +42,18 @@ function is_installed () {
 
 function install_operator() {
     # Shared function to install the operator from a specific repository branch and cleanup
-    script_dir=${1}
-    repository=${2}
-    branch=${3}
-    tmpfile="${script_dir}/flux-operator.yaml"
+    repository=${1}
+    branch=${2}
+    cleanup=${3}
+    tmpfile=$(mktemp /tmp/flux-operator.XXXXXX.yaml)
+    rm -rf $tmpfile
     run_echo wget -O $tmpfile https://raw.githubusercontent.com/${REPOSITORY}/${BRANCH}/examples/dist/flux-operator.yaml
     kubectl apply -f $tmpfile
+    if [[ "${CLEANUP}" == "true" ]]; then
+        rm -rf $tmpfile
+    else
+        echo "Cleanup is false, keeping operator install file ${tmpfile}"
+    fi
 }
 
 
@@ -124,3 +133,21 @@ function with_exponential_backoff {
     fi
     return $exitcode
 }
+
+# Defaults - these are in the config but left here for information
+FORCE_CLUSTER="false"
+
+is_installed minikube
+is_installed yes
+
+# Check if it already exists
+minikube status
+retval=$?
+if [[ "${retval}" != "0" ]]; then
+    print_blue "There is no MiniKube cluster running."
+    echo
+    exit 0
+fi
+
+# No force option here
+run_echo minikube delete

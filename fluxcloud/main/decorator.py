@@ -41,7 +41,8 @@ class save_meta(Decorator):
 
         res = self.func(cls, *args, **kwargs)
         experiment = experiment or setup.get_single_experiment()
-        cls.save_experiment_metadata(setup, experiment)
+        experiment.save_metadata(cls.times)
+        cls.clear_minicluster_times()
         return res
 
 

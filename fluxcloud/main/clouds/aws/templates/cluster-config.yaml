@@ -2,23 +2,23 @@ apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 
 metadata:
-  name: {{ cluster_name }}
+  name: {{ experiment.cluster_name }}
   region: {{ region }}
-  version: "{{ kubernetes_version }}"
+  version: "{{ experiment.kubernetes_version }}"
   {% if tags %}tags:{% for tag in tags %}
     "{{ tag[0] }}": "{{ tag[1] }}"
     {% endfor %}{% endif %}
 
-availabilityZones: [{% for zone in availability_zones %}"{{ zone }}"{% if loop.last %}{% else %}, {% endif %}{% endfor %}]
+{% if variables['availability_zones'] %}availabilityZones: [{% for zone in variables['availability_zones'] %}"{{ zone }}"{% if loop.last %}{% else %}, {% endif %}{% endfor %}]{% endif %}
 managedNodeGroups:
   - name: workers
-    instanceType: {{ machine }}
-    minSize: {{ size }}
-    maxSize: {{ size }}
+    instanceType: {{ experiment.machine }}
+    minSize: {{ experiment.size }}
+    maxSize: {{ experiment.size }}
     labels: { "fluxoperator": "true" }
-    {% if ssh_key %}ssh:
+    {% if variables['ssh_key'] %}ssh:
       allow: true
-      publicKeyPath: {{ ssh_key }}{% endif %}
+      publicKeyPath: {{ variables['ssh_key'] }}{% endif %}
     {% if variables["private_networking"] %}privateNetworking: true{% endif %}
     {% if variables["efa_enabled"] %}efaEnabled: true{% endif %}
     # Assume for now we just have a placement group name

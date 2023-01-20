@@ -37,56 +37,31 @@ class AmazonCloud(ExperimentClient):
         Bring up a cluster
         """
         experiment = experiment or setup.get_single_experiment()
-        create_script = self.get_script("cluster-create")
 
         # ssh key if provided must exist
         ssh_key = self.settings.aws.get("ssh_key")
         if ssh_key and not os.path.exists(ssh_key):
             raise ValueError("ssh_key defined and does not exist: {ssh_key}")
 
-        tags = self.get_tags(experiment)
-
         # Create the cluster with creation script, write to temporary file
-        template = self.generate_config(setup, experiment)
-        config_file = utils.get_tmpfile(prefix="eksctl-config", suffix=".yaml")
-        utils.write_file(template, config_file)
-
-        # Most of these are not needed, but provided for terminal printing
-        # and consistent output with Google GKE runner
-        cmd = [
-            create_script,
-            "--region",
-            self.region,
-            "--machine",
-            setup.get_machine(experiment),
-            "--cluster",
-            setup.get_cluster_name(experiment),
-            "--cluster-version",
-            setup.get_cluster_version(experiment)
-            or self.settings.kubernetes["version"],
-            "--config",
-            config_file,
-            "--size",
-            setup.get_size(experiment),
-        ]
-        if setup.force_cluster:
-            cmd.append("--force-cluster")
-        if tags:
-            cmd += ["--tags", ",".join(tags)]
-
-        # Cleanup function to remove temporary file
-        def cleanup():
-            if os.path.exists(config_file):
-                os.remove(config_file)
-
-        return self.run_timed("create-cluster", cmd, cleanup)
+        config_file = self.generate_config(setup, experiment)
+        tags = ",".join(self.get_tags(experiment))
+        kwargs = {
+            "experiment": experiment,
+            "setup": setup,
+            "region": self.region,
+            "config_file": config_file,
+            "tags": tags,
+        }
+        create_script = experiment.get_script("cluster-create", self.name, kwargs)
+        return self.run_timed("create-cluster", ["/bin/bash", create_script])
 
     def get_tags(self, experiment):
         """
         Convert cluster tags into list of key value pairs
         """
         tags = {}
-        for tag in experiment.get("cluster", {}).get("tags") or []:
+        for tag in experiment.tags or []:
             if "=" not in tag:
                 raise ValueError(
                     f"Cluster tags must be provided in format key=value, found {tag}"
@@ -105,35 +80,40 @@ class AmazonCloud(ExperimentClient):
         template = jinja2.Template(utils.read_file(self.config_template))
         values = {}
 
-        # Cluster name, kubernetes version, and region
-        values["cluster_name"] = setup.get_cluster_name(experiment)
-        values["region"] = self.region
-        values["machine"] = setup.get_machine(experiment)
-        values["kubernetes_version"] = (
-            setup.get_cluster_version(experiment) or self.settings.kubernetes["version"]
-        )
-        values["size"] = setup.get_size(experiment)
-        values["ssh_key"] = self.settings.aws.get("ssh_key")
-        zones = self.settings.aws.get("availability_zones")
+        # Write to experiment scripts directory
+        config_file = os.path.join(experiment.script_dir, "exsctl-config.yaml")
+        if not os.path.exists(experiment.script_dir):
+            utils.mkdir_p(experiment.script_dir)
 
-        # If we don't have availability zones, provide a and b (min)
-        if not zones:
-            zones = ["%sa" % self.region, "%sb" % self.region]
+        # Experiment variables and custom variables
+        values = {
+            "experiment": experiment,
+            "setup": setup,
+            "region": self.region,
+            "variables": experiment.variables,
+            "tags": self.get_tags(experiment),
+        }
 
-        values["availability_zones"] = zones
+        # Optional booleans for settings, don't take preference over experiment
+        for key, value in self.settings.aws.get("variables", {}).items():
+            if value and key not in values["variables"]:
+                values["variables"][key] = value
 
-        # All extra custom variables
-        values["variables"] = experiment.get("variables", {})
+        # Add zones if not present!
+        if "availability_zones" not in values["variables"]:
+            values["variables"]["availability_zones"] = [
+                "%sa" % self.region,
+                "%sb" % self.region,
+            ]
 
-        # Optional booleans
-        for key in ["private_networking", "efa_enabled"]:
-            value = self.settings.aws.get("private_networking")
-            if value is True:
-                values[key] = value
+        # Show the user custom variables
+        for key, value in values["variables"].items():
+            logger.info(f"> Custom variable: {key}={value}")
 
         result = template.render(**values)
         logger.debug(result)
-        return result
+        utils.write_file(result, config_file)
+        return config_file
 
     @save_meta
     def down(self, setup, experiment=None):
@@ -141,17 +121,6 @@ class AmazonCloud(ExperimentClient):
         Destroy a cluster
         """
         experiment = experiment or setup.get_single_experiment()
-        destroy_script = self.get_script("cluster-destroy")
-
-        # Create the cluster with creation script
-        cmd = [
-            destroy_script,
-            "--region",
-            self.region,
-            "--cluster",
-            setup.get_cluster_name(experiment),
-        ]
-        if setup.force_cluster:
-            cmd.append("--force-cluster")
-        self.run_timed("destroy-cluster", cmd)
-        return self.save_experiment_metadata(setup, experiment)
+        kwargs = {"setup": setup, "experiment": experiment}
+        destroy_script = experiment.get_script("cluster-destroy", self.name, kwargs)
+        return self.run_timed("destroy-cluster", ["/bin/bash", destroy_script])

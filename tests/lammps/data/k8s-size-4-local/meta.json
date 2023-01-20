@@ -1,9 +1,9 @@
 {
     "times": {
-        "create-cluster-minikube": 110.994,
-        "minicluster-run-lmp-size-2-minicluster-size-2": 69.827,
-        "minicluster-run-lmp-size-4-minicluster-size-4": 68.203,
-        "destroy-cluster-minikube": 15.611
+        "destroy-cluster": 0.057,
+        "create-cluster": 83.118,
+        "minicluster-run-lmp-size-2-minicluster-size-2": 64.121,
+        "minicluster-run-lmp-size-4-minicluster-size-4": 62.662
     },
     "size": 4,
     "minicluster": {
@@ -25,6 +25,5 @@
             "image": "ghcr.io/rse-ops/lammps:flux-sched-focal-v0.24.0",
             "size": 4
         }
-    },
-    "id": "k8s-size-4-local"
+    }
 }

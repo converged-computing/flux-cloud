@@ -1,58 +1,15 @@
 #!/bin/bash
 
-SHORT="c:,z:,f,h"
-LONG="cluster:,zone:,force-cluster,help"
-OPTS=$(getopt -a -n create --options $SHORT --longoptions $LONG -- "$@")
-
-eval set -- "$OPTS"
-
-HERE=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-ROOT=$(dirname $(dirname ${HERE}))
-
 # Source shared helper scripts
-. $ROOT/shared/scripts/helpers.sh
+{% include "helpers.sh" %}
 
-# Defaults
-CLUSTER_NAME="flux-cluster"
-FORCE_CLUSTER="false"
-ZONE="us-central1-a"
-
-function usage() {
-   echo "This is the Google Cloud kubernetes cluster destroyer."
-   echo "usage: cluster-destroy --cluster <cluster-name> --zone <zone>"
-}
-
-while :
-do
-  case "$1" in
-    -c | --cluster)
-        CLUSTER_NAME=$2
-        shift 2
-        ;;
-    -z | --zone)
-        ZONE=$2
-        shift 2
-        ;;
-    -h | --help)
-      usage
-      exit 2
-      ;;
-    -f | --force-cluster)
-        FORCE_CLUSTER="true"
-        shift 1
-        ;;
-    --)
-      shift;
-      break
-      ;;
-    *)
-      echo "Unexpected option: $1"
-      ;;
-  esac
-done
+# Defaults - these are in the config but left here for information
+CLUSTER_NAME="{% if experiment.cluster_name %}{{ experiment.cluster_name }}{% else %}flux{% endif %}"
+FORCE_CLUSTER="{% if setup.force_cluster %}true{% else %}false{% endif %}"
+ZONE="{% if zone %}{{ zone }}{% else %}us-central1-a{% endif %}"
 
 if [ -z ${ZONE+x} ]; then
-    echo "Please provide your Google Cloud zone with --zone";
+    echo "Google Cloud zone template missing as ZONE";
     exit 1
 fi
 

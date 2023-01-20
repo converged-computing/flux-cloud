@@ -1,4 +1,4 @@
-# Copyright 2022 Lawrence Livermore National Security, LLC and other
+# Copyright 2022-2023 Lawrence Livermore National Security, LLC and other
 # This is part of Flux Framework. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: Apache-2.0
@@ -17,6 +17,7 @@ def main(args, parser, extra, subparser):
         template=args.template,
         outdir=args.output_dir,
         test=args.test,
+        cleanup=args.cleanup,
         force_cluster=args.force_cluster,
         force=args.force,
     )
@@ -24,4 +25,10 @@ def main(args, parser, extra, subparser):
     # Update config settings on the fly
     cli.settings.update_params(args.config_params)
     setup.settings.update_params(args.config_params)
+
+    # Set the Minicluster size across experiments
+    if args.size:
+        setup.set_minicluster_size(args.size)
+
     cli.run(setup)
+    setup.cleanup(setup.matrices)

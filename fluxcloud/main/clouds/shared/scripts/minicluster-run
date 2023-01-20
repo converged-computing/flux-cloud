@@ -1,66 +1,16 @@
 #!/bin/bash
 
-SHORT="a:,l:,n:,j:,h"
-LONG="apply:,logfile:,namespace:,job:,help"
-OPTS=$(getopt -a -n create --options $SHORT --longoptions $LONG -- "$@")
+# This is a template that will be populated with variables by Flux-Cloud
+# It used to be a script proper with getopt, but in practice this was
+# erroneous on different operating systems.
 
-eval set -- "$OPTS"
+# Include shared helper scripts
+{% include "helpers.sh" %}
 
-HERE=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-
-# Source shared helper scripts
-. $HERE/helpers.sh
-
-function usage() {
-   echo "This is the Flux Cloud MiniCluster job runner, where we apply a custom resource definition (CRD)."
-   echo "usage: minicluster-run --apply <crd> --logfile /path/to/log.out --namespace <namespace>"
-}
-
-NAMESPACE="flux-operator"
-
-while :
-do
-  case "$1" in
-    -l | --logfile)
-        LOGFILE=$2
-        shift 2
-        ;;
-    -a | --apply)
-        CRD=$2
-        shift 2
-        ;;
-    -n | --namespace)
-        NAMESPACE=$2
-        shift 2
-        ;;
-    -j | --job)
-        JOB=$2
-        shift 2
-        ;;
-    -h | --help)
-      usage
-      exit 2
-      ;;
-    --)
-      shift;
-      break
-      ;;
-    *)
-      echo "Unexpected option: $1"
-      ;;
-  esac
-done
-
-# Required arguments
-if [ -z ${CRD+x} ]; then
-    echo "A custom resource definition is required with --apply";
-    exit 1
-fi
-
-if [ -z ${JOB+x} ]; then
-    echo "A job name is required with --job";
-    exit 1
-fi
+NAMESPACE="{% if minicluster.namespace %}{{ minicluster.namespace }}{% else %}flux-operator{% endif %}"
+CRD="{{ crd }}"
+JOB="{{ minicluster.name }}"
+LOGFILE="{{ logfile }}"
 
 print_magenta "  apply : ${CRD}"
 print_magenta "    job : ${JOB}"
@@ -100,6 +50,8 @@ print_blue "Waiting for broker pod with prefix ${brokerPrefix} to be running..."
 brokerReady="false"
 while [[ "${brokerReady}" == "false" ]]; do
     echo -n "."
+
+    # TODO - we likely want to check for running OR completed, it's rare but sometimes they can complete too fast.
     for pod in $(kubectl get pods --namespace ${NAMESPACE} --field-selector=status.phase=Running --output=jsonpath='{.items[*].metadata.name}'); do
         if [[ "${pod}" == ${brokerPrefix}* ]]; then
             echo

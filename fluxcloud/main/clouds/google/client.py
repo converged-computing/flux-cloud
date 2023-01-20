@@ -31,31 +31,14 @@ class GoogleCloud(ExperimentClient):
         Bring up a cluster
         """
         experiment = experiment or setup.get_single_experiment()
-        create_script = self.get_script("cluster-create")
-        tags = setup.get_tags(experiment)
-
-        # Create the cluster with creation script
-        cmd = [
-            create_script,
-            "--project",
-            self.project,
-            "--zone",
-            self.zone,
-            "--machine",
-            setup.get_machine(experiment),
-            "--cluster",
-            setup.get_cluster_name(experiment),
-            "--cluster-version",
-            setup.get_cluster_version(experiment)
-            or self.settings.kubernetes["version"],
-            "--size",
-            setup.get_size(experiment),
-        ]
-        if setup.force_cluster:
-            cmd.append("--force-cluster")
-        if tags:
-            cmd += ["--tags", ",".join(tags)]
-        return self.run_timed("create-cluster", cmd)
+        kwargs = {
+            "experiment": experiment,
+            "setup": setup,
+            "project": self.project,
+            "zone": self.zone,
+        }
+        create_script = experiment.get_script("cluster-create", self.name, kwargs)
+        return self.run_timed("create-cluster", ["/bin/bash", create_script])
 
     @save_meta
     def down(self, setup, experiment=None):
@@ -63,16 +46,6 @@ class GoogleCloud(ExperimentClient):
         Destroy a cluster
         """
         experiment = experiment or setup.get_single_experiment()
-        destroy_script = self.get_script("cluster-destroy")
-
-        # Create the cluster with creation script
-        cmd = [
-            destroy_script,
-            "--zone",
-            self.zone,
-            "--cluster",
-            setup.get_cluster_name(experiment),
-        ]
-        if setup.force_cluster:
-            cmd.append("--force-cluster")
-        return self.run_timed("destroy-cluster", cmd)
+        kwargs = {"experiment": experiment, "setup": setup, "zone": self.zone}
+        destroy_script = experiment.get_script("cluster-destroy", self.name, kwargs)
+        return self.run_timed("destroy-cluster", ["/bin/bash", destroy_script])
