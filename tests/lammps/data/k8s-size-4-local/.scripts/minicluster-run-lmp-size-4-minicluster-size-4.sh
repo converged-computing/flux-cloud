@@ -46,18 +46,12 @@ function is_installed () {
 
 function install_operator() {
     # Shared function to install the operator from a specific repository branch and cleanup
-    repository=${1}
-    branch=${2}
-    cleanup=${3}
-    tmpfile=$(mktemp /tmp/flux-operator.XXXXXX.yaml)
-    rm -rf $tmpfile
-    run_echo wget -O $tmpfile https://raw.githubusercontent.com/${REPOSITORY}/${BRANCH}/examples/dist/flux-operator.yaml
+    script_dir=${1}
+    repository=${2}
+    branch=${3}
+    tmpfile="${script_dir}/flux-operator.yaml"
+    run_echo wget -O $tmpfile https://raw.githubusercontent.com/${repository}/${branch}/examples/dist/flux-operator.yaml
     kubectl apply -f $tmpfile
-    if [[ "${CLEANUP}" == "true" ]]; then
-        rm -rf $tmpfile
-    else
-        echo "Cleanup is false, keeping operator install file ${tmpfile}"
-    fi
 }
 
 

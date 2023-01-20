@@ -43,7 +43,7 @@ function install_operator() {
     repository=${2}
     branch=${3}
     tmpfile="${script_dir}/flux-operator.yaml"
-    run_echo wget -O $tmpfile https://raw.githubusercontent.com/${REPOSITORY}/${BRANCH}/examples/dist/flux-operator.yaml
+    run_echo wget -O $tmpfile https://raw.githubusercontent.com/${repository}/${branch}/examples/dist/flux-operator.yaml
     kubectl apply -f $tmpfile
 }
 

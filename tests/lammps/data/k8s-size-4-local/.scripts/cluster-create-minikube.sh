@@ -42,18 +42,12 @@ function is_installed () {
 
 function install_operator() {
     # Shared function to install the operator from a specific repository branch and cleanup
-    repository=${1}
-    branch=${2}
-    cleanup=${3}
-    tmpfile=$(mktemp /tmp/flux-operator.XXXXXX.yaml)
-    rm -rf $tmpfile
+    script_dir=${1}
+    repository=${2}
+    branch=${3}
+    tmpfile="${script_dir}/flux-operator.yaml"
     run_echo wget -O $tmpfile https://raw.githubusercontent.com/${REPOSITORY}/${BRANCH}/examples/dist/flux-operator.yaml
     kubectl apply -f $tmpfile
-    if [[ "${CLEANUP}" == "true" ]]; then
-        rm -rf $tmpfile
-    else
-        echo "Cleanup is false, keeping operator install file ${tmpfile}"
-    fi
 }
 
 
@@ -141,7 +135,7 @@ FORCE_CLUSTER="false"
 SIZE=4
 REPOSITORY="flux-framework/flux-operator"
 BRANCH="main"
-CLEANUP="true"
+SCRIPT_DIR="/home/vanessa/Desktop/Code/flux/flux-cloud/tests/lammps/data/k8s-size-4-local/.scripts"
 
 print_magenta "   cluster  : ${CLUSTER_NAME}"
 print_magenta "    version : ${CLUSTER_VERSION}"
@@ -157,7 +151,7 @@ minikube status
 retval=$?
 if [[ "${retval}" == "0" ]]; then
     print_blue "A MiniKube cluster already exists."
-    install_operator ${REPOSITORY} ${BRANCH} ${CLEANUP}
+    install_operator ${SCRIPT_DIR} ${REPOSITORY} ${BRANCH}
     echo
     exit 0
 fi
@@ -168,7 +162,7 @@ fi
 
 # Create the cluster
 run_echo minikube start --nodes=${SIZE}
-install_operator ${REPOSITORY} ${BRANCH} ${CLEANUP}
+install_operator ${SCRIPT_DIR} ${REPOSITORY} ${BRANCH}
 
 # Show nodes
 run_echo kubectl get nodes
