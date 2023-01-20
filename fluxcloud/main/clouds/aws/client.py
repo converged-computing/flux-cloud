@@ -49,12 +49,18 @@ class AmazonCloud(ExperimentClient):
         kwargs = {
             "experiment": experiment,
             "setup": setup,
-            "region": self.region,
+            "region": self.get_region(experiment),
             "config_file": config_file,
             "tags": tags,
         }
         create_script = experiment.get_script("cluster-create", self.name, kwargs)
         return self.run_timed("create-cluster", ["/bin/bash", create_script])
+
+    def get_region(self, experiment):
+        """
+        Get the region - using the experiment first and defaulting to settings
+        """
+        return experiment.variables.get("region") or self.region
 
     def get_tags(self, experiment):
         """
@@ -89,7 +95,7 @@ class AmazonCloud(ExperimentClient):
         values = {
             "experiment": experiment,
             "setup": setup,
-            "region": self.region,
+            "region": self.get_region(experiment),
             "variables": experiment.variables,
             "tags": self.get_tags(experiment),
         }
@@ -100,10 +106,11 @@ class AmazonCloud(ExperimentClient):
                 values["variables"][key] = value
 
         # Add zones if not present!
+        region = self.get_region(experiment)
         if "availability_zones" not in values["variables"]:
             values["variables"]["availability_zones"] = [
-                "%sa" % self.region,
-                "%sb" % self.region,
+                "%sa" % region,
+                "%sb" % region,
             ]
 
         # Show the user custom variables
@@ -121,6 +128,10 @@ class AmazonCloud(ExperimentClient):
         Destroy a cluster
         """
         experiment = experiment or setup.get_single_experiment()
-        kwargs = {"setup": setup, "experiment": experiment}
+        kwargs = {
+            "setup": setup,
+            "experiment": experiment,
+            "region": self.get_region(experiment),
+        }
         destroy_script = experiment.get_script("cluster-destroy", self.name, kwargs)
         return self.run_timed("destroy-cluster", ["/bin/bash", destroy_script])
