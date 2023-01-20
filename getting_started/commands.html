@@ -33,10 +33,9 @@
         <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
       
     
+        <link rel="stylesheet" type="text/css" href="../_static/sphinx_immaterial_theme.fa3fbbd75cfdd7cef.min.css" />
         <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
         <link rel="stylesheet" type="text/css" href="../_static/css/rtd_sphinx_search.min.css" />
-        <link rel="stylesheet" type="text/css" href="../_static/google_fonts.css" />
-        <link rel="stylesheet" type="text/css" href="../_static/stylesheets/sphinx_immaterial_theme.7e770c658028b1997.min.css" />
         <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
@@ -473,6 +472,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#scripts" class="md-nav__link">
+    <span title="/getting_started/commands.md#scripts (reference label)" class="md-ellipsis">scripts</span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -676,27 +682,34 @@
 <p>After creating an experiments.yaml file, you might want to know how your matrix maps out into kubernetes
 clusters. To see all identifiers generated, you can use list:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>flux-cloud<span class="w"> </span>list
-n1-standard-1-2
-n1-standard-2-2
-n1-standard-1-4
-n1-standard-2-4
-n1-standard-1-6
-n1-standard-2-6
+k8s-size-8-m5.large
+<span class="w">  </span>sizes:
+<span class="w">    </span><span class="m">2</span>:<span class="w"> </span>k8s-size-8-m5.large<span class="w"> </span><span class="m">2</span>
+<span class="w">    </span><span class="m">4</span>:<span class="w"> </span>k8s-size-8-m5.large<span class="w"> </span><span class="m">4</span>
+<span class="w">    </span><span class="m">6</span>:<span class="w"> </span>k8s-size-8-m5.large<span class="w"> </span><span class="m">6</span>
+<span class="w">    </span><span class="m">8</span>:<span class="w"> </span>k8s-size-8-m5.large<span class="w"> </span><span class="m">8</span>
 </code></pre></div>
 </div>
-<p>The above shows the format <code class="docutils literal notranslate"><span class="pre">&lt;machine&gt;-&lt;size&gt;</span></code>, and is generated from this matrix:</p>
+<p>The above shows for the kubernetes cluster of size 8 with machine type <code class="docutils literal notranslate"><span class="pre">m5.large</span></code> we are experiments
+with MiniClusters of sizes 2, 4, 6, 8</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><code><span class="c1"># This can obviously be expanded to more sizes or machines,</span>
 <span class="nt">matrix</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">size</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">2</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">4</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">6</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8</span>
 <span class="w">  </span><span class="nt">machine</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;n1-standard-1&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;n1-standard-2&quot;</span><span class="p p-Indicator">]</span>
+
+<span class="nt">minicluster</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">size</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">2</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">4</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">6</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">8</span><span class="p p-Indicator">]</span>
 </code></pre></div>
 </div>
-<p>We have these identifiers for the purposes of output. This means that if you use
-<code class="docutils literal notranslate"><span class="pre">flux-cloud</span> <span class="pre">run</span></code>, the cluster sizes and machines will be written to the correct
-place by way of iterating through the matrices. If you are using this in more of
-an “expert” mode and running “apply” or “up” or “down” on your own, you will
-need to target a specific identifier (one of the above) otherwise the tool won’t
-know which cluster you want to interact with.</p>
+<p>You can also target a specific experiment cluster (meaning Kubernetes size)
+with <code class="docutils literal notranslate"><span class="pre">-e</span></code> for any command, e.g.,</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>flux-cloud<span class="w"> </span>apply<span class="w"> </span>-e<span class="w"> </span>k8s-size-8-m5.large
+</code></pre></div>
+</div>
+<p>And this will run across sizes. To ask for a specific size:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>flux-cloud<span class="w"> </span>apply<span class="w"> </span>-e<span class="w"> </span>k8s-size-8-m5.large<span class="w"> </span>--size<span class="w"> </span><span class="m">2</span>
+</code></pre></div>
+</div>
 <h2 id="run">run<a class="headerlink" href="#run" title="Permalink to this heading">¶</a></h2>
 <p>The main command is a “run” that is going to, for each cluster:</p>
 <ol class="arabic simple">
@@ -727,7 +740,7 @@ know which cluster you want to interact with.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>flux-cloud<span class="w"> </span>run<span class="w"> </span>-e<span class="w"> </span>n1-standard-1-2<span class="w"> </span>--force
 </code></pre></div>
 </div>
-<p>If you want to have more control, you can run one step at a time,
+<p>If you want to have more control, you can run one Kubernetes size (across MiniCluster sizes) at a time,
 each of “up” “apply” and “down”:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>flux-cloud<span class="w"> </span>up<span class="w"> </span>-e<span class="w"> </span>n1-standard-1-2
 $<span class="w"> </span>flux-cloud<span class="w"> </span>apply<span class="w"> </span>-e<span class="w"> </span>n1-standard-1-2
@@ -808,6 +821,22 @@ the cluster config created for eksctl:</p>
 <span class="go">...</span>
 </code></pre></div>
 </div>
+<h2 id="scripts">scripts<a class="headerlink" href="#scripts" title="Permalink to this heading">¶</a></h2>
+<p>By default, flux cloud keeps all scripts that the job renders in the experiment output directory under <code class="docutils literal notranslate"><span class="pre">.scripts</span></code>. If you
+want to cleanup instead, you can add the <code class="docutils literal notranslate"><span class="pre">--cleanup</span></code> flag. We do this so you can inspect a script to debug, or if you
+just want to keep them for reproducibility. As an example, here is outfrom from a run with multiple repeats of the
+same command, across two MiniCluster cluster sizes (2 and 4):</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><code><span class="gp">$ </span>tree<span class="w"> </span>data/k8s-size-4-n1-standard-1/.scripts/
+<span class="go">data/k8s-size-4-n1-standard-1/.scripts/</span>
+<span class="go">├── cluster-destroy.sh</span>
+<span class="go">├── minicluster-run-lmp-1-minicluster-size-2.sh</span>
+<span class="go">├── minicluster-run-lmp-1-minicluster-size-4.sh</span>
+<span class="go">├── minicluster-run-lmp-2-minicluster-size-2.sh</span>
+<span class="go">├── minicluster-run-lmp-2-minicluster-size-4.sh</span>
+<span class="go">└── minicluster.yaml</span>
+<span class="go">0 directories, 6 files</span>
+</code></pre></div>
+</div>
 <p>And that’s it! I think there might be a more elegant way to determine what cluster is running,
 however if the user decides to launch more than one, it might be harder. More thinking / docs / examples coming soon.</p>
 
@@ -817,7 +846,7 @@ however if the user decides to launch more than one, it might be harder. More th
   <small>
     
       Last update:
-      Jan 19, 2023
+      Jan 20, 2023
     
   </small>
 </div>
@@ -928,9 +957,8 @@ however if the user decides to launch more than one, it might be harder. More th
     
     <script id="__config" type="application/json">{"base": "..", "features": ["navigation.expand", "navigation.tabs", "toc.integrate", "navigation.sections", "navigation.instant", "header.autohide", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "toc.follow", "toc.sticky", "content.tabs.link", "announce.dismiss"], "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
     
-    
-      <script src="../_static/javascripts/bundle.444abb77.min.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
+      
+        <script src="../_static/sphinx_immaterial_theme.cea6a0c1d5b0618cf.min.js"></script>
         <script src="../_static/clipboard.min.js"></script>
         <script src="../_static/copybutton.js"></script>
         <script src="../_static/js/rtd_sphinx_search.min.js"></script>

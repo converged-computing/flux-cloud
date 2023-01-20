@@ -33,10 +33,9 @@
         <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
       
     
+        <link rel="stylesheet" type="text/css" href="../_static/sphinx_immaterial_theme.fa3fbbd75cfdd7cef.min.css" />
         <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
         <link rel="stylesheet" type="text/css" href="../_static/css/rtd_sphinx_search.min.css" />
-        <link rel="stylesheet" type="text/css" href="../_static/google_fonts.css" />
-        <link rel="stylesheet" type="text/css" href="../_static/stylesheets/sphinx_immaterial_theme.7e770c658028b1997.min.css" />
         <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
@@ -468,7 +467,8 @@
     <span title="/getting_started/experiments.md#matrix-of-experiments (reference label)" class="md-ellipsis">Matrix of Experiments</span>
   </a>
   
-</li>
+    <nav class="md-nav" aria-label="Matrix of Experiments">
+      <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#single-experiment" class="md-nav__link">
@@ -488,32 +488,44 @@
     </nav>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#custom-variables" class="md-nav__link">
     <span title="/getting_started/experiments.md#custom-variables (reference label)" class="md-ellipsis">Custom Variables</span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
+  <a href="#operator-definition" class="md-nav__link">
+    <span title="/getting_started/experiments.md#operator-definition (reference label)" class="md-ellipsis">Operator Definition</span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#minicluster-definition" class="md-nav__link">
     <span title="/getting_started/experiments.md#minicluster-definition (reference label)" class="md-ellipsis">Mini<wbr>Cluster Definition</span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#kubernetes" class="md-nav__link">
     <span title="/getting_started/experiments.md#kubernetes (reference label)" class="md-ellipsis">Kubernetes</span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#jobs" class="md-nav__link">
     <span title="/getting_started/experiments.md#jobs (reference label)" class="md-ellipsis">Jobs</span>
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -521,6 +533,26 @@
   <a href="#custom-resource-definition" class="md-nav__link">
     <span title="/getting_started/experiments.md#custom-resource-definition (reference label)" class="md-ellipsis">Custom Resource Definition</span>
   </a>
+  
+    <nav class="md-nav" aria-label="Custom Resource Definition">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#use-your-own" class="md-nav__link">
+    <span title="/getting_started/experiments.md#use-your-own (reference label)" class="md-ellipsis">Use Your Own</span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#use-the-default" class="md-nav__link">
+    <span title="/getting_started/experiments.md#use-the-default (reference label)" class="md-ellipsis">Use The Default</span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -722,14 +754,14 @@ Let’s get started with talking about experiments. Your experiments will typica
 will expand on this idea later. This would run each size across each machine, for a total of 4 Kubernetes clusters created.
 The number of custom resource (CRD) definitions applied to each one would vary based on the number of jobs.
 The idea here is that we might want to run multiple jobs in the same container, and size, and machine.</p>
-<h3 id="single-experiment">Single Experiment<a class="headerlink" href="#single-experiment" title="Permalink to this heading">¶</a></h3>
+<h4 id="single-experiment">Single Experiment<a class="headerlink" href="#single-experiment" title="Permalink to this heading">¶</a></h4>
 <p>A single experiment is ideal for perhaps a demo. It’s basically the above, but a single entry:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><code><span class="nt">experiment</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
 <span class="w">  </span><span class="nt">machine</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">n1-standard-1</span>
 </code></pre></div>
 </div>
-<h3 id="experiment-listing">Experiment Listing<a class="headerlink" href="#experiment-listing" title="Permalink to this heading">¶</a></h3>
+<h4 id="experiment-listing">Experiment Listing<a class="headerlink" href="#experiment-listing" title="Permalink to this heading">¶</a></h4>
 <p>And finally, a listing! This is when you don’t quite want a matrix, but you have more than one study
 to run (e.g., multiple Kubernetes cluster setups.)</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><code><span class="nt">experiments</span><span class="p">:</span>
@@ -738,7 +770,7 @@ to run (e.g., multiple Kubernetes cluster setups.)</p>
 </code></pre></div>
 </div>
 <p>Note that it’s a yaml list.</p>
-<h2 id="custom-variables">Custom Variables<a class="headerlink" href="#custom-variables" title="Permalink to this heading">¶</a></h2>
+<h3 id="custom-variables">Custom Variables<a class="headerlink" href="#custom-variables" title="Permalink to this heading">¶</a></h3>
 <p>Each cloud provider is allowed to specify any number of custom variables, and these
 are available in the “variables” section. As an example, let’s say we want to customize networking
 arguments for aws:</p>
@@ -748,7 +780,17 @@ arguments for aws:</p>
 </code></pre></div>
 </div>
 <p>You can look at each cloud page here to see what variables are known.</p>
-<h2 id="minicluster-definition">MiniCluster Definition<a class="headerlink" href="#minicluster-definition" title="Permalink to this heading">¶</a></h2>
+<h3 id="operator-definition">Operator Definition<a class="headerlink" href="#operator-definition" title="Permalink to this heading">¶</a></h3>
+<p>If you want to override your branch or repository to install the operator from (in your settings)
+you can set them in the experiment file as follows:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><code><span class="nt">operator</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">branch</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my-feature-branch</span>
+<span class="w">  </span><span class="nt">repository</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my-user/flux-operator</span>
+</code></pre></div>
+</div>
+<p>Note that the file location to install from is consistent under <code class="docutils literal notranslate"><span class="pre">examples/dist/flux-operator.yaml</span></code>,
+and this file is updated with <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">build-config</span></code>.</p>
+<h3 id="minicluster-definition">MiniCluster Definition<a class="headerlink" href="#minicluster-definition" title="Permalink to this heading">¶</a></h3>
 <p>The minicluster is suggested to be defined, although it’s not required (by default we will use the name and namespace in your settings).
 As an example, here is setting a custom name and namespace:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><code><span class="c1"># Flux Mini Cluster experiment attributes</span>
@@ -776,7 +818,7 @@ add the size variable to our MiniCluster:</p>
 <p>And in fact this is an expected practice for an experiment where you want to be making
 comparisons across your MiniCluster sizes, as once you bring down a cluster it cannot
 be compared to another cluster that you bring up.</p>
-<h2 id="kubernetes">Kubernetes<a class="headerlink" href="#kubernetes" title="Permalink to this heading">¶</a></h2>
+<h3 id="kubernetes">Kubernetes<a class="headerlink" href="#kubernetes" title="Permalink to this heading">¶</a></h3>
 <p>While it’s recommended to define defaults for Kubernetes (e.g., version) in your <code class="docutils literal notranslate"><span class="pre">settings.yml</span></code>, you can one-off edit them
 via a “cluster” attribute in your <code class="docutils literal notranslate"><span class="pre">experiments.yaml</span></code>. Unlike settings, this supports a field for “tags” that should be a list of strings:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><code><span class="nt">cluster</span><span class="p">:</span>
@@ -794,7 +836,7 @@ via a “cluster” attribute in your <code class="docutils literal notranslate"
 </div>
 <p>This is validated at runtime when you create the cluster. For both, they are converted to comma separated values to provide
 to the command line client.</p>
-<h2 id="jobs">Jobs<a class="headerlink" href="#jobs" title="Permalink to this heading">¶</a></h2>
+<h3 id="jobs">Jobs<a class="headerlink" href="#jobs" title="Permalink to this heading">¶</a></h3>
 <p>The jobs specification defines what commands (required) you want run across each Kubernetes cluster.
 For each command, we technically create its own MiniCluster, which means using the operator to bring
 up the pods, run the command, and then clean up. Minimally, the jobs should be a set of key value
@@ -825,9 +867,10 @@ defined. For now we require you to provide the template.</p>
 <blockquote>
 <div><p>minicluster-template.yaml</p>
 </div></blockquote>
-<p>The custom resource definition template “CRD” is currently required, and is used by flux-cloud
-to populate your job metadata and then submit one or more jobs to your Kubernetes cluster.
-Here is an example that uses a shared working directory (so it’s hard coded) and a variable
+<p>The custom resource definition template “CRD” is currently suggested so you can customize exactly to your liking,
+but it’s not required. It is used by flux-cloud to populate your job metadata and then submit one or more jobs to your Kubernetes cluster.</p>
+<h3 id="use-your-own">Use Your Own<a class="headerlink" href="#use-your-own" title="Permalink to this heading">¶</a></h3>
+<p>Here is an example that uses a shared working directory (so it’s hard coded) and a variable
 for the command:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><code><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">flux-framework.org/v1alpha1</span>
 <span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MiniCluster</span>
@@ -854,6 +897,35 @@ for the command:</p>
 <span class="w">      </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="w"> </span><span class="nv">job.command</span><span class="w"> </span><span class="p p-Indicator">}}</span>
 </code></pre></div>
 </div>
+<h3 id="use-the-default">Use The Default<a class="headerlink" href="#use-the-default" title="Permalink to this heading">¶</a></h3>
+<p>To use the default, you want to make sure that you provide all variables that are required.
+The following are required (and have defaults or are otherwise generated by flux cloud
+so you could leave them out of your experiments.yaml):</p>
+<ul class="simple">
+<li><p>minicluster.name</p></li>
+<li><p>minicluster.namespace</p></li>
+<li><p>minicluster.local_deploy (defaults to false)</p></li>
+<li><p>minicluster.verbose (default to false to run in test mode)</p></li>
+</ul>
+<p>It’s recommended to set your listing of sizes for miniclusters:</p>
+<ul class="simple">
+<li><p>minicluster.size</p></li>
+</ul>
+<p>The following are specific to the job and required:</p>
+<ul class="simple">
+<li><p>job.image</p></li>
+<li><p>job.command</p></li>
+</ul>
+<p>The following are specific to the job but not required:</p>
+<ul class="simple">
+<li><p>job.workdir</p></li>
+<li><p>job.tasks (recommended for better control of flux, as this would default to 1)</p></li>
+<li><p>job.flux_option_flags (e.g., “-ompi=openmpi&#64;5”)</p></li>
+<li><p>job.cores (defaults to 1 if not set, likely not ideal for your experiment)</p></li>
+<li><p>job.limits (key value pairs)</p></li>
+<li><p>job.requests (key value pairs)</p></li>
+<li><p>job.pre_command: the job pre-command (usually multiple lines) but not required.</p></li>
+</ul>
 
 
   <hr>
@@ -861,7 +933,7 @@ for the command:</p>
   <small>
     
       Last update:
-      Jan 19, 2023
+      Jan 20, 2023
     
   </small>
 </div>
@@ -972,9 +1044,8 @@ for the command:</p>
     
     <script id="__config" type="application/json">{"base": "..", "features": ["navigation.expand", "navigation.tabs", "toc.integrate", "navigation.sections", "navigation.instant", "header.autohide", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "toc.follow", "toc.sticky", "content.tabs.link", "announce.dismiss"], "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
     
-    
-      <script src="../_static/javascripts/bundle.444abb77.min.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
+      
+        <script src="../_static/sphinx_immaterial_theme.cea6a0c1d5b0618cf.min.js"></script>
         <script src="../_static/clipboard.min.js"></script>
         <script src="../_static/copybutton.js"></script>
         <script src="../_static/js/rtd_sphinx_search.min.js"></script>

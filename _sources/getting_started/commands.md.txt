@@ -9,28 +9,37 @@ clusters. To see all identifiers generated, you can use list:
 
 ```bash
 $ flux-cloud list
-n1-standard-1-2
-n1-standard-2-2
-n1-standard-1-4
-n1-standard-2-4
-n1-standard-1-6
-n1-standard-2-6
+k8s-size-8-m5.large
+  sizes:
+    2: k8s-size-8-m5.large 2
+    4: k8s-size-8-m5.large 4
+    6: k8s-size-8-m5.large 6
+    8: k8s-size-8-m5.large 8
 ```
-The above shows the format `<machine>-<size>`, and is generated from this matrix:
+The above shows for the kubernetes cluster of size 8 with machine type `m5.large` we are experiments
+with MiniClusters of sizes 2, 4, 6, 8
 
 ```yaml
 # This can obviously be expanded to more sizes or machines,
 matrix:
-  size: [2, 4, 6]
+  size: 8
   machine: ["n1-standard-1", "n1-standard-2"]
+
+minicluster:
+  size: [2, 4, 6, 8]
 ```
 
-We have these identifiers for the purposes of output. This means that if you use
-`flux-cloud run`, the cluster sizes and machines will be written to the correct
-place by way of iterating through the matrices. If you are using this in more of
-an "expert" mode and running "apply" or "up" or "down" on your own, you will
-need to target a specific identifier (one of the above) otherwise the tool won't
-know which cluster you want to interact with.
+You can also target a specific experiment cluster (meaning Kubernetes size)
+with `-e` for any command, e.g.,
+
+```bash
+$ flux-cloud apply -e k8s-size-8-m5.large
+```
+And this will run across sizes. To ask for a specific size:
+
+```bash
+$ flux-cloud apply -e k8s-size-8-m5.large --size 2
+```
 
 ## run
 
@@ -71,7 +80,7 @@ To force overwrite of existing results (by default they are skipped)
 $ flux-cloud run -e n1-standard-1-2 --force
 ```
 
-If you want to have more control, you can run one step at a time,
+If you want to have more control, you can run one Kubernetes size (across MiniCluster sizes) at a time,
 each of "up" "apply" and "down":
 
 ```bash
@@ -176,6 +185,25 @@ managedNodeGroups:
     maxSize: 2
     labels: { "fluxoperator": "true" }
 ...
+```
+
+## scripts
+
+By default, flux cloud keeps all scripts that the job renders in the experiment output directory under `.scripts`. If you
+want to cleanup instead, you can add the `--cleanup` flag. We do this so you can inspect a script to debug, or if you
+just want to keep them for reproducibility. As an example, here is outfrom from a run with multiple repeats of the
+same command, across two MiniCluster cluster sizes (2 and 4):
+
+```console
+$ tree data/k8s-size-4-n1-standard-1/.scripts/
+data/k8s-size-4-n1-standard-1/.scripts/
+├── cluster-destroy.sh
+├── minicluster-run-lmp-1-minicluster-size-2.sh
+├── minicluster-run-lmp-1-minicluster-size-4.sh
+├── minicluster-run-lmp-2-minicluster-size-2.sh
+├── minicluster-run-lmp-2-minicluster-size-4.sh
+└── minicluster.yaml
+0 directories, 6 files
 ```
 
 And that's it! I think there might be a more elegant way to determine what cluster is running,
