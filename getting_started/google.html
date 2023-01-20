@@ -499,6 +499,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#custom-variables" class="md-nav__link">
+    <span title="/getting_started/google.md#custom-variables (reference label)" class="md-ellipsis">Custom Variables</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#run-experiments" class="md-nav__link">
     <span title="/getting_started/google.md#run-experiments (reference label)" class="md-ellipsis">Run Experiments</span>
   </a>
@@ -672,6 +679,14 @@ and ensure you are logged in and have kubectl installed:</p>
 <h2 id="cloud">Cloud<a class="headerlink" href="#cloud" title="Permalink to this heading">¶</a></h2>
 <p>Finally, ensure that google is either your default cloud (the <code class="docutils literal notranslate"><span class="pre">default_cloud</span></code> in your settings.yml)
 or you specify it with <code class="docutils literal notranslate"><span class="pre">--cloud</span></code> when you do run.</p>
+<h2 id="custom-variables">Custom Variables<a class="headerlink" href="#custom-variables" title="Permalink to this heading">¶</a></h2>
+<p>The following custom variables are supported in the “variables” section (key value pairs)
+for Google in an <code class="docutils literal notranslate"><span class="pre">experiments.yaml</span></code></p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><code><span class="nt">variables</span><span class="p">:</span>
+<span class="w">    </span><span class="c1"># Customize zone just for this experiment</span>
+<span class="w">    </span><span class="nt">zone</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">us-central1-a</span>
+</code></pre></div>
+</div>
 <h2 id="run-experiments">Run Experiments<a class="headerlink" href="#run-experiments" title="Permalink to this heading">¶</a></h2>
 <p>Each experiment is defined by the matrix and variables in an <code class="docutils literal notranslate"><span class="pre">experiment.yaml</span></code> that is used to
 populate a <code class="docutils literal notranslate"><span class="pre">minicluster-template.yaml</span></code> that you can either provide, or use a template provided by the
@@ -689,14 +704,7 @@ in your settings.</p>
 </code></pre></div>
 </div>
 <p>Given an experiments.yaml in the present working directory. Take a look at an <code class="docutils literal notranslate"><span class="pre">experients.yaml</span></code> in an example directory.
-Note that machines and size are required for the matrix, and variables get piped into all experiments (in full). Under variables,
-both “commands” and “ids” are required, and must be equal in length (each command is assigned to one id
-for output). To just run the first entry in the matrix (test mode) do:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>flux-cloud<span class="w"> </span>run<span class="w"> </span>experiments.yaml<span class="w"> </span>--test
-</code></pre></div>
-</div>
-<p>Note that you can also use the other commands in place of a single run, notably “up” “apply” and “down.”
-By default, results will be written to a temporary output directory, but you can customize this with <code class="docutils literal notranslate"><span class="pre">--outdir</span></code>.</p>
+Note that machines and size are required for the matrix, and variables get piped into all experiments (in full).</p>
 
 
   <hr>

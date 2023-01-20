@@ -60,6 +60,12 @@ variables:
 
     # Add a custom placement group name to your workers managed node group
     placement_group: eks-efa-testing
+
+    # Customize region just for this experiment
+    region: us-east-2
+
+    # Customize availability zones for this experiment
+    availability_zones: [us-east-1a, us-east-1b]
 ```
 
 Note that we currently take a simple approach for boolean values - if it's present (e.g., the examples)
@@ -91,13 +97,4 @@ $ flux-cloud run
 ```
 
 Given an experiments.yaml in the present working directory. Take a look at an `experients.yaml` in an example directory.
-Note that machines and size are required for the matrix, and variables get piped into all experiments (in full). Under variables,
-both "commands" and "ids" are required, and must be equal in length (each command is assigned to one id
-for output). To just run the first entry in the matrix (test mode) do:
-
-```bash
-$ flux-cloud run experiments.yaml --test
-```
-
-Note that you can also use the other commands in place of a single run, notably "up" "apply" and "down."
-By default, results will be written to a temporary output directory, but you can customize this with `--outdir`.
+Note that machines and size are required for the matrix, and variables get piped into all experiments (in full).

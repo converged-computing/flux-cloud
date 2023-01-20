@@ -37,6 +37,18 @@ Finally, ensure that google is either your default cloud (the `default_cloud` in
 or you specify it with `--cloud` when you do run.
 
 
+## Custom Variables
+
+The following custom variables are supported in the "variables" section (key value pairs)
+for Google in an `experiments.yaml`
+
+```yaml
+variables:
+    # Customize zone just for this experiment
+    zone: us-central1-a
+```
+
+
 ## Run Experiments
 
 Each experiment is defined by the matrix and variables in an `experiment.yaml` that is used to
@@ -59,13 +71,4 @@ $ flux-cloud run
 ```
 
 Given an experiments.yaml in the present working directory. Take a look at an `experients.yaml` in an example directory.
-Note that machines and size are required for the matrix, and variables get piped into all experiments (in full). Under variables,
-both "commands" and "ids" are required, and must be equal in length (each command is assigned to one id
-for output). To just run the first entry in the matrix (test mode) do:
-
-```bash
-$ flux-cloud run experiments.yaml --test
-```
-
-Note that you can also use the other commands in place of a single run, notably "up" "apply" and "down."
-By default, results will be written to a temporary output directory, but you can customize this with `--outdir`.
+Note that machines and size are required for the matrix, and variables get piped into all experiments (in full).
