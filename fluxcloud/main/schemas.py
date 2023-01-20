@@ -47,17 +47,40 @@ single_experiment_properties = {
     "size": {"type": "integer"},
 }
 
-cloud_properties = {"zone": {"type": "string"}, "machine": {"type": "string"}}
+cloud_properties = {
+    "zone": {"type": "string"},
+    "machine": {"type": "string"},
+    "variables": keyvals,
+}
+
 google_cloud_properties = copy.deepcopy(cloud_properties)
 google_cloud_properties["project"] = {"type": ["null", "string"]}
-aws_cloud_properties = {
-    "region": {"type": "string"},
-    "machine": {"type": "string"},
+
+# These are aws extra variables we want to control extra types for
+aws_variables = {
     "private_networking": {"type": ["null", "boolean"]},
     "efa_enabled": {"type": ["null", "boolean"]},
     "ssh_key": {"type": ["string", "null"]},
     "availability_zones": {"type": "array", "items": {"type": "string"}},
 }
+
+aws_cloud_properties = copy.deepcopy(cloud_properties)
+aws_cloud_properties.update(
+    {
+        "region": {"type": "string"},
+        "machine": {"type": "string"},
+        "variables": {
+            "oneOf": [
+                {"type": "null"},
+                {
+                    "type": "object",
+                    "additionalProperties": True,
+                    "properties": aws_variables,
+                },
+            ]
+        },
+    }
+)
 
 kubernetes_properties = {"version": {"type": "string"}}
 kubernetes_cluster_properties = {
@@ -72,11 +95,14 @@ minicluster_properties = {
     "name": {"type": "string"},
     "namespace": {"type": "string"},
     "size": {"items": {"type": "number"}, "type": "array"},
+    "local_deploy": {"type": "boolean"},
+    "verbose": {"type": "boolean"},
 }
 minicluster = {
     "type": "object",
     "properties": minicluster_properties,
-    "additionalProperties": False,
+    # Allow any extra args to be flexible to MiniCluster CRD
+    "additionalProperties": True,
     "required": ["name", "namespace"],
 }
 
@@ -143,6 +169,11 @@ experiment_schema = {
         "kubernetes": {
             "type": "object",
             "properties": kubernetes_cluster_properties,
+            "additionalProperties": False,
+        },
+        "operator": {
+            "type": "object",
+            "properties": operator_properties,
             "additionalProperties": False,
         },
         "matrix": {

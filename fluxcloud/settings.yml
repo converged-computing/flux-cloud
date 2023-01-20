@@ -30,6 +30,7 @@ google:
 aws:
   region: us-east-2
   machine: m5.large
-  private_networking: false
-  efa_enabled: false
-  availability_zones: ["us-east-2b", "us-east-2c"]
+  variables:
+    private_networking: false
+    efa_enabled: false
+    availability_zones: ["us-east-2b", "us-east-2c"]

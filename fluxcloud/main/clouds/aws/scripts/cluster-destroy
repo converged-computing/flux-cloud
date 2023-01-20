@@ -1,58 +1,14 @@
 #!/bin/bash
 
-SHORT="c:,r:,f,h"
-LONG="cluster:,region:,force-cluster,help"
-OPTS=$(getopt -a -n create --options $SHORT --longoptions $LONG -- "$@")
-
-eval set -- "$OPTS"
-
-HERE=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-ROOT=$(dirname $(dirname ${HERE}))
-
-# Source shared helper scripts
-. $ROOT/shared/scripts/helpers.sh
+{% include "helpers.sh" %}
 
 # Defaults
-CLUSTER_NAME="flux-cluster"
-FORCE_CLUSTER="false"
-REGION="us-east-1"
-
-function usage() {
-   echo "This is the Amazon EKS (Elastic Kubernetes Services)  cluster destroyer."
-   echo "usage: cluster-destroy --cluster <cluster-name> --region <region>"
-}
-
-while :
-do
-  case "$1" in
-    -c | --cluster)
-        CLUSTER_NAME=$2
-        shift 2
-        ;;
-    -r | --region)
-        REGION=$2
-        shift 2
-        ;;
-    -h | --help)
-      usage
-      exit 2
-      ;;
-    -f | --force-cluster)
-        FORCE_CLUSTER="true"
-        shift 1
-        ;;
-    --)
-      shift;
-      break
-      ;;
-    *)
-      echo "Unexpected option: $1"
-      ;;
-  esac
-done
+CLUSTER_NAME="{% if experiment.cluster_name %}{{ experiment.cluster_name }}{% else %}flux-cluster{% endif %}"
+REGION="{% if region %}{{ region }}{% else %}us-east-1{% endif %}"
+FORCE_CLUSTER="{% if setup.force_cluster %}true{% else %}false{% endif %}"
 
 if [ -z ${REGION+x} ]; then
-    echo "Please provide your Amazon EKS region with --region";
+    echo "Missing Amazon EKS region as REGION";
     exit 1
 fi
 

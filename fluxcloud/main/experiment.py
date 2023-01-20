@@ -6,6 +6,7 @@
 import copy
 import itertools
 import os
+import shutil
 
 import jinja2
 import jsonschema
@@ -14,6 +15,7 @@ import fluxcloud.defaults as defaults
 import fluxcloud.main.settings as settings
 import fluxcloud.utils as utils
 from fluxcloud.logger import logger
+from fluxcloud.main.clouds.templates import Script
 
 
 class ExperimentSetup:
@@ -23,19 +25,25 @@ class ExperimentSetup:
         template=None,
         outdir=None,
         validate=True,
+        cleanup=True,
         test=False,
         quiet=False,
         **kwargs,
     ):
         """
-        An experiment setup.
+        An experiment setup is a light wrapper around a group of experiments.
         """
         self.experiment_file = os.path.abspath(experiments)
-        self.template = os.path.abspath(template) if template is not None else None
-        self._outdir = outdir
+        self.template = (
+            os.path.abspath(template)
+            if template is not None and os.path.exists(template)
+            else None
+        )
+        self.outdir = outdir
         self.test = test
         self.settings = settings.Settings
         self.quiet = quiet
+        self.run_cleanup = cleanup
 
         # Show the user the template file
         if template:
@@ -51,6 +59,25 @@ class ExperimentSetup:
         # Prepare the matrices for the setup
         self.prepare_matrices()
 
+    def cleanup(self, experiments):
+        """
+        Cleanup the experiment script directory, if cleanup is true
+        """
+        if not isinstance(experiments, list):
+            experiments = [experiments]
+        if not self.run_cleanup:
+            return
+
+        for experiment in experiments:
+            experiment.cleanup()
+
+    def set_minicluster_size(self, size):
+        """
+        Set the minicluster size across experiments.
+        """
+        for experiment in self.matrices:
+            experiment.set_minicluster_size(size)
+
     def prepare_matrices(self):
         """
         Given an experiments.yaml, prepare matrices to run.
@@ -59,7 +86,7 @@ class ExperimentSetup:
         validate_experiments(self.spec)
 
         # Sploot out into matrices
-        matrices = expand_experiments(self.spec)
+        matrices = expand_experiments(self.spec, self.outdir, self.template)
         if not matrices:
             raise ValueError(
                 "No matrices generated. Did you include any empty variables in your matrix?"
@@ -80,32 +107,25 @@ class ExperimentSetup:
             logger.warning("Matrix found - will use first entry.")
         return self.matrices[0]
 
-    def generate_crd(self, experiment, job, minicluster_size):
+    def validate(self):
         """
-        Given an experiment, generate the custom resource definition for it.
+        Validate that all paths exist (create output if it does not)
         """
-        template = jinja2.Template(utils.read_file(self.template))
-        experiment = copy.deepcopy(experiment)
+        # This file must always be provided and exist
+        if not os.path.exists(self.experiment_file):
+            raise ValueError(f"Experiments file {self.experiment_file} does not exist.")
 
-        # If the experiment doesn't define a minicluster, add our default
-        if "minicluster" not in experiment:
-            experiment["minicluster"] = self.settings.minicluster
 
-        # Update minicluster size to the one we want
-        experiment["minicluster"]["size"] = minicluster_size
+class Experiment:
+    """
+    An experiment wrapper to make it easy to get variables in templates.
+    """
 
-        if "jobs" in experiment:
-            del experiment["jobs"]
-        experiment["job"] = job
-        result = template.render(**experiment)
-        logger.debug(result)
-        return result
-
-    def get_experiment_directory(self, experiment):
-        """
-        Consistent means to get experiment.
-        """
-        return os.path.join(self.outdir, experiment["id"])
+    def __init__(self, experiment, outdir=None, template=None):
+        self.experiment = experiment
+        self.settings = settings.Settings
+        self._outdir = outdir
+        self.template = template or defaults.default_minicluster_template
 
     @property
     def outdir(self):
@@ -121,49 +141,244 @@ class ExperimentSetup:
             utils.mkdir_p(self._outdir)
         return self._outdir
 
-    # Shared "getter" functions to be used across actions
-    def get_size(self, experiment):
-        return str(experiment.get("size") or self.settings.google["size"])
+    @property
+    def variables(self):
+        return self.experiment.get("variables", {})
 
-    def get_minicluster(self, experiment):
+    @property
+    def root_dir(self):
+        """
+        Consistent means to get experiment.
+        """
+        return os.path.join(self.outdir, self.expid)
+
+    @property
+    def script_dir(self):
+        """
+        Save scripts to script directory for reproducing (if desired)
+        """
+        return os.path.join(self.root_dir, ".scripts")
+
+    def get_script(self, name, cloud, render_kwargs=None, ext="sh", suffix=""):
+        """
+        Get a named script from the cloud's script folder
+        """
+        ext = ext.strip(".")
+        render_kwargs = render_kwargs or {}
+        script = Script(cloud, name)
+        outfile = os.path.join(self.script_dir, f"{name}{suffix}.{ext}")
+        outdir = os.path.dirname(outfile)
+        if not os.path.exists(outdir):
+            logger.info(f"Creating output directory {outdir} for scripts.")
+            utils.mkdir_p(outdir)
+        return script.render(outfile=outfile, **render_kwargs)
+
+    def get_shared_script(self, name, render_kwargs=None, suffix="", ext="sh"):
+        """
+        Get a named shared script
+        """
+        render_kwargs = render_kwargs or {}
+        return self.get_script(
+            name, cloud="shared", render_kwargs=render_kwargs, suffix=suffix, ext=ext
+        )
+
+    def cleanup(self):
+        """
+        Cleanup the scripts directory for the experiment!
+        """
+        if os.path.exists(self.script_dir):
+            logger.debug(f"Cleaning up {self.script_dir}")
+            shutil.rmtree(self.script_dir)
+
+    def generate_crd(self, job, minicluster_size):
+        """
+        Generate a custom resource definition for the experiment
+        """
+        template = jinja2.Template(utils.read_file(self.template))
+        experiment = copy.deepcopy(self.experiment)
+
+        # If the experiment doesn't define a minicluster, add our default
+        if "minicluster" not in experiment:
+            experiment["minicluster"] = self.settings.minicluster
+
+        # Update minicluster size to the one we want
+        experiment["minicluster"]["size"] = minicluster_size
+
+        if "jobs" in experiment:
+            del experiment["jobs"]
+        experiment["job"] = job
+        result = template.render(**experiment)
+        logger.debug(result)
+
+        # Write to output directory
+        outfile = os.path.join(self.script_dir, "minicluster.yaml")
+        outdir = os.path.dirname(outfile)
+        if not os.path.exists(outdir):
+            logger.info(f"Creating output directory for scripts {outdir}")
+            utils.mkdir_p(outdir)
+        return utils.write_file(result, outfile)
+
+    @property
+    def jobs(self):
+        return self.experiment.get("jobs", {})
+
+    def is_run(self):
+        """
+        Determine if all jobs are already run in an experiment
+        """
+        if not self.jobs:
+            logger.warning(f"Experiment {self.expid} has no jobs, nothing to run.")
+            return True
+
+        # If all job output files exist, experiment is considered run
+        for size in self.minicluster["size"]:
+
+            # We can't run if the minicluster > the experiment size
+            if size > self.size:
+                logger.warning(
+                    f"Cluster of size {self.size} cannot handle a MiniCluster of size {size}, not considering."
+                )
+                continue
+
+            # Jobname is used for output
+            for jobname, job in self.jobs.items():
+
+                # Do we want to run this job for this size and machine?
+                if not self.check_job_run(job, size):
+                    logger.debug(
+                        f"Skipping job {jobname} as does not match inclusion criteria."
+                    )
+                    continue
+
+                # Add the size
+                jobname = f"{jobname}-minicluster-size-{size}"
+                job_output = os.path.join(self.root_dir, jobname)
+                logfile = os.path.join(job_output, "log.out")
+
+                # Do we have output?
+                if not os.path.exists(logfile):
+                    return False
+        return True
+
+    def check_job_run(self, job, size):
+        """
+        Determine if a job is marked for a MiniCluster size.
+        """
+        if "sizes" in job and size not in job["sizes"]:
+            return False
+        if "size" in job and job["size"] != size:
+            return False
+        if "machine" in job and self.machine and job["machine"] != self.machine:
+            return False
+        if "machines" in job and self.machine and self.machine not in job["machines"]:
+            return False
+        return True
+
+    def save_metadata(self, times):
+        """
+        Save experiment metadata, loading an existing meta.json, if present.
+        """
+        experiment_dir = self.root_dir
+
+        # The experiment is defined by the machine type and size
+        if not os.path.exists(experiment_dir):
+            utils.mkdir_p(experiment_dir)
+        meta_file = os.path.join(experiment_dir, "meta.json")
+
+        # Load existing metadata, if we have it
+        meta = {"times": times}
+        if os.path.exists(meta_file):
+            meta = utils.read_json(meta_file)
+
+            # Don't update cluster-up/down if already here
+            frozen_keys = ["create-cluster", "destroy-cluster"]
+            for timekey, timevalue in times.items():
+                if timekey in meta and timekey in frozen_keys:
+                    continue
+                meta["times"][timekey] = timevalue
+
+        # TODO we could add cost estimation here - data from cloud select
+        for key, value in self.experiment.items():
+            meta[key] = value
+        utils.write_json(meta, meta_file)
+        return meta
+
+    def set_minicluster_size(self, size):
+        """
+        Set the minicluster size for an experiment.
+        """
+        if size not in self.minicluster["size"]:
+            logger.exit(
+                f"Size {size} is not a known MiniCluster size for this experiment."
+            )
+
+        logger.debug(f"MiniCluster size {size} selected to run for {self.expid}")
+        self.minicluster["size"] = [size]
+
+    # Shared "getter" functions to be used across actions
+    @property
+    def size(self):
+        return self.experiment.get("size") or self.settings.google["size"]
+
+    @property
+    def operator_branch(self):
+        return (
+            self.experiment.get("operator", {}).get("branch")
+            or self.settings.operator["branch"]
+            or "main"
+        )
+
+    @property
+    def operator_repository(self):
+        return (
+            self.experiment.get("operator", {}).get("repository")
+            or self.settings.operator["repository"]
+            or "flux-framework/flux-operator"
+        )
+
+    @property
+    def minicluster(self):
         """
         Get mini cluster definition, first from experiment and fall back to settings.
         """
-        minicluster = experiment.get("minicluster") or self.settings.minicluster
+        minicluster = self.experiment.get("minicluster") or self.settings.minicluster
         if "namespace" not in minicluster or not minicluster["namespace"]:
             minicluster["namespace"] = defaults.default_namespace
-        if "size" not in minicluster:
-            minicluster["size"] = [experiment["size"]]
         return minicluster
 
-    def get_machine(self, experiment):
-        return experiment.get("machine") or self.settings.google["machine"]
+    @property
+    def machine(self):
+        return self.experiment.get("machine") or self.settings.google["machine"]
 
-    def get_tags(self, experiment):
-        return experiment.get("kubernetes", {}).get("tags")
+    @property
+    def tags(self):
+        return self.experiment.get("kubernetes", {}).get("tags")
 
-    def get_cluster_name(self, experiment):
+    @property
+    def expid(self):
+        """
+        Return the experiment id
+        """
+        if "machine" not in self.experiment:
+            return f"k8s-size-{self.experiment['size']}-local"
+        return f"k8s-size-{self.experiment['size']}-{self.experiment['machine']}"
+
+    @property
+    def cluster_name(self):
         return (
-            experiment.get("kubernetes", {}).get("name")
+            self.experiment.get("kubernetes", {}).get("name")
             or defaults.default_cluster_name
         )
 
-    def get_cluster_version(self, experiment):
-        return experiment.get("kubernetes", {}).get("version")
-
-    def validate(self):
-        """
-        Validate that all paths exist (create output if it does not)
-        """
-        if self.template is not None and not os.path.exists(self.template):
-            raise ValueError(f"Template file {self.template} does not exist.")
-
-        # This file must always be provided and exist
-        if not os.path.exists(self.experiment_file):
-            raise ValueError(f"Experiments file {self.experiment_file} does not exist.")
+    @property
+    def kubernetes_version(self):
+        return (
+            self.experiment.get("kubernetes", {}).get("version")
+            or self.settings.kubernetes["version"]
+        )
 
 
-def expand_experiments(experiments):
+def expand_experiments(experiments, outdir, template=None):
     """
     Given a valid experiments.yaml, expand out into experiments
     """
@@ -188,23 +403,12 @@ def expand_experiments(experiments):
         raise ValueError(
             'The key "experiment" or "experiments" or "matrix" is required.'
         )
-    # Add ids to all entries
-    matrix = add_experiment_ids(matrix)
-    return matrix
 
-
-def add_experiment_ids(matrix):
-    """
-    Add experiment identifiers based on machine.
-
-    The size is for the kubernetes cluster
-    """
+    # Put in final matrix form
+    final = []
     for entry in matrix:
-        if "machine" not in entry:
-            entry["id"] = f"k8s-size-{entry['size']}-local"
-        else:
-            entry["id"] = f"k8s-size-{entry['size']}-{entry['machine']}"
-    return matrix
+        final.append(Experiment(entry, outdir, template))
+    return final
 
 
 def expand_jobs(jobs):

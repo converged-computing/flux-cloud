@@ -3,6 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+
 import fluxcloud.utils as utils
 from fluxcloud.logger import logger
 from fluxcloud.main.client import ExperimentClient
@@ -22,22 +23,15 @@ class MiniKube(ExperimentClient):
         Bring up a MiniKube cluster
         """
         experiment = experiment or setup.get_single_experiment()
-        create_script = self.get_script("cluster-create-minikube", "local")
+
+        # Variables to populate template
+        kwargs = {"experiment": experiment, "setup": setup}
+        create_script = experiment.get_script(
+            "cluster-create-minikube", "local", kwargs
+        )
 
         # Create the cluster with creation script
-        cmd = [
-            create_script,
-            "--cluster",
-            setup.get_cluster_name(experiment),
-            "--cluster-version",
-            setup.get_cluster_version(experiment)
-            or self.settings.kubernetes["version"],
-            "--size",
-            setup.get_size(experiment),
-        ]
-        if setup.force_cluster:
-            cmd.append("--force-cluster")
-        return self.run_timed("create-cluster", cmd)
+        return self.run_timed("create-cluster", ["/bin/bash", create_script])
 
     def pre_apply(self, experiment, jobname, job):
         """
@@ -64,14 +58,11 @@ class MiniKube(ExperimentClient):
         Destroy a cluster
         """
         experiment = experiment or setup.get_single_experiment()
-        destroy_script = self.get_script("cluster-destroy-minikube", "local")
 
-        # Create the cluster with creation script
-        cmd = [
-            destroy_script,
-            "--cluster",
-            setup.get_cluster_name(experiment),
-        ]
-        if setup.force_cluster:
-            cmd.append("--force-cluster")
-        return self.run_timed("destroy-cluster", cmd)
+        kwargs = {"experiment": experiment, "setup": setup}
+        destroy_script = experiment.get_script(
+            "cluster-destroy-minikube", "local", kwargs
+        )
+
+        # If we aren't cleaning up, show path to destroy script in debug
+        return self.run_timed("destroy-cluster", ["/bin/bash", destroy_script])

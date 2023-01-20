@@ -17,6 +17,7 @@ def main(args, parser, extra, subparser):
     setup = ExperimentSetup(
         args.experiments,
         quiet=True,
+        cleanup=args.cleanup,
         force_cluster=args.force_cluster,
         outdir=args.output_dir,
     )
@@ -24,5 +25,6 @@ def main(args, parser, extra, subparser):
     # Update config settings on the fly
     cli.settings.update_params(args.config_params)
     setup.settings.update_params(args.config_params)
-    experiment = select_experiment(setup, args.experiment_id)
+    experiment = select_experiment(setup, args.experiment_id, args.size)
     cli.up(setup, experiment=experiment)
+    setup.cleanup(setup.matrices)

@@ -17,6 +17,7 @@ def main(args, parser, extra, subparser):
     setup = ExperimentSetup(
         args.experiments,
         quiet=True,
+        cleanup=args.cleanup,
         force_cluster=args.force_cluster,
         outdir=args.output_dir,
     )
@@ -30,6 +31,7 @@ def main(args, parser, extra, subparser):
     else:
         experiments = [select_experiment(setup, args.experiment_id)]
 
-    # Bring down all experiments
+    # Bring down all experiments (minicluster size doesn't matter, it's one cluster)
     for experiment in experiments:
         cli.down(setup, experiment=experiment)
+    setup.cleanup(setup.matrices)

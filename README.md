@@ -19,13 +19,13 @@ It will be expanded as needed.
 
 🚧️ **under development** 🚧️
 
-Code is under development and will be added soon! In the meantime, for early documentation, see ⭐️ [docs](docs) ⭐️
+
+Code is under development and likely to change!
+In the meantime, for early documentation, see our ⭐️ [Documentation](https://converged-computing.github.io/flux-cloud/) ⭐️
 
 ## TODO
 
- - we should not have bash scripts, generate templates instead.
- - add avail zones to debug output
- - should have generic template provided by library
+ - test for list of experiments
  - cloud-select could estimate the cost?
  - run and add more cluster examples
 

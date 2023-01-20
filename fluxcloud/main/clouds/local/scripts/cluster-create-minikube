@@ -1,88 +1,20 @@
 #!/bin/bash
 
-SHORT="c:,v:,s:,b:,r:,f:,h"
-LONG="cluster-version:,size:,branch:,repository:,force-cluster,help"
-OPTS=$(getopt -a -n create --options $SHORT --longoptions $LONG -- "$@")
-
-eval set -- "$OPTS"
-
-HERE=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-ROOT=$(dirname $(dirname ${HERE}))
-
 # Source shared helper scripts
-. $ROOT/shared/scripts/helpers.sh
+{% include "helpers.sh" %}
 
-function install_operator() {
-    tmpfile=$(mktemp /tmp/flux-operator.XXXXXX.yaml)
-    rm -rf $tmpfile
-    run_echo wget -O $tmpfile https://raw.githubusercontent.com/${REPOSITORY}/${BRANCH}/examples/dist/flux-operator.yaml
-    kubectl apply -f $tmpfile
-    rm -rf $tmpfile
-}
-
-# Defaults
-CLUSTER_NAME="flux-cluster"
-CLUSTER_VERSION="1.23"
-MACHINE_TYPE="n1-standard-1"
-FORCE_CLUSTER="false"
-SIZE=4
-TAGS=flux-cluster
-REPOSITORY="flux-framework/flux-operator"
-BRANCH="main"
-
-function usage() {
-   echo "This is the MiniKube kubernetes cluster creator."
-   echo "usage: cluster-create --cluster <cluster-name> --size <size>"
-}
-
-while :
-do
-  case "$1" in
-    -c | --cluster)
-        CLUSTER_NAME=$2
-        shift 2
-        ;;
-    -v | --cluster-version)
-        CLUSTER_VERSION=$2
-        shift 2
-        ;;
-    -t | --tags)
-        TAGS=$2
-        shift 2
-        ;;
-    -f | --force-cluster)
-        FORCE_CLUSTER="true"
-        shift 1
-        ;;
-    -s | --size)
-        SIZE=$2
-        shift 2
-        ;;
-    -b | --branch)
-        BRANCH=$2
-        shift 2
-        ;;
-    -r | --repository)
-        REPOSITORY=$2
-        shift 2
-        ;;
-    -h | --help)
-      usage
-      exit 2
-      ;;
-    --)
-      shift;
-      break
-      ;;
-    *)
-      echo "Unexpected option: $1"
-      ;;
-  esac
-done
+# Defaults - these are in the config but left here for information
+CLUSTER_NAME="{% if experiment.cluster_name %}{{ experiment.cluster_name }}{% else %}flux-cluster{% endif %}"
+CLUSTER_VERSION="{% if experiment.kubernetes_version %}{{ experiment.kubernetes_version }}{% else %}1.23{% endif %}"
+FORCE_CLUSTER="{% if setup.force_cluster %}true{% else %}false{% endif %}"
+SIZE={% if experiment.size %}{{ experiment.size }}{% else %}4{% endif %}
+REPOSITORY="{% if experiment.operator_repository %}{{ experiment.operator_repository }}{% else %}flux-framework/flux-operator{% endif %}"
+BRANCH="{% if experiment.operator_branch %}{{ experiment.operator_branch }}{% else %}main{% endif %}"
+SCRIPT_DIR="{{ experiment.script_dir }}"
 
 print_magenta "   cluster  : ${CLUSTER_NAME}"
 print_magenta "    version : ${CLUSTER_VERSION}"
-print_magenta "    size   : ${SIZE}"
+print_magenta "     size   : ${SIZE}"
 print_magenta "repository  : ${REPOSITORY}"
 print_magenta "     branch : ${BRANCH}"
 
@@ -94,7 +26,7 @@ minikube status
 retval=$?
 if [[ "${retval}" == "0" ]]; then
     print_blue "A MiniKube cluster already exists."
-    install_operator
+    install_operator ${SCRIPT_DIR} ${REPOSITORY} ${BRANCH}
     echo
     exit 0
 fi
@@ -105,7 +37,7 @@ fi
 
 # Create the cluster
 run_echo minikube start --nodes=${SIZE}
-install_operator
+install_operator ${SCRIPT_DIR} ${REPOSITORY} ${BRANCH}
 
 # Show nodes
 run_echo kubectl get nodes

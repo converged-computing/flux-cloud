@@ -183,10 +183,24 @@ flux-cloud config add cloud aws""",
             default=False,
         )
         command.add_argument(
+            "--cleanup",
+            dest="cleanup",
+            help="Cleanup intermediate script files in .script directory.",
+            action="store_true",
+            default=False,
+        )
+        command.add_argument(
             "--id",
             "-e",
             dest="experiment_id",
-            help="experiment ID to apply to (<machine>-<size>)",
+            help="experiment ID to apply to (<machine>-<k8s-size>)",
+        )
+        command.add_argument(
+            "--size",
+            "-s",
+            dest="size",
+            type=int,
+            help="experiment size under ID to apply to",
         )
 
     for command in run, apply, up, down:
