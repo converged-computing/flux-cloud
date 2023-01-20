@@ -81,7 +81,7 @@ class AmazonCloud(ExperimentClient):
         values = {}
 
         # Write to experiment scripts directory
-        config_file = os.path.join(experiment.script_dir, "exsctl-config.yaml")
+        config_file = os.path.join(experiment.script_dir, "eksctl-config.yaml")
         if not os.path.exists(experiment.script_dir):
             utils.mkdir_p(experiment.script_dir)
 
