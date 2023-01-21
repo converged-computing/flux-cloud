@@ -18,6 +18,23 @@ print_magenta "logfile : ${LOGFILE}"
 
 is_installed kubectl
 
+# Ensure we wait for the space to be cleaned up
+echo
+podsCleaned="false"
+print_blue "Waiting for previous pods to be cleaned up..."
+while [[ "${podsCleaned}" == "false" ]]; do
+    echo -n "."
+    sleep 2
+    state=$(kubectl get pods --namespace ${NAMESPACE} 2>&1)
+    lines=$(echo $state | wc -l)
+    if [[ "${lines}" == "1" ]] && [[ "${lines}" == *"No resources found in"* ]];
+        echo
+        print_green "🌀️ Previous pods are cleaned up."
+        podsCleaned="true"
+        break
+    fi
+done
+
 # Create the namespace (ok if already exists)
 run_echo_allow_fail kubectl create namespace ${NAMESPACE}
 
