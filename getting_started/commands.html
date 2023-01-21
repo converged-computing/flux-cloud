@@ -782,6 +782,8 @@ first entry, otherwise we use the identifier you provide.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>flux-cloud<span class="w"> </span>apply<span class="w"> </span>-e<span class="w"> </span>n1-standard-1-2<span class="w"> </span>--force
 </code></pre></div>
 </div>
+<p>Note that by default, we always wait for a previous run to be cleaned up
+before continuing.</p>
 <h2 id="down">down<a class="headerlink" href="#down" title="Permalink to this heading">¶</a></h2>
 <p>And then bring down your first (or named) cluster:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>flux-cloud<span class="w"> </span>down
@@ -846,7 +848,7 @@ however if the user decides to launch more than one, it might be harder. More th
   <small>
     
       Last update:
-      Jan 20, 2023
+      Jan 21, 2023
     
   </small>
 </div>

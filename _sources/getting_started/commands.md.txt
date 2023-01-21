@@ -138,6 +138,9 @@ To force overwrite of existing results (by default they are skipped)
 $ flux-cloud apply -e n1-standard-1-2 --force
 ```
 
+Note that by default, we always wait for a previous run to be cleaned up
+before continuing.
+
 ## down
 
 And then bring down your first (or named) cluster:
