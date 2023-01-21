@@ -133,15 +133,32 @@ function with_exponential_backoff {
 }
 
 NAMESPACE="flux-operator"
-CRD="/home/vanessa/Desktop/Code/flux/flux-cloud/tests/lammps/data/k8s-size-4-local/.scripts/minicluster.yaml"
+CRD="/tmp/lammps-data-WpiC0E/k8s-size-4-local/.scripts/minicluster.yaml"
 JOB="lammps"
-LOGFILE="/home/vanessa/Desktop/Code/flux/flux-cloud/tests/lammps/data/k8s-size-4-local/lmp-size-2-minicluster-size-2/log.out"
+LOGFILE="/tmp/lammps-data-WpiC0E/k8s-size-4-local/lmp-size-2-minicluster-size-2/log.out"
 
 print_magenta "  apply : ${CRD}"
 print_magenta "    job : ${JOB}"
 print_magenta "logfile : ${LOGFILE}"
 
 is_installed kubectl
+
+# Ensure we wait for the space to be cleaned up
+echo
+podsCleaned="false"
+print_blue "Waiting for previous pods to be cleaned up..."
+while [[ "${podsCleaned}" == "false" ]]; do
+    echo -n "."
+    sleep 2
+    state=$(kubectl get pods --namespace ${NAMESPACE} 2>&1)
+    lines=$(echo $state | wc -l)
+    if [[ "${lines}" == "1" ]] && [[ "${state}" == *"No resources found in"* ]]; then
+        echo
+        print_green "🌀️ Previous pods are cleaned up."
+        podsCleaned="true"
+        break
+    fi
+done
 
 # Create the namespace (ok if already exists)
 run_echo_allow_fail kubectl create namespace ${NAMESPACE}
