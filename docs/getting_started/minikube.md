@@ -96,7 +96,8 @@ spec:
   size: {{ minicluster.size }}
 
   # Disable verbose output
-  test: true
+  logging:
+    quiet: true
 
   # This is a list because a pod can support multiple containers
   containers:
