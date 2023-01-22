@@ -160,7 +160,7 @@ $ flux-cloud apply -e n1-standard-1-2 --force
 ```
 
 Apply is going to be creating on CRD per job, so that's a lot of
-pod creation and deletion. This is in comparion to "submit" that
+pod creation and deletion. This is in comparison to "submit" that
 brings up a MiniCluster once, and then executes commands to it, allowing
 Flux to serve as the scheduler. Note that by default, we always wait for a previous run to be cleaned up
 before continuing.
@@ -203,7 +203,7 @@ $ flux-cloud batch --cloud aws
 ```
 
 Note that since we are communicating with the FluxRestful API, you are required to
-provide a `FLUX_USER` and `FLUX_TOKEN` for the API. If you are running this programatically,
+provide a `FLUX_USER` and `FLUX_TOKEN` for the API. If you are running this programmatically,
 the Flux Restful Client will handle this, however if you, for example, press control C to
 cancel a run, you'll need to copy paste the username and token that was previously shown
 before running submit again to continue where you left off. Batch is equivalent to:
