@@ -46,7 +46,7 @@ function install_operator() {
     repository=${2}
     branch=${3}
     tmpfile="${script_dir}/flux-operator.yaml"
-    run_echo wget -O $tmpfile https://raw.githubusercontent.com/${REPOSITORY}/${BRANCH}/examples/dist/flux-operator.yaml
+    run_echo wget -O $tmpfile https://raw.githubusercontent.com/${repository}/${branch}/examples/dist/flux-operator.yaml
     kubectl apply -f $tmpfile
 }
 
@@ -130,12 +130,12 @@ function with_exponential_backoff {
 
 # Defaults - these are in the config but left here for information
 CLUSTER_NAME="flux-cluster"
-CLUSTER_VERSION="1.22"
-FORCE_CLUSTER="false"
+CLUSTER_VERSION="1.23"
+FORCE_CLUSTER="true"
 SIZE=4
 REPOSITORY="flux-framework/flux-operator"
 BRANCH="main"
-SCRIPT_DIR="/home/vanessa/Desktop/Code/flux/flux-cloud/tests/lammps/data/k8s-size-4-local/.scripts"
+SCRIPT_DIR="/tmp/lammps-data-WHqAsc/k8s-size-4-local/.scripts"
 
 print_magenta "   cluster  : ${CLUSTER_NAME}"
 print_magenta "    version : ${CLUSTER_VERSION}"

@@ -72,7 +72,7 @@ class ExperimentClient:
             # Don't bring up a cluster if experiments already run!
             if not setup.force and experiment.is_run():
                 logger.info(
-                    f"Experiment on machine {experiment['id']} was already run and force is False, skipping."
+                    f"Experiment on machine {experiment.expid} was already run and force is False, skipping."
                 )
                 continue
 
@@ -97,7 +97,9 @@ class ExperimentClient:
         # The MiniCluster can vary on size
         minicluster = experiment.minicluster
         if not experiment.jobs:
-            logger.warning(f"Experiment {experiment} has no jobs, nothing to run.")
+            logger.warning(
+                f"Experiment {experiment.expid} has no jobs, nothing to run."
+            )
             return
 
         # The experiment is defined by the machine type and size
