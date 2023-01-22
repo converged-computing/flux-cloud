@@ -3,30 +3,22 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-import fluxcloud.utils as utils
-from fluxcloud.main import get_experiment_client
-from fluxcloud.main.experiment import ExperimentSetup
-
-from .helpers import select_experiment
+from .helpers import prepare_client
 
 
 def main(args, parser, extra, subparser):
-    utils.ensure_no_extra(extra)
-
-    cli = get_experiment_client(args.cloud)
-    setup = ExperimentSetup(
-        args.experiments,
-        force_cluster=args.force_cluster,
-        template=args.template,
-        cleanup=args.cleanup,
-        outdir=args.output_dir,
-        test=args.test,
-        quiet=True,
-    )
-
-    # Update config settings on the fly
-    cli.settings.update_params(args.config_params)
-    setup.settings.update_params(args.config_params)
-    experiment = select_experiment(setup, args.experiment_id, args.size)
+    """
+    apply parser submits via separate CRDs.
+    """
+    cli, setup, experiment = prepare_client(args, extra)
     cli.apply(setup, experiment=experiment)
+    setup.cleanup(setup.matrices)
+
+
+def submit(args, parser, extra, subparser):
+    """
+    submit parser submits via the Flux Restful API to one cluster
+    """
+    cli, setup, experiment = prepare_client(args, extra)
+    cli.submit(setup, experiment=experiment)
     setup.cleanup(setup.matrices)

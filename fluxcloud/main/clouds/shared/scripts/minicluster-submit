@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# This is a template that will be populated with variables by Flux-Cloud
+# We only run it to check if a MiniCluster is running. An apply is only
+# needed if the MiniCluster is not created yet.
+
+# Include shared helper scripts
+{% include "helpers.sh" %}
+
+NAMESPACE="{% if minicluster.namespace %}{{ minicluster.namespace }}{% else %}flux-operator{% endif %}"
+CRD="{{ crd }}"
+JOB="{{ minicluster.name }}"
+
+# Size -1 to account for certificate generator
+SIZE={{ size }}
+
+print_magenta "  apply : ${CRD}"
+print_magenta "    job : ${JOB}"
+
+is_installed kubectl
+
+# Create the namespace (ok if already exists)
+run_echo_allow_fail kubectl create namespace ${NAMESPACE}
+
+# Always cleanup a previous one so tokens don't get stale
+run_echo_allow_fail kubectl delete -f ${CRD}
+{% include "wait_for_cleanup.sh" %}
+
+# Ensure we have a MiniCluster of the right namespace running
+echo
+print_green "🌀️ Creating MiniCluster in ${NAMESPACE}"
+{% include "wait_for_all.sh" %}
+{% include "wait_for_flux_restful.sh" %}

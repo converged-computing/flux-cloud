@@ -124,18 +124,27 @@ flux-cloud config add cloud aws""",
         type=str,
     )
 
-    # Experiment runner is "run"
+    # These are multi-commands, e.g., up <command> down
     run = subparsers.add_parser(
         "run",
-        description="Main run command to run experiments",
+        description="Bring the cluster up, run experiments via applying CRDs, and bring it down.",
+        formatter_class=argparse.RawTextHelpFormatter,
+    )
+    batch = subparsers.add_parser(
+        "batch",
+        description="Bring the cluster up, run experiments via a Flux Restful API submit, and bring it down.",
+        formatter_class=argparse.RawTextHelpFormatter,
+    )
+    submit = subparsers.add_parser(
+        "submit",
+        description="Submit experiments via the Flux Restful API (one set of pods, shared)",
         formatter_class=argparse.RawTextHelpFormatter,
     )
     apply = subparsers.add_parser(
         "apply",
-        description="Apply experiments (CRDs) to the cluster.",
+        description="Run experiments via the applying experiments (CRDs) to the cluster (each a set of pods)",
         formatter_class=argparse.RawTextHelpFormatter,
     )
-
     up = subparsers.add_parser(
         "up",
         description="Bring up a cluster and install the operator",
@@ -159,7 +168,7 @@ flux-cloud config add cloud aws""",
         description="List experiment ids available.",
         formatter_class=argparse.RawTextHelpFormatter,
     )
-    for command in run, up, down, apply, listing:
+    for command in run, up, down, apply, listing, batch, submit:
         command.add_argument(
             "experiments",
             default="experiments.yaml",
@@ -174,7 +183,7 @@ flux-cloud config add cloud aws""",
             choices=clouds.cloud_names,
         )
 
-    for command in apply, up, down, run:
+    for command in apply, up, down, run, batch, submit:
         command.add_argument(
             "--force-cluster",
             dest="force_cluster",
@@ -202,8 +211,6 @@ flux-cloud config add cloud aws""",
             type=int,
             help="experiment size under ID to apply to",
         )
-
-    for command in run, apply, up, down:
         command.add_argument(
             "-o",
             "--output-dir",
@@ -275,10 +282,14 @@ def run():
     # Does the user want a shell?
     if args.command == "apply":
         from .apply import main
+    elif args.command == "submit":
+        from .apply import submit as main
     elif args.command == "list":
         from .listing import main
     elif args.command == "run":
         from .run import main
+    elif args.command == "batch":
+        from .run import batch as main
     elif args.command == "config":
         from .config import main
     elif args.command == "up":

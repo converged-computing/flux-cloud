@@ -8,6 +8,7 @@ import shutil
 
 import fluxcloud.utils as utils
 from fluxcloud.logger import logger
+from fluxcloud.main.api import APIClient
 from fluxcloud.main.decorator import save_meta, timed
 
 here = os.path.dirname(os.path.abspath(__file__))
@@ -22,6 +23,7 @@ class ExperimentClient:
         import fluxcloud.main.settings as settings
 
         self.settings = settings.Settings
+        self.info = {}
         self.times = {}
 
         # Job prefix is used for organizing time entries
@@ -86,6 +88,82 @@ class ExperimentClient:
         Destroy a cluster implemented by underlying cloud.
         """
         raise NotImplementedError
+
+    @save_meta
+    def submit(self, setup, experiment):
+        """
+        Submit a Job via the Restful API
+        """
+        # The MiniCluster can vary on size
+        minicluster = experiment.minicluster
+        if not experiment.jobs:
+            logger.warning(
+                f"Experiment {experiment.expid} has no jobs, nothing to run."
+            )
+            return
+
+        # Create a FluxRestful API to submit to
+        # This will get creds from the environment or create new ones
+        api = APIClient()
+        logger.info(
+            "Save these if you want to log into the Flux RESTFul interface, there are specific to the MiniCluster"
+        )
+        logger.info(f"export FLUX_USER={api.user}")
+        logger.info(f"export FLUX_TOKEN={api.token}")
+
+        # Iterate through all the cluster sizes
+        for size in minicluster["size"]:
+
+            # We can't run if the minicluster > the experiment size
+            if size > experiment.size:
+                logger.warning(
+                    f"Cluster of size {experiment.size} cannot handle a MiniCluster of size {size}, skipping."
+                )
+                continue
+
+            logger.info(f"\n🌀 Bringing up MiniCluster of size {size}")
+
+            # Get the global "job" for the size (and validate only one image)
+            # This will raise error if > 1 image, or no image.
+            image = experiment.get_persistent_image(size)
+            job = {"image": image, "token": api.token, "user": api.user}
+
+            # Pre-pull containers, etc.
+            if hasattr(self, "pre_apply"):
+                self.pre_apply(experiment, "global-job", job=job)
+
+            # Create the minicluster via a CRD without a command
+            crd = experiment.generate_crd(job, size)
+
+            # Create one MiniCluster CRD (without a command) to run the Flux Restful API
+            kwargs = {
+                "minicluster": minicluster,
+                "crd": crd,
+                "token": api.token,
+                "user": api.user,
+                "size": size,
+            }
+            submit_script = experiment.get_shared_script(
+                "minicluster-submit", kwargs, suffix=f"-size-{size}"
+            )
+            # Start the MiniCluster! This should probably be done better...
+            self.run_timed(
+                f"minicluster-submit-size-{size}", ["/bin/bash", submit_script]
+            )
+
+            # Ensure our credentials still work, and open port forward
+            api.check(experiment)
+
+            # Get times back OR save as we go? (probably better)
+            for jobid, info in api.submit(setup, experiment, size):
+                logger.info(f"{jobid} took {info['runtime']} seconds.")
+                self.times[jobid] = info["runtime"]
+                self.info[jobid] = info
+
+            logger.info(f"\n🌀 MiniCluster of size {size} is finished")
+            self.run_timed(
+                f"minicluster-destroy-size-{size}", ["kubectl", "delete", "-f", crd]
+            )
 
     @save_meta
     def apply(self, setup, experiment):

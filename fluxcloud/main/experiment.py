@@ -152,6 +152,32 @@ class Experiment:
         """
         return os.path.join(self.outdir, self.expid)
 
+    def get_persistent_image(self, size):
+        """
+        A persistent image is a job image used across a size of MiniCluster
+        """
+        image = None
+        for _, job in self.jobs.items():
+
+            # Skip jobs targeted for a different size
+            if "size" in job and job["size"] != size:
+                continue
+
+            if "image" in job and not image:
+                image = job["image"]
+                continue
+            if "image" in job and image != job["image"]:
+                raise ValueError(
+                    f"Submit uses a consistent container image, but found two images under size {size}: {image} and {job['image']}"
+                )
+
+        # If we get here and we don't have an image
+        if not image:
+            raise ValueError(
+                'Submit requires a container "image" under at least one job spec to create the MiniCluster.'
+            )
+        return image
+
     @property
     def script_dir(self):
         """
@@ -207,11 +233,13 @@ class Experiment:
         if "jobs" in experiment:
             del experiment["jobs"]
         experiment["job"] = job
-        result = template.render(**experiment)
+        result = template.render(**experiment).strip(" ")
         logger.debug(result)
 
         # Write to output directory
-        outfile = os.path.join(self.script_dir, "minicluster.yaml")
+        outfile = os.path.join(
+            self.script_dir, f"minicluster-size-{minicluster_size}.yaml"
+        )
         outdir = os.path.dirname(outfile)
         if not os.path.exists(outdir):
             logger.info(f"Creating output directory for scripts {outdir}")
@@ -274,11 +302,12 @@ class Experiment:
             return False
         return True
 
-    def save_metadata(self, times):
+    def save_metadata(self, times, info=None):
         """
         Save experiment metadata, loading an existing meta.json, if present.
         """
         experiment_dir = self.root_dir
+        info = info or {}
 
         # The experiment is defined by the machine type and size
         if not os.path.exists(experiment_dir):
@@ -286,7 +315,7 @@ class Experiment:
         meta_file = os.path.join(experiment_dir, "meta.json")
 
         # Load existing metadata, if we have it
-        meta = {"times": times}
+        meta = {"times": times, "info": info}
         if os.path.exists(meta_file):
             meta = utils.read_json(meta_file)
 
@@ -296,6 +325,10 @@ class Experiment:
                 if timekey in meta and timekey in frozen_keys:
                     continue
                 meta["times"][timekey] = timevalue
+
+            # Update info
+            for key, value in info.items():
+                meta["info"][key] = value
 
         # TODO we could add cost estimation here - data from cloud select
         for key, value in self.experiment.items():
