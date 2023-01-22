@@ -739,6 +739,12 @@ in your settings.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>flux-cloud<span class="w"> </span>run
 </code></pre></div>
 </div>
+<p>Or for more control and/or verbosity:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>flux-cloud<span class="w"> </span>--debug<span class="w"> </span>up<span class="w"> </span>--cloud<span class="w"> </span>aws
+$<span class="w"> </span>flux-cloud<span class="w"> </span>--debug<span class="w"> </span>apply<span class="w"> </span>--cloud<span class="w"> </span>aws
+$<span class="w"> </span>flux-cloud<span class="w"> </span>--debug<span class="w"> </span>down<span class="w"> </span>--cloud<span class="w"> </span>aws
+</code></pre></div>
+</div>
 <p>Given an experiments.yaml in the present working directory. Take a look at an <code class="docutils literal notranslate"><span class="pre">experients.yaml</span></code> in an example directory.
 Note that machines and size are required for the matrix, and variables get piped into all experiments (in full).</p>
 
@@ -748,7 +754,7 @@ Note that machines and size are required for the matrix, and variables get piped
   <small>
     
       Last update:
-      Jan 21, 2023
+      Jan 22, 2023
     
   </small>
 </div>

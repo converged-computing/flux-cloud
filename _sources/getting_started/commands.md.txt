@@ -52,17 +52,22 @@ The main command is a "run" that is going to, for each cluster:
 And output will be organized based on machine, size, and command identifier. E.g.,:
 
 ```bash
-$ tree ./data/
-├── meta.json
-├── n1-standard-1-2
-│   └── reaxc-hns
-│       └── log.out
-└── n1-standard-1-4
-    └── reaxc-hns
-        └── log.out
+data/
+└── k8s-size-64-hpc6a.48xlarge
+    ├── lmp-16-10-minicluster-size-16
+    │   └── log.out
+    ├── lmp-16-11-minicluster-size-16
+    │   └── log.out
+    ...
+    ├── lmp-64-9-minicluster-size-64
+    │   └── log.out
+    └── meta.json
 ```
 
-That looks like this:
+In the above, the top level directory `k8s-size-64-hpc6a.48xlarge` corresponds to our
+Kubernetes cluster size and machine type. The subdirectories under that correspond
+to specific jobs and repeat numbers and sizes, and the `meta.json` includes a summary
+of your experiments across those in json. Thus, to run everything:
 
 ```bash
 $ flux-cloud run
@@ -77,7 +82,13 @@ $ flux-cloud run --force-cluster
 To force overwrite of existing results (by default they are skipped)
 
 ```bash
-$ flux-cloud run -e n1-standard-1-2 --force
+$ flux-cloud run --force
+```
+
+Ask for a specific cloud:
+
+```bash
+$ flux-cloud run --cloud aws
 ```
 
 If you want to have more control, you can run one Kubernetes size (across MiniCluster sizes) at a time,
@@ -88,6 +99,7 @@ $ flux-cloud up -e n1-standard-1-2
 $ flux-cloud apply -e n1-standard-1-2
 $ flux-cloud down -e n1-standard-1-2
 ```
+
 These commands are discussed in more next.
 
 ### up
@@ -199,14 +211,17 @@ same command, across two MiniCluster cluster sizes (2 and 4):
 
 ```console
 $ tree data/k8s-size-4-n1-standard-1/.scripts/
-data/k8s-size-4-n1-standard-1/.scripts/
+├── cluster-create.sh
 ├── cluster-destroy.sh
-├── minicluster-run-lmp-1-minicluster-size-2.sh
-├── minicluster-run-lmp-1-minicluster-size-4.sh
-├── minicluster-run-lmp-2-minicluster-size-2.sh
-├── minicluster-run-lmp-2-minicluster-size-4.sh
+├── eksctl-config.yaml
+├── flux-operator.yaml
+├── minicluster-run-lmp-16-10-minicluster-size-16.sh
+├── minicluster-run-lmp-16-11-minicluster-size-16.sh
+├── minicluster-run-lmp-16-12-minicluster-size-16.sh
+...
+├── minicluster-run-lmp-64-8-minicluster-size-64.sh
+├── minicluster-run-lmp-64-9-minicluster-size-64.sh
 └── minicluster.yaml
-0 directories, 6 files
 ```
 
 And that's it! I think there might be a more elegant way to determine what cluster is running,

@@ -96,5 +96,13 @@ Note that since the experiments file defaults to that name, you can also just do
 $ flux-cloud run
 ```
 
+Or for more control and/or verbosity:
+
+```bash
+$ flux-cloud --debug up --cloud aws
+$ flux-cloud --debug apply --cloud aws
+$ flux-cloud --debug down --cloud aws
+```
+
 Given an experiments.yaml in the present working directory. Take a look at an `experients.yaml` in an example directory.
 Note that machines and size are required for the matrix, and variables get piped into all experiments (in full).

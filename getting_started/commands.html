@@ -718,17 +718,22 @@ with <code class="docutils literal notranslate"><span class="pre">-e</span></cod
 <li><p>Bring down the cluster</p></li>
 </ol>
 <p>And output will be organized based on machine, size, and command identifier. E.g.,:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>tree<span class="w"> </span>./data/
-├──<span class="w"> </span>meta.json
-├──<span class="w"> </span>n1-standard-1-2
-│<span class="w">   </span>└──<span class="w"> </span>reaxc-hns
-│<span class="w">       </span>└──<span class="w"> </span>log.out
-└──<span class="w"> </span>n1-standard-1-4
-<span class="w">    </span>└──<span class="w"> </span>reaxc-hns
-<span class="w">        </span>└──<span class="w"> </span>log.out
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>data/
+└──<span class="w"> </span>k8s-size-64-hpc6a.48xlarge
+<span class="w">    </span>├──<span class="w"> </span>lmp-16-10-minicluster-size-16
+<span class="w">    </span>│<span class="w">   </span>└──<span class="w"> </span>log.out
+<span class="w">    </span>├──<span class="w"> </span>lmp-16-11-minicluster-size-16
+<span class="w">    </span>│<span class="w">   </span>└──<span class="w"> </span>log.out
+<span class="w">    </span>...
+<span class="w">    </span>├──<span class="w"> </span>lmp-64-9-minicluster-size-64
+<span class="w">    </span>│<span class="w">   </span>└──<span class="w"> </span>log.out
+<span class="w">    </span>└──<span class="w"> </span>meta.json
 </code></pre></div>
 </div>
-<p>That looks like this:</p>
+<p>In the above, the top level directory <code class="docutils literal notranslate"><span class="pre">k8s-size-64-hpc6a.48xlarge</span></code> corresponds to our
+Kubernetes cluster size and machine type. The subdirectories under that correspond
+to specific jobs and repeat numbers and sizes, and the <code class="docutils literal notranslate"><span class="pre">meta.json</span></code> includes a summary
+of your experiments across those in json. Thus, to run everything:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>flux-cloud<span class="w"> </span>run
 </code></pre></div>
 </div>
@@ -737,7 +742,11 @@ with <code class="docutils literal notranslate"><span class="pre">-e</span></cod
 </code></pre></div>
 </div>
 <p>To force overwrite of existing results (by default they are skipped)</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>flux-cloud<span class="w"> </span>run<span class="w"> </span>-e<span class="w"> </span>n1-standard-1-2<span class="w"> </span>--force
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>flux-cloud<span class="w"> </span>run<span class="w"> </span>--force
+</code></pre></div>
+</div>
+<p>Ask for a specific cloud:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>flux-cloud<span class="w"> </span>run<span class="w"> </span>--cloud<span class="w"> </span>aws
 </code></pre></div>
 </div>
 <p>If you want to have more control, you can run one Kubernetes size (across MiniCluster sizes) at a time,
@@ -829,14 +838,17 @@ want to cleanup instead, you can add the <code class="docutils literal notransla
 just want to keep them for reproducibility. As an example, here is outfrom from a run with multiple repeats of the
 same command, across two MiniCluster cluster sizes (2 and 4):</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><code><span class="gp">$ </span>tree<span class="w"> </span>data/k8s-size-4-n1-standard-1/.scripts/
-<span class="go">data/k8s-size-4-n1-standard-1/.scripts/</span>
+<span class="go">├── cluster-create.sh</span>
 <span class="go">├── cluster-destroy.sh</span>
-<span class="go">├── minicluster-run-lmp-1-minicluster-size-2.sh</span>
-<span class="go">├── minicluster-run-lmp-1-minicluster-size-4.sh</span>
-<span class="go">├── minicluster-run-lmp-2-minicluster-size-2.sh</span>
-<span class="go">├── minicluster-run-lmp-2-minicluster-size-4.sh</span>
+<span class="go">├── eksctl-config.yaml</span>
+<span class="go">├── flux-operator.yaml</span>
+<span class="go">├── minicluster-run-lmp-16-10-minicluster-size-16.sh</span>
+<span class="go">├── minicluster-run-lmp-16-11-minicluster-size-16.sh</span>
+<span class="go">├── minicluster-run-lmp-16-12-minicluster-size-16.sh</span>
+<span class="go">...</span>
+<span class="go">├── minicluster-run-lmp-64-8-minicluster-size-64.sh</span>
+<span class="go">├── minicluster-run-lmp-64-9-minicluster-size-64.sh</span>
 <span class="go">└── minicluster.yaml</span>
-<span class="go">0 directories, 6 files</span>
 </code></pre></div>
 </div>
 <p>And that’s it! I think there might be a more elegant way to determine what cluster is running,
@@ -848,7 +860,7 @@ however if the user decides to launch more than one, it might be harder. More th
   <small>
     
       Last update:
-      Jan 21, 2023
+      Jan 22, 2023
     
   </small>
 </div>
