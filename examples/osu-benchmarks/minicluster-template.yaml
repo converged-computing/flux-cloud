@@ -9,8 +9,9 @@ spec:
   # Number of pods to create for MiniCluster
   size: {{ size }}
 
-  # Set test to true to clean up output
-  test: true
+  # Disable verbose output
+  logging:
+    quiet: true
 
   # This is a list because a pod can support multiple containers
   containers:
