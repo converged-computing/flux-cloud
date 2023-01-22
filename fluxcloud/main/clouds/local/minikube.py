@@ -47,6 +47,7 @@ class MiniKube(ExperimentClient):
             return
 
         # cmd = ["minikube", "ssh", "docker", "pull", job["image"]]
+        logger.info(f"{job['image']} is being pre-pulled, please wait...")
         cmd = ["minikube", "image", "load", job["image"]]
 
         # Don't pull again if we've done it once

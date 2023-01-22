@@ -62,4 +62,5 @@ for filename in $(find ./data -type f -print); do
     fi
 done
 
+echo ${output}
 rm -rf ${output}

@@ -129,7 +129,7 @@ function with_exponential_backoff {
 }
 
 # Defaults - these are in the config but left here for information
-FORCE_CLUSTER="false"
+FORCE_CLUSTER="true"
 
 is_installed minikube
 is_installed yes
