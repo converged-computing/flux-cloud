@@ -13,7 +13,7 @@ spec:
   tasks: 1
 
   # Disable verbose output
-  
+
 
   # Optional credentials if running the flux restful api
   fluxRestful:
@@ -23,10 +23,7 @@ spec:
   # TODO add pod resources, if needed
   containers:
     - image: ghcr.io/rse-ops/lammps:flux-sched-focal-v0.24.0
-      
-      
-      
+
+
+
       cores: 1
-      
-        
-        
