@@ -376,6 +376,11 @@ class Experiment:
         # TODO we could add cost estimation here - data from cloud select
         for key, value in self.experiment.items():
             meta[key] = value
+
+        # Do not add empty info (only for batch mode)
+        if "info" in meta and not meta["info"]:
+            del meta["info"]
+
         utils.write_json(meta, meta_file)
         return meta
 
