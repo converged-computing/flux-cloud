@@ -1,4 +1,4 @@
-# Up, Submit, Down
+``# Up, Submit, Down
 
 This is an example of using flux cloud to bring up a cluster, install the Flux Operator
 (and then you would use it as you please) and run jobs with submit (on the same
@@ -44,4 +44,19 @@ Run all three with one command:
 ```bash
 $ flux-cloud batch --cloud minikube
 $ flux-cloud batch --cloud google
+```
+
+
+## Plot
+
+I threw together a script to compare running times with info and output times,
+where:
+
+running time < info < output
+
+```bash
+$ pip install pandas matplotlib seaborn
+```
+```bash
+$ python plot_results.py data/k8s-size-4-n1-standard-1/meta.json
 ```
