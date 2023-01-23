@@ -133,9 +133,9 @@ function with_exponential_backoff {
 }
 
 NAMESPACE="flux-operator"
-CRD="/tmp/lammps-data-WHqAsc/k8s-size-4-local/.scripts/minicluster.yaml"
+CRD="/tmp/lammps-data-PeHJF2/k8s-size-4-local/.scripts/minicluster-size-4.yaml"
 JOB="lammps"
-LOGFILE="/tmp/lammps-data-WHqAsc/k8s-size-4-local/lmp-size-4-minicluster-size-4/log.out"
+LOGFILE="/tmp/lammps-data-PeHJF2/k8s-size-4-local/lmp-size-4-minicluster-size-4/log.out"
 
 print_magenta "  apply : ${CRD}"
 print_magenta "    job : ${JOB}"
@@ -146,7 +146,7 @@ is_installed kubectl
 # Ensure we wait for the space to be cleaned up
 echo
 podsCleaned="false"
-print_blue "Waiting for previous pods to be cleaned up..."
+print_blue "Waiting for previous MiniCluster to be cleaned up..."
 while [[ "${podsCleaned}" == "false" ]]; do
     echo -n "."
     sleep 2
