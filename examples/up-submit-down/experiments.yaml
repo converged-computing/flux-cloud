@@ -1,6 +1,7 @@
 # This is intended for MiniKube, so no machine needed
 matrix:
   size: [4]
+  machine: [n1-standard-1]
 
 # Flux Mini Cluster experiment attributes
 minicluster:

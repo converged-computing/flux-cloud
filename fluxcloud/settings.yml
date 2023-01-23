@@ -24,7 +24,7 @@ kubernetes:
 
 google:
   zone: us-central1-a
-  machine: n2-standard-1
+  machine: n1-standard-1
   project: null
 
 aws:
