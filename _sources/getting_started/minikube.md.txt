@@ -2,10 +2,17 @@
 
 > Running on a local MiniKube cluster
 
-Flux Cloud (as of version 0.1.0) can run on MiniKube! The main steps of running experiments are:
+Flux Cloud (as of version 0.1.0) can run on MiniKube! The main steps of running experiments with
+different container bases are:
 
  - **up** to bring up a cluster
- - **apply** to apply one or more experiments defined by an experiments.yaml
+ - **apply** to apply one or more CRDs from experiments defined by an experiments.yaml
+ - **down** to destroy a cluster
+
+or one or more commands with the same container base(s):
+
+ - **up** to bring up a cluster
+ - **submit** to submit one or more experiments to the same set of pods defined by an experiments.yaml
  - **down** to destroy a cluster
 
 Each of these commands can be run in isolation, and we provide a single command **run** to
@@ -19,7 +26,6 @@ want to remove the abstraction at any point and run the commands on your own, yo
 You should first [install minikube](https://minikube.sigs.k8s.io/docs/start/)
 and kubectl.
 
-
 ## Run Experiments
 
 Each experiment is defined by the matrix and variables in an `experiment.yaml` that is used to
@@ -29,7 +35,11 @@ provide this library for you to easily edit and use! Take a look at the [example
 directory for a few that we provide. We will walk through a generic one here to launch
 an experiment on a MiniKube Kubernetes cluster. Note that before doing this step you should
 have installed flux-cloud, along with kubectl and minikube. Note that if it's not the default,
-you'll need to specify using MiniKube:
+you'll need to specify using MiniKube
+
+### Apply / Run
+
+> Ideal if you need to run multiple jobs on different containers
 
 ```bash
 $ flux-cloud run --cloud minikube experiments.yaml
@@ -108,3 +118,20 @@ spec:
       workingDir: /home/flux/examples/reaxff/HNS
       command: {{ job.command }}
 ```
+
+### Submit
+
+> Ideal for one or more commands across the same container(s) and MiniCluster size.
+
+```bash
+$ flux-cloud up --cloud minikube
+$ flux-cloud submit --cloud minikube
+$ flux-cloud down --cloud minikube
+```
+
+The submit will always check if the MiniCluster is already created, and if not, create it
+to submit jobs. For submit (and the equivalent to bring it up and down with batch)
+your commands aren't provided in the CRD,
+but rather to the Flux Restful API. Submit / batch will also generate one CRD
+per MiniCluster size, but use the same MiniCluster across jobs. This is different
+from apply, which generates one CRD per job to run.

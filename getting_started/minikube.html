@@ -526,6 +526,26 @@
     <span title="/getting_started/minikube.md#run-experiments (reference label)" class="md-ellipsis">Run Experiments</span>
   </a>
   
+    <nav class="md-nav" aria-label="Run Experiments">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#apply-run" class="md-nav__link">
+    <span title="/getting_started/minikube.md#apply-run (reference label)" class="md-ellipsis">Apply / Run</span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#submit" class="md-nav__link">
+    <span title="/getting_started/minikube.md#submit (reference label)" class="md-ellipsis">Submit</span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
     </ul>
@@ -639,10 +659,17 @@
 <blockquote>
 <div><p>Running on a local MiniKube cluster</p>
 </div></blockquote>
-<p>Flux Cloud (as of version 0.1.0) can run on MiniKube! The main steps of running experiments are:</p>
+<p>Flux Cloud (as of version 0.1.0) can run on MiniKube! The main steps of running experiments with
+different container bases are:</p>
 <ul class="simple">
 <li><p><strong>up</strong> to bring up a cluster</p></li>
-<li><p><strong>apply</strong> to apply one or more experiments defined by an experiments.yaml</p></li>
+<li><p><strong>apply</strong> to apply one or more CRDs from experiments defined by an experiments.yaml</p></li>
+<li><p><strong>down</strong> to destroy a cluster</p></li>
+</ul>
+<p>or one or more commands with the same container base(s):</p>
+<ul class="simple">
+<li><p><strong>up</strong> to bring up a cluster</p></li>
+<li><p><strong>submit</strong> to submit one or more experiments to the same set of pods defined by an experiments.yaml</p></li>
 <li><p><strong>down</strong> to destroy a cluster</p></li>
 </ul>
 <p>Each of these commands can be run in isolation, and we provide a single command <strong>run</strong> to
@@ -661,7 +688,11 @@ provide this library for you to easily edit and use! Take a look at the <a class
 directory for a few that we provide. We will walk through a generic one here to launch
 an experiment on a MiniKube Kubernetes cluster. Note that before doing this step you should
 have installed flux-cloud, along with kubectl and minikube. Note that if it’s not the default,
-you’ll need to specify using MiniKube:</p>
+you’ll need to specify using MiniKube</p>
+<h3 id="apply-run">Apply / Run<a class="headerlink" href="#apply-run" title="Permalink to this heading">¶</a></h3>
+<blockquote>
+<div><p>Ideal if you need to run multiple jobs on different containers</p>
+</div></blockquote>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>flux-cloud<span class="w"> </span>run<span class="w"> </span>--cloud<span class="w"> </span>minikube<span class="w"> </span>experiments.yaml
 </code></pre></div>
 </div>
@@ -729,6 +760,21 @@ in the experiment.yaml so it can be pulled before the experiment is run. E.g., t
 <span class="w">      </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="w"> </span><span class="nv">job.command</span><span class="w"> </span><span class="p p-Indicator">}}</span>
 </code></pre></div>
 </div>
+<h3 id="submit">Submit<a class="headerlink" href="#submit" title="Permalink to this heading">¶</a></h3>
+<blockquote>
+<div><p>Ideal for one or more commands across the same container(s) and MiniCluster size.</p>
+</div></blockquote>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>flux-cloud<span class="w"> </span>up<span class="w"> </span>--cloud<span class="w"> </span>minikube
+$<span class="w"> </span>flux-cloud<span class="w"> </span>submit<span class="w"> </span>--cloud<span class="w"> </span>minikube
+$<span class="w"> </span>flux-cloud<span class="w"> </span>down<span class="w"> </span>--cloud<span class="w"> </span>minikube
+</code></pre></div>
+</div>
+<p>The submit will always check if the MiniCluster is already created, and if not, create it
+to submit jobs. For submit (and the equivalent to bring it up and down with batch)
+your commands aren’t provided in the CRD,
+but rather to the Flux Restful API. Submit / batch will also generate one CRD
+per MiniCluster size, but use the same MiniCluster across jobs. This is different
+from apply, which generates one CRD per job to run.</p>
 
 
   <hr>
@@ -736,7 +782,7 @@ in the experiment.yaml so it can be pulled before the experiment is run. E.g., t
   <small>
     
       Last update:
-      Jan 22, 2023
+      Jan 23, 2023
     
   </small>
 </div>

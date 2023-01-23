@@ -455,13 +455,25 @@ and save the output, and bring it down. This is what flux cloud does! With Flux 
 <li><p>Run the experiments (each a MiniCluster) and save output and timings.</p></li>
 <li><p>Bring down the cluster as soon as you are done.</p></li>
 </ol>
-<p>For all of the above, you can either run with one command <cite>flux-cloud run</cite> or break into three:</p>
+<p>For all of the above, there are two modes of execution. If you have different containers you want to run for jobs,
+then you would want to use <strong>run</strong> or <strong>apply</strong> to create separate sets of pods, each time bringing them up and down.
+That can be done with either run with one command <cite>flux-cloud run</cite> or broken into three:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><code><span class="gp">$ </span>flux-cloud<span class="w"> </span>up
 <span class="gp">$ </span>flux-cloud<span class="w"> </span>apply
 <span class="gp">$ </span>flux-cloud<span class="w"> </span>down
 </code></pre></div>
 </div>
-<p>And given any failure of a command, you are given the option to try again or exit and cancel. E.g.,
+<p>If you want to instead run one or more commands <em>across the same set of pods</em> meaning that your container(s)
+base(s) do not need to change, you can use <strong>submit</strong>:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><code><span class="gp">$ </span>flux-cloud<span class="w"> </span>up
+<span class="gp">$ </span>flux-cloud<span class="w"> </span>submit
+<span class="gp">$ </span>flux-cloud<span class="w"> </span>down
+</code></pre></div>
+</div>
+<p>And for the single command equivalent, do <cite>flux-cloud batch</cite>. The difference in the latter is that we will actually
+be using Flux as a scheduler, and have much more efficient runs in that we don’t need to bring down pods and bring them
+back up each time.</p>
+<p>For either approach, given any failure of a command, you are given the option to try again or exit and cancel. E.g.,
 when you are developing, you can run “apply” and then easily debug until you are done and ready to bring the cluster
 down.</p>
 <p>This project is currently 🚧️ Under Construction! 🚧️ and optimized for the creator &#64;vsoch’s use case
@@ -492,7 +504,7 @@ Would you like to request a feature or contribute?
   <small>
     
       Last update:
-      Jan 22, 2023
+      Jan 23, 2023
     
   </small>
 </div>

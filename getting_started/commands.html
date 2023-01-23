@@ -459,6 +459,20 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#submit" class="md-nav__link">
+    <span title="/getting_started/commands.md#submit (reference label)" class="md-ellipsis">submit</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#batch" class="md-nav__link">
+    <span title="/getting_started/commands.md#batch (reference label)" class="md-ellipsis">batch</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#down" class="md-nav__link">
     <span title="/getting_started/commands.md#down (reference label)" class="md-ellipsis">down</span>
   </a>
@@ -677,7 +691,12 @@
   </a>
 
 <h1 id="commands">Commands<a class="headerlink" href="#commands" title="Permalink to this heading">¶</a></h1>
-<p>The following commands are provided by Flux Cloud.</p>
+<p>The following commands are provided by Flux Cloud. For running jobs, you can either do:</p>
+<ul class="simple">
+<li><p><strong>apply</strong>/<strong>run</strong>: A single/multi job submission intended for different containers to re-create pods each time.</p></li>
+<li><p><strong>batch</strong>/<strong>submit</strong>: A single/multi job submission intended for a common container base where we use the same set of pods.</p></li>
+</ul>
+<p>Both are described in the following sections.</p>
 <h2 id="list">list<a class="headerlink" href="#list" title="Permalink to this heading">¶</a></h2>
 <p>After creating an experiments.yaml file, you might want to know how your matrix maps out into kubernetes
 clusters. To see all identifiers generated, you can use list:</p>
@@ -711,6 +730,9 @@ with <code class="docutils literal notranslate"><span class="pre">-e</span></cod
 </code></pre></div>
 </div>
 <h2 id="run">run<a class="headerlink" href="#run" title="Permalink to this heading">¶</a></h2>
+<blockquote>
+<div><p>Up, apply, down in one command, ideal for completely headless runs and jobs with different containers.</p>
+</div></blockquote>
 <p>The main command is a “run” that is going to, for each cluster:</p>
 <ol class="arabic simple">
 <li><p>Create the cluster</p></li>
@@ -778,7 +800,10 @@ we will either select the first in the matrix (default):</p>
 </code></pre></div>
 </div>
 <h2 id="apply">apply<a class="headerlink" href="#apply" title="Permalink to this heading">¶</a></h2>
-<p>And then run experiments (as you feel) with “apply.”</p>
+<blockquote>
+<div><p>Ideal for running multiple jobs with different containers.</p>
+</div></blockquote>
+<p>After “up” you can choose to run experiments (as you feel) with “apply.”</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>flux-cloud<span class="w"> </span>apply
 </code></pre></div>
 </div>
@@ -791,8 +816,54 @@ first entry, otherwise we use the identifier you provide.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>flux-cloud<span class="w"> </span>apply<span class="w"> </span>-e<span class="w"> </span>n1-standard-1-2<span class="w"> </span>--force
 </code></pre></div>
 </div>
-<p>Note that by default, we always wait for a previous run to be cleaned up
+<p>Apply is going to be creating on CRD per job, so that’s a lot of
+pod creation and deletion. This is in comparison to “submit” that
+brings up a MiniCluster once, and then executes commands to it, allowing
+Flux to serve as the scheduler. Note that by default, we always wait for a previous run to be cleaned up
 before continuing.</p>
+<h2 id="submit">submit<a class="headerlink" href="#submit" title="Permalink to this heading">¶</a></h2>
+<blockquote>
+<div><p>Ideal for one or more commands across the same container(s) and MiniCluster size.</p>
+</div></blockquote>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>flux-cloud<span class="w"> </span>up<span class="w"> </span>--cloud<span class="w"> </span>minikube
+$<span class="w"> </span>flux-cloud<span class="w"> </span>submit<span class="w"> </span>--cloud<span class="w"> </span>minikube
+$<span class="w"> </span>flux-cloud<span class="w"> </span>down<span class="w"> </span>--cloud<span class="w"> </span>minikube
+</code></pre></div>
+</div>
+<p>The submit will always check if the MiniCluster is already created, and if not, create it
+to submit jobs. For submit (and the equivalent to bring it up and down with batch)
+your commands aren’t provided in the CRD,
+but rather to the Flux Restful API. Submit / batch will also generate one CRD
+per MiniCluster size, but use the same MiniCluster across jobs. This is different
+from apply, which generates one CRD per job to run.</p>
+<h2 id="batch">batch<a class="headerlink" href="#batch" title="Permalink to this heading">¶</a></h2>
+<blockquote>
+<div><p>Up, submit, down in one command, ideal for jobs with the same container(s)</p>
+</div></blockquote>
+<p>The “batch” command is comparable to “run” except we are running commands
+across the same set of containers. We don’t need to bring pods up/down each time,
+and we are using Flux in our cluster to handle scheduling.
+This command is going to:</p>
+<ol class="arabic simple">
+<li><p>Create the cluster</p></li>
+<li><p>Run each of the experiments, saving output and timing, on the same pods</p></li>
+<li><p>Bring down the cluster</p></li>
+</ol>
+<p>The output is organized in the same way, and as before, you can choose to run a single
+command with “submit”</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>flux-cloud<span class="w"> </span>batch<span class="w"> </span>--cloud<span class="w"> </span>aws
+</code></pre></div>
+</div>
+<p>Note that since we are communicating with the FluxRestful API, you are required to
+provide a <code class="docutils literal notranslate"><span class="pre">FLUX_USER</span></code> and <code class="docutils literal notranslate"><span class="pre">FLUX_TOKEN</span></code> for the API. If you are running this programmatically,
+the Flux Restful Client will handle this, however if you, for example, press control C to
+cancel a run, you’ll need to copy paste the username and token that was previously shown
+before running submit again to continue where you left off. Batch is equivalent to:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>flux-cloud<span class="w"> </span>up
+$<span class="w"> </span>flux-cloud<span class="w"> </span>submit
+$<span class="w"> </span>flux-cloud<span class="w"> </span>down
+</code></pre></div>
+</div>
 <h2 id="down">down<a class="headerlink" href="#down" title="Permalink to this heading">¶</a></h2>
 <p>And then bring down your first (or named) cluster:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>flux-cloud<span class="w"> </span>down
@@ -860,7 +931,7 @@ however if the user decides to launch more than one, it might be harder. More th
   <small>
     
       Last update:
-      Jan 22, 2023
+      Jan 23, 2023
     
   </small>
 </div>
