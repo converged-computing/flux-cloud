@@ -14,6 +14,7 @@ and **Merged pull requests**. Critical items to know are:
 The versions coincide with releases on pip. Only major versions will be released as tags on Github.
 
 ## [0.0.x](https://github.com/converged-computing/flux-cloud/tree/main) (0.0.x)
+ - support for submit and batch, to run jobs on the same MiniCluster (0.1.15)
  - minikube docker pull needs message, update tests and typo (0.1.14)
  - wait until pods terminated and removed between applies (0.1.13)
  - add support for custom placement group name (0.1.12)

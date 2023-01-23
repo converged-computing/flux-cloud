@@ -59,6 +59,19 @@ class ExperimentSetup:
         # Prepare the matrices for the setup
         self.prepare_matrices()
 
+    def iter_experiments(self):
+        """
+        yield experiments that are not run yet.
+        """
+        for experiment in self.matrices:
+            # Don't bring up a cluster if experiments already run!
+            if not self.force and experiment.is_run():
+                logger.info(
+                    f"Experiment on machine {experiment.expid} was already run and force is False, skipping."
+                )
+                continue
+            yield experiment
+
     def cleanup(self, experiments):
         """
         Cleanup the experiment script directory, if cleanup is true
@@ -151,6 +164,34 @@ class Experiment:
         Consistent means to get experiment.
         """
         return os.path.join(self.outdir, self.expid)
+
+    def iter_jobs(self):
+        """
+        Iterate through experiment jobs
+        """
+        minicluster = self.minicluster
+
+        # Iterate through all the cluster sizes
+        for size in minicluster["size"]:
+
+            # We can't run if the minicluster > the experiment size
+            if size > self.size:
+                logger.warning(
+                    f"Cluster of size {self.size} cannot handle a MiniCluster of size {size}, skipping."
+                )
+                continue
+
+            # Jobname is used for output
+            for jobname, job in self.jobs.items():
+
+                # Do we want to run this job for this size and machine?
+                if not self.check_job_run(job, size):
+                    logger.debug(
+                        f"Skipping job {jobname} as does not match inclusion criteria."
+                    )
+                    continue
+
+                yield size, jobname, job
 
     def get_persistent_image(self, size):
         """
@@ -327,6 +368,8 @@ class Experiment:
                 meta["times"][timekey] = timevalue
 
             # Update info
+            if "info" not in meta and info:
+                meta["info"] = {}
             for key, value in info.items():
                 meta["info"][key] = value
 

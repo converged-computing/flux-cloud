@@ -3,30 +3,34 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+import atexit
+import logging
 import os
 import shutil
-import uuid
+import subprocess
+import threading
 import time
+import uuid
 
 from flux_restful_client.main import get_client
+
 import fluxcloud.utils as utils
 from fluxcloud.logger import logger
-import threading
 
 here = os.path.dirname(os.path.abspath(__file__))
 
 exit_event = threading.Event()
 
-class APIClient:
 
+class APIClient:
     def __init__(self, token=None, user=None):
         """
         API client wrapper.
         """
-        self.user = token or os.environ.get('FLUX_USER') or "fluxuser"
-        self.token = token or os.environ.get('FLUX_TOKEN') or str(uuid.uuid4())
+        self.user = token or os.environ.get("FLUX_USER") or "fluxuser"
+        self.token = token or os.environ.get("FLUX_TOKEN") or str(uuid.uuid4())
         self.cli = get_client(user=self.user, token=self.token)
-        self.pid = None
+        self.proc = None
         self.broker_pod = None
 
     def check(self, experiment):
@@ -34,40 +38,42 @@ class APIClient:
         Set the basic auth for username and password and check it works
         """
         minicluster = experiment.minicluster
-        get_broker_pod = experiment.get_shared_script("broker-id", {"minicluster": minicluster})
+        get_broker_pod = experiment.get_shared_script(
+            "broker-id", {"minicluster": minicluster}
+        )
 
-        logger.info('Waiting for id of running broker pod...')
- 
+        logger.info("Waiting for id of running broker pod...")
+
         # We've already waited for them to be running
         broker_pod = None
         while not broker_pod:
             result = utils.run_capture(["/bin/bash", get_broker_pod], stream=True)
 
             # Save the broker pod, or exit on failure.
-            if result['message']:
-                broker_pod = result['message'].strip()        
+            if result["message"]:
+                broker_pod = result["message"].strip()
 
         self.broker_pod = broker_pod
-        self.port_forward(minicluster['namespace'], self.broker_pod)
+        self.port_forward(minicluster["namespace"], self.broker_pod)
 
-    # Create a port forward via threading
     def port_forward(self, namespace, broker_pod):
         """
         Ask user to open port to forward
         """
-        command = f"kubectl port-forward -n {namespace} {broker_pod} 5000:5000"
+        command = ["kubectl", "port-forward", "-n", namespace, broker_pod, "5000:5000"]
 
-        # Try to list nodes
-        retry = 0
-        while True and retry < 3:
-            if not utils.confirm_action(f"Please run the following command in another terminal to connect to your cluster:\n{command}\nAre you done?"):
-                logger.exit('We cannot port forward without connecting to the RESTFul API.')
-            try:
-                self.cli.list_nodes()
-                return
-            except Exception as e:
-                time.sleep(5)
-                retry += 1
+        # This is detached - we can kill but not interact
+        logger.info(" ".join(command))
+        self.proc = proc = subprocess.Popen(
+            command,
+            stdout=subprocess.DEVNULL if logger.level >= logging.DEBUG else None,
+        )
+
+        def cleanup():
+            proc.kill()
+
+        # Ensure we cleanup if anything goes wrong
+        atexit.register(cleanup)
 
     def submit(self, setup, experiment, size):
         """
@@ -87,11 +93,9 @@ class APIClient:
                 continue
 
             if "command" not in job:
-                logger.debug(
-                    f"Skipping job {jobname} as does not have a command."
-                )
+                logger.debug(f"Skipping job {jobname} as does not have a command.")
                 continue
-       
+
             # The experiment is defined by the machine type and size
             experiment_dir = experiment.root_dir
 
@@ -102,8 +106,9 @@ class APIClient:
 
             # Do we have output?
             if os.path.exists(logfile) and not setup.force:
+                relpath = os.path.relpath(logfile, experiment_dir)
                 logger.warning(
-                    f"{logfile} already exists and force is False, skipping."
+                    f"{relpath} already exists and force is False, skipping."
                 )
                 continue
 
@@ -115,39 +120,51 @@ class APIClient:
             utils.mkdir_p(job_output)
 
             kwargs = dict(job)
-            del kwargs['command']
- 
+            del kwargs["command"]
+
             # Assume the task gets all nodes, unless specified in job
             # Also assume the flux restful server is using one node
             if "nodes" not in kwargs:
-                kwargs['nodes'] = size-1 
+                kwargs["nodes"] = size - 1
             if "tasks" not in kwargs:
-                kwargs['tasks'] = size-1
+                kwargs["tasks"] = size - 1
 
             # Ensure we convert - map between job params and the flux restful api
-            for convert in ['num_tasks', 'tasks'], ['cores_per_task', 'cores'], ['gpus_per_task', 'gpus'], ['num_nodes', 'nodes']:
+            for convert in (
+                ["num_tasks", "tasks"],
+                ["cores_per_task", "cores"],
+                ["gpus_per_task", "gpus"],
+                ["num_nodes", "nodes"],
+            ):
                 if convert[1] in kwargs:
                     kwargs[convert[0]] = kwargs[convert[1]]
-            
+
+            # Let's also keep track of actual time to get logs, info, etc.
+            start = time.time()
+
             # Run and block output until job is done
-            res = self.cli.submit(command=job['command'], **kwargs)
-            
+            res = self.cli.submit(command=job["command"], **kwargs)
+
             logger.info(f"Submitting {jobname}: {job['command']}")
-            if job.get('has_output', True) != False:
-                output = None
-                while not output or "output does not exist yet" in output:
-                    output = self.cli.output(res['id']).get('Output')
-                    print('.', end='')
-                    time.sleep(sleep_time) 
-            else:
-                logger.info('Job is not expected to have output.')
-                time.sleep(sleep_time) 
+            info = self.cli.jobs(res["id"])
 
-            utils.write_file(''.join(output), logfile)
+            while info["returncode"] == "":
+                info = self.cli.jobs(res["id"])
+                time.sleep(sleep_time)
 
-            # Get the full job info
-            info = self.cli.jobs(res['id'])
+            end1 = time.time()
+            output = self.cli.output(res["id"]).get("Output")
+            if output:
+                utils.write_file("".join(output), logfile)
+            end2 = time.time()
+
+            # Get the full job info, and add some wrapper times
+            info = self.cli.jobs(res["id"])
+            info["start_to_info_seconds"] = end1 - start
+            info["start_to_output_seconds"] = end2 - start
+
             yield jobname, info
-            sleep_time = info['runtime']
+            sleep_time = info["runtime"]
 
-        #self.thread.raise_exception()
+        # Kill the connection to the service
+        self.proc.kill()

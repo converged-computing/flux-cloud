@@ -15,3 +15,14 @@ def main(args, parser, extra, subparser):
 
     cli.run(setup)
     setup.cleanup(setup.matrices)
+
+
+def batch(args, parser, extra, subparser):
+    cli, setup, _ = prepare_client(args, extra)
+
+    # Set the Minicluster size across experiments
+    if args.size:
+        setup.set_minicluster_size(args.size)
+
+    cli.batch(setup)
+    setup.cleanup(setup.matrices)
