@@ -13,34 +13,30 @@ spec:
   tasks: {% if job.tasks %}{{ job.tasks }}{% else %}1{% endif %}
 
   # Disable verbose output
-  test: {% if minicluster.verbose %}false{% else %}true{% endif %}
+  {% if job.quiet or job.timed %}logging:
+    {% if job.quiet %}quiet: true{% endif %}
+    {% if job.timed %}timed: true{% endif %}{% endif %}
+
+  # Optional credentials if running the flux restful api
+  {% if job.token or job.user %}fluxRestful:
+    {% if job.token %}token: "{{ job.token }}"{% endif %}
+    {% if job.user %}username: "{{ job.user }}"{% endif %}{% endif %}
 
   # TODO add pod resources, if needed
-  # This is a list because a pod can support multiple containers
   containers:
     - image: {{ job.image }}
       {% if job.workdir %}workingDir: {{ job.workdir }}{% endif %}
-      command: {{ job.command }}
-
-      # Option Flags for this flux runner wait.sh entrypoint
+      {% if job.command %}command: {{ job.command }}{% endif %}
       {% if job.flux_option_flags %}fluxOptionFlags: "-ompi=openmpi@5"{% endif %}
-
-      # Leave 2 cores for kubernetes, we have 96,
-      # this is just for eksctl
       cores: {% if job.cores %}{{ job.cores }}{% else %}1{% endif %}
-
-      # Resource limits to enable efa
       {% if job.limits or job.resources %}resources:{% endif %}
         {% if job.limits %}limits:
           {% for limit in job.limits %}
             {{ limit[0] }}: {{ limit[1] }}
           {% endfor %}{% endif %}
-
         {% if job.requests %}requests:
           {% for limit in job.requests %}
             {{ limit[0] }}: {{ limit[1] }}
           {% endfor %}{% endif %}
-
-      # custom preCommand logic (run at start of script)
       {% if job.pre_command %}preCommand: |
         {{ job.pre_command }}{% endif %}

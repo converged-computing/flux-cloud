@@ -1,0 +1,12 @@
+#!/bin/bash
+
+NAMESPACE="{% if minicluster.namespace %}{{ minicluster.namespace }}{% else %}flux-operator{% endif %}"
+JOB="{{ minicluster.name }}"
+brokerPrefix="${JOB}-0"
+
+for pod in $(kubectl get pods --namespace ${NAMESPACE} --field-selector=status.phase=Running --output=jsonpath='{.items[*].metadata.name}'); do
+    if [[ "${pod}" == ${brokerPrefix}* ]]; then
+        echo ${pod}
+        break
+    fi
+done

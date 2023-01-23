@@ -192,7 +192,6 @@ def setup_logger(
     stdout=False,
     debug=False,
     use_threads=False,
-    wms_monitor=None,
 ):
     # console output only if no custom logger was specified
     stream_handler = ColorizingStreamHandler(
@@ -201,6 +200,7 @@ def setup_logger(
         use_threads=use_threads,
     )
     logger.set_stream_handler(stream_handler)
-    logger.set_level(_logging.DEBUG if debug else _logging.INFO)
+    logger.level = _logging.DEBUG if debug else _logging.INFO
+    logger.set_level(logger.level)
     logger.quiet = quiet
     logger.printshellcmds = printshellcmds

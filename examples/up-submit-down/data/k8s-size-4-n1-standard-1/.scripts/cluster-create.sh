@@ -130,28 +130,52 @@ function with_exponential_backoff {
 
 # Defaults - these are in the config but left here for information
 CLUSTER_NAME="flux-cluster"
+ZONE="us-central1-a"
 CLUSTER_VERSION="1.23"
-FORCE_CLUSTER="true"
+MACHINE_TYPE="n1-standard-1"
+FORCE_CLUSTER="false"
 SIZE=4
+TAGS="flux-cluster"
 REPOSITORY="flux-framework/flux-operator"
 BRANCH="main"
-SCRIPT_DIR="/tmp/lammps-data-PeHJF2/k8s-size-4-local/.scripts"
+GOOGLE_PROJECT="dinodev"
+SCRIPT_DIR="/home/vanessa/Desktop/Code/flux/flux-cloud/examples/up-submit-down/data/k8s-size-4-n1-standard-1/.scripts"
+
+# Required arguments
+if [ -z ${GOOGLE_PROJECT+x} ]; then
+    echo "Missing Google Project template variable as GOOGLE_PROJECT";
+    exit 1
+fi
+
+if [ -z ${ZONE+x} ]; then
+    echo "Missing Google Cloud zone template variable as ZONE";
+    exit 1
+fi
+
+if [ -z ${MACHINE_TYPE+x} ]; then
+    echo "Missing Google Cloud machine type template variable as MACHINE_TYPE";
+    exit 1
+fi
 
 print_magenta "   cluster  : ${CLUSTER_NAME}"
 print_magenta "    version : ${CLUSTER_VERSION}"
+print_magenta "  project   : ${GOOGLE_PROJECT}"
+print_magenta "  machine   : ${MACHINE_TYPE}"
+print_magenta "     zone   : ${ZONE}"
+print_magenta "     tags   : ${TAGS}"
 print_magenta "     size   : ${SIZE}"
 print_magenta "repository  : ${REPOSITORY}"
 print_magenta "     branch : ${BRANCH}"
 
-is_installed minikube
+is_installed kubectl
+is_installed gcloud
 is_installed wget
 
 # Check if it already exists
-minikube status
+gcloud container clusters list --zone ${ZONE} | grep ${CLUSTER_NAME}
 retval=$?
 if [[ "${retval}" == "0" ]]; then
-    print_blue "A MiniKube cluster already exists."
-    install_operator ${SCRIPT_DIR} ${REPOSITORY} ${BRANCH}
+    print_blue "${CLUSTER_NAME} in ${ZONE} already exists."
     echo
     exit 0
 fi
@@ -161,11 +185,20 @@ if [[ "${FORCE_CLUSTER}" != "true" ]]; then
 fi
 
 # Create the cluster
-run_echo minikube start --nodes=${SIZE}
-install_operator ${SCRIPT_DIR} ${REPOSITORY} ${BRANCH}
+run_echo gcloud container clusters create ${CLUSTER_NAME} --project $GOOGLE_PROJECT \
+    --zone ${ZONE} --cluster-version ${CLUSTER_VERSION} --machine-type ${MACHINE_TYPE} \
+    --num-nodes=${SIZE} --enable-network-policy --tags=${TAGS} --enable-intra-node-visibility
+
+# Get credentials so kubectl will work
+run_echo gcloud container clusters get-credentials ${CLUSTER_NAME} --zone ${ZONE} --project $GOOGLE_PROJECT
+run_echo kubectl create clusterrolebinding cluster-admin-binding --clusterrole cluster-admin --user $(gcloud config get-value core/account)
 
 # Show nodes
 run_echo kubectl get nodes
+
+# Deploy the operator
+mkdir -p ${SCRIPT_DIR}
+install_operator ${SCRIPT_DIR} ${REPOSITORY} ${BRANCH}
 
 run_echo kubectl get namespace
 run_echo kubectl describe namespace operator-system

@@ -8,6 +8,7 @@ import shutil
 
 import fluxcloud.utils as utils
 from fluxcloud.logger import logger
+from fluxcloud.main.api import APIClient
 from fluxcloud.main.decorator import save_meta, timed
 
 here = os.path.dirname(os.path.abspath(__file__))
@@ -22,6 +23,7 @@ class ExperimentClient:
         import fluxcloud.main.settings as settings
 
         self.settings = settings.Settings
+        self.info = {}
         self.times = {}
 
         # Job prefix is used for organizing time entries
@@ -40,17 +42,12 @@ class ExperimentClient:
         if res.returncode != 0:
             raise ValueError("nonzero exit code, exiting.")
 
-    def run_command(self, cmd, cleanup_func=None):
+    def run_command(self, cmd):
         """
         Run a timed command, and handle nonzero exit codes.
         """
         logger.debug("\n> Running Command: " + " ".join(cmd))
         res = utils.run_command(cmd)
-
-        # An optional cleanup function (also can run if not successful)
-        if cleanup_func is not None:
-            cleanup_func()
-
         if res.returncode != 0:
             raise ValueError("nonzero exit code, exiting.")
 
@@ -67,17 +64,24 @@ class ExperimentClient:
         3. bring down the cluster
         """
         # Each experiment has its own cluster size and machine type
-        for experiment in setup.matrices:
-
-            # Don't bring up a cluster if experiments already run!
-            if not setup.force and experiment.is_run():
-                logger.info(
-                    f"Experiment on machine {experiment.expid} was already run and force is False, skipping."
-                )
-                continue
-
+        for experiment in setup.iter_experiments():
             self.up(setup, experiment=experiment)
             self.apply(setup, experiment=experiment)
+            self.down(setup, experiment=experiment)
+
+    @save_meta
+    def batch(self, setup):
+        """
+        Run Flux Operator experiments via batch submit
+
+        1. create the cluster
+        2. run each command via submit to same MiniCluster
+        3. bring down the cluster
+        """
+        # Each experiment has its own cluster size and machine type
+        for experiment in setup.iter_experiments():
+            self.up(setup, experiment=experiment)
+            self.submit(setup, experiment=experiment)
             self.down(setup, experiment=experiment)
 
     @save_meta
@@ -88,11 +92,9 @@ class ExperimentClient:
         raise NotImplementedError
 
     @save_meta
-    def apply(self, setup, experiment):
+    def submit(self, setup, experiment):
         """
-        Apply a CRD to run the experiment and wait for output.
-
-        This is really just running the setup!
+        Submit a Job via the Restful API
         """
         # The MiniCluster can vary on size
         minicluster = experiment.minicluster
@@ -102,8 +104,14 @@ class ExperimentClient:
             )
             return
 
-        # The experiment is defined by the machine type and size
-        experiment_dir = experiment.root_dir
+        # Create a FluxRestful API to submit to
+        # This will get creds from the environment or create new ones
+        api = APIClient()
+        logger.info(
+            "Save these if you want to log into the Flux RESTFul interface, there are specific to the MiniCluster"
+        )
+        logger.info(f"export FLUX_USER={api.user}")
+        logger.info(f"export FLUX_TOKEN={api.token}")
 
         # Iterate through all the cluster sizes
         for size in minicluster["size"]:
@@ -115,53 +123,109 @@ class ExperimentClient:
                 )
                 continue
 
-            # Jobname is used for output
-            for jobname, job in experiment.jobs.items():
+            logger.info(f"\n🌀 Bringing up MiniCluster of size {size}")
 
-                # Do we want to run this job for this size and machine?
-                if not experiment.check_job_run(job, size):
-                    logger.debug(
-                        f"Skipping job {jobname} as does not match inclusion criteria."
-                    )
-                    continue
+            # Get the global "job" for the size (and validate only one image)
+            # This will raise error if > 1 image, or no image.
+            image = experiment.get_persistent_image(size)
+            job = {"image": image, "token": api.token, "user": api.user}
 
-                # Add the size
-                jobname = f"{jobname}-minicluster-size-{size}"
-                job_output = os.path.join(experiment_dir, jobname)
-                logfile = os.path.join(job_output, "log.out")
+            # Pre-pull containers, etc.
+            if hasattr(self, "pre_apply"):
+                self.pre_apply(experiment, "global-job", job=job)
 
-                # Any custom commands to run first?
-                if hasattr(self, "pre_apply"):
-                    self.pre_apply(experiment, jobname, job)
+            # Create the minicluster via a CRD without a command
+            crd = experiment.generate_crd(job, size)
 
-                # Do we have output?
-                if os.path.exists(logfile) and not setup.force:
-                    logger.warning(
-                        f"{logfile} already exists and force is False, skipping."
-                    )
-                    continue
+            # Create one MiniCluster CRD (without a command) to run the Flux Restful API
+            kwargs = {
+                "minicluster": minicluster,
+                "crd": crd,
+                "token": api.token,
+                "user": api.user,
+                "size": size,
+            }
+            submit_script = experiment.get_shared_script(
+                "minicluster-submit", kwargs, suffix=f"-size-{size}"
+            )
+            # Start the MiniCluster! This should probably be done better...
+            self.run_timed(
+                f"minicluster-submit-size-{size}", ["/bin/bash", submit_script]
+            )
 
-                elif os.path.exists(logfile) and setup.force:
-                    logger.warning(f"Cleaning up previous run in {job_output}.")
-                    shutil.rmtree(job_output)
+            # Ensure our credentials still work, and open port forward
+            api.check(experiment)
 
-                # Create job directory anew
-                utils.mkdir_p(job_output)
+            # Save times (and logs in submit) as we go
+            for jobid, info in api.submit(setup, experiment, size):
+                logger.info(f"{jobid} took {info['runtime']} seconds.")
+                self.times[jobid] = info["runtime"]
+                self.info[jobid] = info
 
-                # Generate the populated crd from the template
-                crd = experiment.generate_crd(job, size)
+            logger.info(f"\n🌀 MiniCluster of size {size} is finished")
+            self.run_timed(
+                f"minicluster-destroy-size-{size}", ["kubectl", "delete", "-f", crd]
+            )
 
-                # Prepare specific .crd for template
-                # Note the output directory is already specific to the job index
-                kwargs = {"minicluster": minicluster, "logfile": logfile, "crd": crd}
-                apply_script = experiment.get_shared_script(
-                    "minicluster-run", kwargs, suffix=f"-{jobname}"
+    @save_meta
+    def apply(self, setup, experiment):
+        """
+        Apply a CRD to run the experiment and wait for output.
+
+        This is really just running the setup!
+        """
+        # The MiniCluster can vary on size
+        if not experiment.jobs:
+            logger.warning(
+                f"Experiment {experiment.expid} has no jobs, nothing to run."
+            )
+            return
+
+        # Save output here
+        experiment_dir = experiment.root_dir
+
+        for size, jobname, job in experiment.iter_jobs():
+
+            # Add the size
+            jobname = f"{jobname}-minicluster-size-{size}"
+            job_output = os.path.join(experiment_dir, jobname)
+            logfile = os.path.join(job_output, "log.out")
+
+            # Any custom commands to run first?
+            if hasattr(self, "pre_apply"):
+                self.pre_apply(experiment, jobname, job)
+
+            # Do we have output?
+            if os.path.exists(logfile) and not setup.force:
+                relpath = os.path.relpath(logfile, experiment_dir)
+                logger.warning(
+                    f"{relpath} already exists and force is False, skipping."
                 )
+                continue
 
-                # Apply the job, and save to output directory
-                self.run_timed(
-                    f"{self.job_prefix}-{jobname}", ["/bin/bash", apply_script]
-                )
+            elif os.path.exists(logfile) and setup.force:
+                logger.warning(f"Cleaning up previous run in {job_output}.")
+                shutil.rmtree(job_output)
+
+            # Create job directory anew
+            utils.mkdir_p(job_output)
+
+            # Generate the populated crd from the template
+            crd = experiment.generate_crd(job, size)
+
+            # Prepare specific .crd for template
+            # Note the output directory is already specific to the job index
+            kwargs = {
+                "minicluster": experiment.minicluster,
+                "logfile": logfile,
+                "crd": crd,
+            }
+            apply_script = experiment.get_shared_script(
+                "minicluster-run", kwargs, suffix=f"-{jobname}"
+            )
+
+            # Apply the job, and save to output directory
+            self.run_timed(f"{self.job_prefix}-{jobname}", ["/bin/bash", apply_script])
 
     def clear_minicluster_times(self):
         """

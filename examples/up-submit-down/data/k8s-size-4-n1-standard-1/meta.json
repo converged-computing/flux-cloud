@@ -1,0 +1,696 @@
+{
+    "times": {
+        "destroy-cluster": 324.709,
+        "create-cluster": 491.577,
+        "minicluster-submit-size-2": 183.626,
+        "reaxc-hns-1-minicluster-size-2": 32.1847505569458,
+        "reaxc-hns-2-minicluster-size-2": 33.41048860549927,
+        "reaxc-hns-3-minicluster-size-2": 30.96457529067993,
+        "reaxc-hns-4-minicluster-size-2": 30.777089595794678,
+        "reaxc-hns-5-minicluster-size-2": 31.048890829086304,
+        "sleep-1-minicluster-size-2": 5.0783607959747314,
+        "sleep-2-minicluster-size-2": 5.040483474731445,
+        "sleep-3-minicluster-size-2": 5.04453706741333,
+        "sleep-4-minicluster-size-2": 5.048432111740112,
+        "sleep-5-minicluster-size-2": 5.058692455291748,
+        "hello-world-1-minicluster-size-2": 0.07241106033325195,
+        "hello-world-2-minicluster-size-2": 0.052734375,
+        "hello-world-3-minicluster-size-2": 0.04248523712158203,
+        "hello-world-4-minicluster-size-2": 0.045003652572631836,
+        "hello-world-5-minicluster-size-2": 0.05110311508178711,
+        "minicluster-destroy-size-2": 0.277
+    },
+    "size": 4,
+    "machine": "n1-standard-1",
+    "minicluster": {
+        "name": "lammps-job",
+        "namespace": "flux-operator",
+        "size": [
+            2
+        ]
+    },
+    "jobs": {
+        "reaxc-hns-1": {
+            "command": "lmp -v x 2 -v y 2 -v z 2 -in in.reaxc.hns -nocite",
+            "image": "ghcr.io/rse-ops/lammps:flux-sched-focal-v0.24.0",
+            "repeats": 5,
+            "workdir": "/home/flux/examples/reaxff/HNS"
+        },
+        "reaxc-hns-2": {
+            "command": "lmp -v x 2 -v y 2 -v z 2 -in in.reaxc.hns -nocite",
+            "image": "ghcr.io/rse-ops/lammps:flux-sched-focal-v0.24.0",
+            "repeats": 5,
+            "workdir": "/home/flux/examples/reaxff/HNS"
+        },
+        "reaxc-hns-3": {
+            "command": "lmp -v x 2 -v y 2 -v z 2 -in in.reaxc.hns -nocite",
+            "image": "ghcr.io/rse-ops/lammps:flux-sched-focal-v0.24.0",
+            "repeats": 5,
+            "workdir": "/home/flux/examples/reaxff/HNS"
+        },
+        "reaxc-hns-4": {
+            "command": "lmp -v x 2 -v y 2 -v z 2 -in in.reaxc.hns -nocite",
+            "image": "ghcr.io/rse-ops/lammps:flux-sched-focal-v0.24.0",
+            "repeats": 5,
+            "workdir": "/home/flux/examples/reaxff/HNS"
+        },
+        "reaxc-hns-5": {
+            "command": "lmp -v x 2 -v y 2 -v z 2 -in in.reaxc.hns -nocite",
+            "image": "ghcr.io/rse-ops/lammps:flux-sched-focal-v0.24.0",
+            "repeats": 5,
+            "workdir": "/home/flux/examples/reaxff/HNS"
+        },
+        "sleep-1": {
+            "command": "sleep 5",
+            "image": "ghcr.io/rse-ops/lammps:flux-sched-focal-v0.24.0",
+            "repeats": 5,
+            "workdir": "/home/flux/examples/reaxff/HNS"
+        },
+        "sleep-2": {
+            "command": "sleep 5",
+            "image": "ghcr.io/rse-ops/lammps:flux-sched-focal-v0.24.0",
+            "repeats": 5,
+            "workdir": "/home/flux/examples/reaxff/HNS"
+        },
+        "sleep-3": {
+            "command": "sleep 5",
+            "image": "ghcr.io/rse-ops/lammps:flux-sched-focal-v0.24.0",
+            "repeats": 5,
+            "workdir": "/home/flux/examples/reaxff/HNS"
+        },
+        "sleep-4": {
+            "command": "sleep 5",
+            "image": "ghcr.io/rse-ops/lammps:flux-sched-focal-v0.24.0",
+            "repeats": 5,
+            "workdir": "/home/flux/examples/reaxff/HNS"
+        },
+        "sleep-5": {
+            "command": "sleep 5",
+            "image": "ghcr.io/rse-ops/lammps:flux-sched-focal-v0.24.0",
+            "repeats": 5,
+            "workdir": "/home/flux/examples/reaxff/HNS"
+        },
+        "hello-world-1": {
+            "command": "echo hello world",
+            "image": "ghcr.io/rse-ops/lammps:flux-sched-focal-v0.24.0",
+            "repeats": 5,
+            "workdir": "/home/flux/examples/reaxff/HNS"
+        },
+        "hello-world-2": {
+            "command": "echo hello world",
+            "image": "ghcr.io/rse-ops/lammps:flux-sched-focal-v0.24.0",
+            "repeats": 5,
+            "workdir": "/home/flux/examples/reaxff/HNS"
+        },
+        "hello-world-3": {
+            "command": "echo hello world",
+            "image": "ghcr.io/rse-ops/lammps:flux-sched-focal-v0.24.0",
+            "repeats": 5,
+            "workdir": "/home/flux/examples/reaxff/HNS"
+        },
+        "hello-world-4": {
+            "command": "echo hello world",
+            "image": "ghcr.io/rse-ops/lammps:flux-sched-focal-v0.24.0",
+            "repeats": 5,
+            "workdir": "/home/flux/examples/reaxff/HNS"
+        },
+        "hello-world-5": {
+            "command": "echo hello world",
+            "image": "ghcr.io/rse-ops/lammps:flux-sched-focal-v0.24.0",
+            "repeats": 5,
+            "workdir": "/home/flux/examples/reaxff/HNS"
+        }
+    },
+    "info": {
+        "reaxc-hns-1-minicluster-size-2": {
+            "id": 130073755648,
+            "userid": 1234,
+            "urgency": 16,
+            "priority": 16,
+            "t_submit": 1674444768.0517902,
+            "t_depend": 1674444768.0517902,
+            "t_run": 1674444768.100832,
+            "t_cleanup": 1674444800.2855825,
+            "t_inactive": 1674444800.290403,
+            "state": "INACTIVE",
+            "name": "lmp",
+            "ntasks": 1,
+            "nnodes": 1,
+            "ranks": "1",
+            "nodelist": "lammps-job-1",
+            "success": true,
+            "exception_occurred": false,
+            "result": "COMPLETED",
+            "expiration": 1675049568.0,
+            "annotations": {
+                "sched": {
+                    "queue": "default"
+                }
+            },
+            "waitstatus": 0,
+            "returncode": 0,
+            "runtime": 32.1847505569458,
+            "exception": {
+                "occurred": false,
+                "severity": "",
+                "type": "",
+                "note": ""
+            },
+            "duration": "",
+            "start_to_info_seconds": 40.13091278076172,
+            "start_to_output_seconds": 43.215059757232666
+        },
+        "reaxc-hns-2-minicluster-size-2": {
+            "id": 816932978688,
+            "userid": 1234,
+            "urgency": 16,
+            "priority": 16,
+            "t_submit": 1674444808.9904723,
+            "t_depend": 1674444808.9904723,
+            "t_run": 1674444809.0098114,
+            "t_cleanup": 1674444842.4203,
+            "t_inactive": 1674444842.4249685,
+            "state": "INACTIVE",
+            "name": "lmp",
+            "ntasks": 1,
+            "nnodes": 1,
+            "ranks": "0",
+            "nodelist": "lammps-job-0",
+            "success": true,
+            "exception_occurred": false,
+            "result": "COMPLETED",
+            "expiration": 1675049609.0,
+            "annotations": {
+                "sched": {
+                    "queue": "default"
+                }
+            },
+            "waitstatus": 0,
+            "returncode": 0,
+            "runtime": 33.41048860549927,
+            "exception": {
+                "occurred": false,
+                "severity": "",
+                "type": "",
+                "note": ""
+            },
+            "duration": "",
+            "start_to_info_seconds": 97.17731666564941,
+            "start_to_output_seconds": 97.31685972213745
+        },
+        "reaxc-hns-3-minicluster-size-2": {
+            "id": 2450245287936,
+            "userid": 1234,
+            "urgency": 16,
+            "priority": 16,
+            "t_submit": 1674444906.3438601,
+            "t_depend": 1674444906.3438601,
+            "t_run": 1674444906.3633585,
+            "t_cleanup": 1674444937.3279338,
+            "t_inactive": 1674444937.33689,
+            "state": "INACTIVE",
+            "name": "lmp",
+            "ntasks": 1,
+            "nnodes": 1,
+            "ranks": "1",
+            "nodelist": "lammps-job-1",
+            "success": true,
+            "exception_occurred": false,
+            "result": "COMPLETED",
+            "expiration": 1675049706.0,
+            "annotations": {
+                "sched": {
+                    "queue": "default"
+                }
+            },
+            "waitstatus": 0,
+            "returncode": 0,
+            "runtime": 30.96457529067993,
+            "exception": {
+                "occurred": false,
+                "severity": "",
+                "type": "",
+                "note": ""
+            },
+            "duration": "",
+            "start_to_info_seconds": 67.29511857032776,
+            "start_to_output_seconds": 67.40737009048462
+        },
+        "reaxc-hns-4-minicluster-size-2": {
+            "id": 3581969170432,
+            "userid": 1234,
+            "urgency": 16,
+            "priority": 16,
+            "t_submit": 1674444973.8004916,
+            "t_depend": 1674444973.8004916,
+            "t_run": 1674444973.8231413,
+            "t_cleanup": 1674445004.600231,
+            "t_inactive": 1674445004.6049078,
+            "state": "INACTIVE",
+            "name": "lmp",
+            "ntasks": 1,
+            "nnodes": 1,
+            "ranks": "1",
+            "nodelist": "lammps-job-1",
+            "success": true,
+            "exception_occurred": false,
+            "result": "COMPLETED",
+            "expiration": 1675049773.0,
+            "annotations": {
+                "sched": {
+                    "queue": "default"
+                }
+            },
+            "waitstatus": 0,
+            "returncode": 0,
+            "runtime": 30.777089595794678,
+            "exception": {
+                "occurred": false,
+                "severity": "",
+                "type": "",
+                "note": ""
+            },
+            "duration": "",
+            "start_to_info_seconds": 62.43251633644104,
+            "start_to_output_seconds": 62.51574635505676
+        },
+        "reaxc-hns-5-minicluster-size-2": {
+            "id": 4631065264128,
+            "userid": 1234,
+            "urgency": 16,
+            "priority": 16,
+            "t_submit": 1674445036.3308098,
+            "t_depend": 1674445036.3308098,
+            "t_run": 1674445036.3509514,
+            "t_cleanup": 1674445067.3998423,
+            "t_inactive": 1674445067.4045572,
+            "state": "INACTIVE",
+            "name": "lmp",
+            "ntasks": 1,
+            "nnodes": 1,
+            "ranks": "1",
+            "nodelist": "lammps-job-1",
+            "success": true,
+            "exception_occurred": false,
+            "result": "COMPLETED",
+            "expiration": 1675049836.0,
+            "annotations": {
+                "sched": {
+                    "queue": "default"
+                }
+            },
+            "waitstatus": 0,
+            "returncode": 0,
+            "runtime": 31.048890829086304,
+            "exception": {
+                "occurred": false,
+                "severity": "",
+                "type": "",
+                "note": ""
+            },
+            "duration": "",
+            "start_to_info_seconds": 92.83428883552551,
+            "start_to_output_seconds": 92.92412114143372
+        },
+        "sleep-1-minicluster-size-2": {
+            "id": 6190792704000,
+            "userid": 1234,
+            "urgency": 16,
+            "priority": 16,
+            "t_submit": 1674445129.2985795,
+            "t_depend": 1674445129.2985795,
+            "t_run": 1674445129.3183057,
+            "t_cleanup": 1674445134.3966665,
+            "t_inactive": 1674445134.400485,
+            "state": "INACTIVE",
+            "name": "sleep",
+            "ntasks": 1,
+            "nnodes": 1,
+            "ranks": "1",
+            "nodelist": "lammps-job-1",
+            "success": true,
+            "exception_occurred": false,
+            "result": "COMPLETED",
+            "expiration": 1675049929.0,
+            "annotations": {
+                "sched": {
+                    "queue": "default"
+                }
+            },
+            "waitstatus": 0,
+            "returncode": 0,
+            "runtime": 5.0783607959747314,
+            "exception": {
+                "occurred": false,
+                "severity": "",
+                "type": "",
+                "note": ""
+            },
+            "duration": "",
+            "start_to_info_seconds": 62.536019802093506,
+            "start_to_output_seconds": 62.61232876777649
+        },
+        "sleep-2-minicluster-size-2": {
+            "id": 7241700737024,
+            "userid": 1234,
+            "urgency": 16,
+            "priority": 16,
+            "t_submit": 1674445191.9373004,
+            "t_depend": 1674445191.9373004,
+            "t_run": 1674445191.9571338,
+            "t_cleanup": 1674445196.9976172,
+            "t_inactive": 1674445197.001546,
+            "state": "INACTIVE",
+            "name": "sleep",
+            "ntasks": 1,
+            "nnodes": 1,
+            "ranks": "1",
+            "nodelist": "lammps-job-1",
+            "success": true,
+            "exception_occurred": false,
+            "result": "COMPLETED",
+            "expiration": 1675049991.0,
+            "annotations": {
+                "sched": {
+                    "queue": "default"
+                }
+            },
+            "waitstatus": 0,
+            "returncode": 0,
+            "runtime": 5.040483474731445,
+            "exception": {
+                "occurred": false,
+                "severity": "",
+                "type": "",
+                "note": ""
+            },
+            "duration": "",
+            "start_to_info_seconds": 13.608879566192627,
+            "start_to_output_seconds": 16.584359407424927
+        },
+        "sleep-3-minicluster-size-2": {
+            "id": 7520689061888,
+            "userid": 1234,
+            "urgency": 16,
+            "priority": 16,
+            "t_submit": 1674445208.5661342,
+            "t_depend": 1674445208.5661342,
+            "t_run": 1674445208.588134,
+            "t_cleanup": 1674445213.632671,
+            "t_inactive": 1674445213.63706,
+            "state": "INACTIVE",
+            "name": "sleep",
+            "ntasks": 1,
+            "nnodes": 1,
+            "ranks": "1",
+            "nodelist": "lammps-job-1",
+            "success": true,
+            "exception_occurred": false,
+            "result": "COMPLETED",
+            "expiration": 1675050008.0,
+            "annotations": {
+                "sched": {
+                    "queue": "default"
+                }
+            },
+            "waitstatus": 0,
+            "returncode": 0,
+            "runtime": 5.04453706741333,
+            "exception": {
+                "occurred": false,
+                "severity": "",
+                "type": "",
+                "note": ""
+            },
+            "duration": "",
+            "start_to_info_seconds": 13.602198600769043,
+            "start_to_output_seconds": 16.66467046737671
+        },
+        "sleep-4-minicluster-size-2": {
+            "id": 7800382029824,
+            "userid": 1234,
+            "urgency": 16,
+            "priority": 16,
+            "t_submit": 1674445225.2364438,
+            "t_depend": 1674445225.2364438,
+            "t_run": 1674445225.2567546,
+            "t_cleanup": 1674445230.3051867,
+            "t_inactive": 1674445230.309494,
+            "state": "INACTIVE",
+            "name": "sleep",
+            "ntasks": 1,
+            "nnodes": 1,
+            "ranks": "1",
+            "nodelist": "lammps-job-1",
+            "success": true,
+            "exception_occurred": false,
+            "result": "COMPLETED",
+            "expiration": 1675050025.0,
+            "annotations": {
+                "sched": {
+                    "queue": "default"
+                }
+            },
+            "waitstatus": 0,
+            "returncode": 0,
+            "runtime": 5.048432111740112,
+            "exception": {
+                "occurred": false,
+                "severity": "",
+                "type": "",
+                "note": ""
+            },
+            "duration": "",
+            "start_to_info_seconds": 13.53053617477417,
+            "start_to_output_seconds": 16.569458484649658
+        },
+        "sleep-5-minicluster-size-2": {
+            "id": 8079202582528,
+            "userid": 1234,
+            "urgency": 16,
+            "priority": 16,
+            "t_submit": 1674445241.855504,
+            "t_depend": 1674445241.855504,
+            "t_run": 1674445241.8752344,
+            "t_cleanup": 1674445246.9339268,
+            "t_inactive": 1674445246.9379504,
+            "state": "INACTIVE",
+            "name": "sleep",
+            "ntasks": 1,
+            "nnodes": 1,
+            "ranks": "1",
+            "nodelist": "lammps-job-1",
+            "success": true,
+            "exception_occurred": false,
+            "result": "COMPLETED",
+            "expiration": 1675050041.0,
+            "annotations": {
+                "sched": {
+                    "queue": "default"
+                }
+            },
+            "waitstatus": 0,
+            "returncode": 0,
+            "runtime": 5.058692455291748,
+            "exception": {
+                "occurred": false,
+                "severity": "",
+                "type": "",
+                "note": ""
+            },
+            "duration": "",
+            "start_to_info_seconds": 13.458645582199097,
+            "start_to_output_seconds": 16.474400281906128
+        },
+        "hello-world-1-minicluster-size-2": {
+            "id": 8356177641472,
+            "userid": 1234,
+            "urgency": 16,
+            "priority": 16,
+            "t_submit": 1674445258.3653252,
+            "t_depend": 1674445258.3653252,
+            "t_run": 1674445258.3868065,
+            "t_cleanup": 1674445258.4592175,
+            "t_inactive": 1674445258.46398,
+            "state": "INACTIVE",
+            "name": "echo",
+            "ntasks": 1,
+            "nnodes": 1,
+            "ranks": "1",
+            "nodelist": "lammps-job-1",
+            "success": true,
+            "exception_occurred": false,
+            "result": "COMPLETED",
+            "expiration": 1675050058.0,
+            "annotations": {
+                "sched": {
+                    "queue": "default"
+                }
+            },
+            "waitstatus": 0,
+            "returncode": 0,
+            "runtime": 0.07241106033325195,
+            "exception": {
+                "occurred": false,
+                "severity": "",
+                "type": "",
+                "note": ""
+            },
+            "duration": "",
+            "start_to_info_seconds": 13.482953310012817,
+            "start_to_output_seconds": 16.53845739364624
+        },
+        "hello-world-2-minicluster-size-2": {
+            "id": 8635753168896,
+            "userid": 1234,
+            "urgency": 16,
+            "priority": 16,
+            "t_submit": 1674445275.028449,
+            "t_depend": 1674445275.028449,
+            "t_run": 1674445275.0489655,
+            "t_cleanup": 1674445275.1016998,
+            "t_inactive": 1674445275.1059186,
+            "state": "INACTIVE",
+            "name": "echo",
+            "ntasks": 1,
+            "nnodes": 1,
+            "ranks": "1",
+            "nodelist": "lammps-job-1",
+            "success": true,
+            "exception_occurred": false,
+            "result": "COMPLETED",
+            "expiration": 1675050075.0,
+            "annotations": {
+                "sched": {
+                    "queue": "default"
+                }
+            },
+            "waitstatus": 0,
+            "returncode": 0,
+            "runtime": 0.052734375,
+            "exception": {
+                "occurred": false,
+                "severity": "",
+                "type": "",
+                "note": ""
+            },
+            "duration": "",
+            "start_to_info_seconds": 0.5918288230895996,
+            "start_to_output_seconds": 0.6222965717315674
+        },
+        "hello-world-3-minicluster-size-2": {
+            "id": 8641507753984,
+            "userid": 1234,
+            "urgency": 16,
+            "priority": 16,
+            "t_submit": 1674445275.3710968,
+            "t_depend": 1674445275.3710968,
+            "t_run": 1674445275.3893383,
+            "t_cleanup": 1674445275.4318235,
+            "t_inactive": 1674445275.4359808,
+            "state": "INACTIVE",
+            "name": "echo",
+            "ntasks": 1,
+            "nnodes": 1,
+            "ranks": "1",
+            "nodelist": "lammps-job-1",
+            "success": true,
+            "exception_occurred": false,
+            "result": "COMPLETED",
+            "expiration": 1675050075.0,
+            "annotations": {
+                "sched": {
+                    "queue": "default"
+                }
+            },
+            "waitstatus": 0,
+            "returncode": 0,
+            "runtime": 0.04248523712158203,
+            "exception": {
+                "occurred": false,
+                "severity": "",
+                "type": "",
+                "note": ""
+            },
+            "duration": "",
+            "start_to_info_seconds": 0.17513155937194824,
+            "start_to_output_seconds": 0.21306657791137695
+        },
+        "hello-world-4-minicluster-size-2": {
+            "id": 8646121488384,
+            "userid": 1234,
+            "urgency": 16,
+            "priority": 16,
+            "t_submit": 1674445275.6465385,
+            "t_depend": 1674445275.6465385,
+            "t_run": 1674445275.6643715,
+            "t_cleanup": 1674445275.7093751,
+            "t_inactive": 1674445275.7134967,
+            "state": "INACTIVE",
+            "name": "echo",
+            "ntasks": 1,
+            "nnodes": 1,
+            "ranks": "1",
+            "nodelist": "lammps-job-1",
+            "success": true,
+            "exception_occurred": false,
+            "result": "COMPLETED",
+            "expiration": 1675050075.0,
+            "annotations": {
+                "sched": {
+                    "queue": "default"
+                }
+            },
+            "waitstatus": 0,
+            "returncode": 0,
+            "runtime": 0.045003652572631836,
+            "exception": {
+                "occurred": false,
+                "severity": "",
+                "type": "",
+                "note": ""
+            },
+            "duration": "",
+            "start_to_info_seconds": 0.19276666641235352,
+            "start_to_output_seconds": 0.2307295799255371
+        },
+        "hello-world-5-minicluster-size-2": {
+            "id": 8649946693632,
+            "userid": 1234,
+            "urgency": 16,
+            "priority": 16,
+            "t_submit": 1674445275.8740122,
+            "t_depend": 1674445275.8740122,
+            "t_run": 1674445275.8942568,
+            "t_cleanup": 1674445275.94536,
+            "t_inactive": 1674445275.95746,
+            "state": "INACTIVE",
+            "name": "echo",
+            "ntasks": 1,
+            "nnodes": 1,
+            "ranks": "1",
+            "nodelist": "lammps-job-1",
+            "success": true,
+            "exception_occurred": false,
+            "result": "COMPLETED",
+            "expiration": 1675050075.0,
+            "annotations": {
+                "sched": {
+                    "queue": "default"
+                }
+            },
+            "waitstatus": 0,
+            "returncode": 0,
+            "runtime": 0.05110311508178711,
+            "exception": {
+                "occurred": false,
+                "severity": "",
+                "type": "",
+                "note": ""
+            },
+            "duration": "",
+            "start_to_info_seconds": 0.17215561866760254,
+            "start_to_output_seconds": 0.19998478889465332
+        }
+    }
+}

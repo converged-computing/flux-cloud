@@ -59,6 +59,19 @@ class ExperimentSetup:
         # Prepare the matrices for the setup
         self.prepare_matrices()
 
+    def iter_experiments(self):
+        """
+        yield experiments that are not run yet.
+        """
+        for experiment in self.matrices:
+            # Don't bring up a cluster if experiments already run!
+            if not self.force and experiment.is_run():
+                logger.info(
+                    f"Experiment on machine {experiment.expid} was already run and force is False, skipping."
+                )
+                continue
+            yield experiment
+
     def cleanup(self, experiments):
         """
         Cleanup the experiment script directory, if cleanup is true
@@ -152,6 +165,60 @@ class Experiment:
         """
         return os.path.join(self.outdir, self.expid)
 
+    def iter_jobs(self):
+        """
+        Iterate through experiment jobs
+        """
+        minicluster = self.minicluster
+
+        # Iterate through all the cluster sizes
+        for size in minicluster["size"]:
+
+            # We can't run if the minicluster > the experiment size
+            if size > self.size:
+                logger.warning(
+                    f"Cluster of size {self.size} cannot handle a MiniCluster of size {size}, skipping."
+                )
+                continue
+
+            # Jobname is used for output
+            for jobname, job in self.jobs.items():
+
+                # Do we want to run this job for this size and machine?
+                if not self.check_job_run(job, size):
+                    logger.debug(
+                        f"Skipping job {jobname} as does not match inclusion criteria."
+                    )
+                    continue
+
+                yield size, jobname, job
+
+    def get_persistent_image(self, size):
+        """
+        A persistent image is a job image used across a size of MiniCluster
+        """
+        image = None
+        for _, job in self.jobs.items():
+
+            # Skip jobs targeted for a different size
+            if "size" in job and job["size"] != size:
+                continue
+
+            if "image" in job and not image:
+                image = job["image"]
+                continue
+            if "image" in job and image != job["image"]:
+                raise ValueError(
+                    f"Submit uses a consistent container image, but found two images under size {size}: {image} and {job['image']}"
+                )
+
+        # If we get here and we don't have an image
+        if not image:
+            raise ValueError(
+                'Submit requires a container "image" under at least one job spec to create the MiniCluster.'
+            )
+        return image
+
     @property
     def script_dir(self):
         """
@@ -207,11 +274,13 @@ class Experiment:
         if "jobs" in experiment:
             del experiment["jobs"]
         experiment["job"] = job
-        result = template.render(**experiment)
+        result = template.render(**experiment).strip(" ")
         logger.debug(result)
 
         # Write to output directory
-        outfile = os.path.join(self.script_dir, "minicluster.yaml")
+        outfile = os.path.join(
+            self.script_dir, f"minicluster-size-{minicluster_size}.yaml"
+        )
         outdir = os.path.dirname(outfile)
         if not os.path.exists(outdir):
             logger.info(f"Creating output directory for scripts {outdir}")
@@ -274,11 +343,12 @@ class Experiment:
             return False
         return True
 
-    def save_metadata(self, times):
+    def save_metadata(self, times, info=None):
         """
         Save experiment metadata, loading an existing meta.json, if present.
         """
         experiment_dir = self.root_dir
+        info = info or {}
 
         # The experiment is defined by the machine type and size
         if not os.path.exists(experiment_dir):
@@ -286,7 +356,7 @@ class Experiment:
         meta_file = os.path.join(experiment_dir, "meta.json")
 
         # Load existing metadata, if we have it
-        meta = {"times": times}
+        meta = {"times": times, "info": info}
         if os.path.exists(meta_file):
             meta = utils.read_json(meta_file)
 
@@ -297,9 +367,20 @@ class Experiment:
                     continue
                 meta["times"][timekey] = timevalue
 
+            # Update info
+            if "info" not in meta and info:
+                meta["info"] = {}
+            for key, value in info.items():
+                meta["info"][key] = value
+
         # TODO we could add cost estimation here - data from cloud select
         for key, value in self.experiment.items():
             meta[key] = value
+
+        # Do not add empty info (only for batch mode)
+        if "info" in meta and not meta["info"]:
+            del meta["info"]
+
         utils.write_json(meta, meta_file)
         return meta
 

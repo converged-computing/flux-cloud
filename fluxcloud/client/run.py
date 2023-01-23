@@ -3,32 +3,26 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-import fluxcloud.utils as utils
-from fluxcloud.main import get_experiment_client
-from fluxcloud.main.experiment import ExperimentSetup
+from .helpers import prepare_client
 
 
 def main(args, parser, extra, subparser):
-    utils.ensure_no_extra(extra)
-
-    cli = get_experiment_client(args.cloud)
-    setup = ExperimentSetup(
-        args.experiments,
-        template=args.template,
-        outdir=args.output_dir,
-        test=args.test,
-        cleanup=args.cleanup,
-        force_cluster=args.force_cluster,
-        force=args.force,
-    )
-
-    # Update config settings on the fly
-    cli.settings.update_params(args.config_params)
-    setup.settings.update_params(args.config_params)
+    cli, setup, _ = prepare_client(args, extra)
 
     # Set the Minicluster size across experiments
     if args.size:
         setup.set_minicluster_size(args.size)
 
     cli.run(setup)
+    setup.cleanup(setup.matrices)
+
+
+def batch(args, parser, extra, subparser):
+    cli, setup, _ = prepare_client(args, extra)
+
+    # Set the Minicluster size across experiments
+    if args.size:
+        setup.set_minicluster_size(args.size)
+
+    cli.batch(setup)
     setup.cleanup(setup.matrices)

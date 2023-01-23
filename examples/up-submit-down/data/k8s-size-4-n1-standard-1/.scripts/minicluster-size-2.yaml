@@ -1,0 +1,29 @@
+apiVersion: flux-framework.org/v1alpha1
+kind: MiniCluster
+
+metadata:
+  name: lammps-job
+  namespace: flux-operator
+spec:
+  # localDeploy needs to be false
+  localDeploy: false
+
+  # Number of pods to create for MiniCluster
+  size: 2
+  tasks: 1
+
+  # Disable verbose output
+
+
+  # Optional credentials if running the flux restful api
+  fluxRestful:
+    token: "b6223555-a19a-4035-b40f-68a6ce4dd5a5"
+    username: "fluxuser"
+
+  # TODO add pod resources, if needed
+  containers:
+    - image: ghcr.io/rse-ops/lammps:flux-sched-focal-v0.24.0
+
+
+
+      cores: 1

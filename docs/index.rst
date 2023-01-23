@@ -18,7 +18,9 @@ and save the output, and bring it down. This is what flux cloud does! With Flux 
 4. Run the experiments (each a MiniCluster) and save output and timings.
 5. Bring down the cluster as soon as you are done.
 
-For all of the above, you can either run with one command `flux-cloud run` or break into three:
+For all of the above, there are two modes of execution. If you have different containers you want to run for jobs,
+then you would want to use **run** or **apply** to create separate sets of pods, each time bringing them up and down.
+That can be done with either run with one command `flux-cloud run` or broken into three:
 
 .. code-block:: console
 
@@ -26,8 +28,20 @@ For all of the above, you can either run with one command `flux-cloud run` or br
     $ flux-cloud apply
     $ flux-cloud down
 
+If you want to instead run one or more commands *across the same set of pods* meaning that your container(s)
+base(s) do not need to change, you can use **submit**:
 
-And given any failure of a command, you are given the option to try again or exit and cancel. E.g.,
+.. code-block:: console
+
+    $ flux-cloud up
+    $ flux-cloud submit
+    $ flux-cloud down
+
+And for the single command equivalent, do `flux-cloud batch`. The difference in the latter is that we will actually
+be using Flux as a scheduler, and have much more efficient runs in that we don't need to bring down pods and bring them
+back up each time.
+
+For either approach, given any failure of a command, you are given the option to try again or exit and cancel. E.g.,
 when you are developing, you can run "apply" and then easily debug until you are done and ready to bring the cluster
 down.
 

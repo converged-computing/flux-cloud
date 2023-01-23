@@ -130,42 +130,32 @@ function with_exponential_backoff {
 
 # Defaults - these are in the config but left here for information
 CLUSTER_NAME="flux-cluster"
-CLUSTER_VERSION="1.23"
-FORCE_CLUSTER="true"
-SIZE=4
-REPOSITORY="flux-framework/flux-operator"
-BRANCH="main"
-SCRIPT_DIR="/tmp/lammps-data-PeHJF2/k8s-size-4-local/.scripts"
+FORCE_CLUSTER="false"
+ZONE="us-central1-a"
 
-print_magenta "   cluster  : ${CLUSTER_NAME}"
-print_magenta "    version : ${CLUSTER_VERSION}"
-print_magenta "     size   : ${SIZE}"
-print_magenta "repository  : ${REPOSITORY}"
-print_magenta "     branch : ${BRANCH}"
+if [ -z ${ZONE+x} ]; then
+    echo "Google Cloud zone template missing as ZONE";
+    exit 1
+fi
 
-is_installed minikube
-is_installed wget
+echo "   cluster  : ${CLUSTER_NAME}"
+echo "     zone   : ${ZONE}"
+
+is_installed gcloud
+is_installed yes || FORCE_CLUSTER="false"
 
 # Check if it already exists
-minikube status
+gcloud container clusters list --zone ${ZONE} | grep ${CLUSTER_NAME}
 retval=$?
-if [[ "${retval}" == "0" ]]; then
-    print_blue "A MiniKube cluster already exists."
-    install_operator ${SCRIPT_DIR} ${REPOSITORY} ${BRANCH}
+if [[ "${retval}" != "0" ]]; then
+    print_blue "${CLUSTER_NAME} in ${ZONE} does not exist."
     echo
     exit 0
 fi
 
-if [[ "${FORCE_CLUSTER}" != "true" ]]; then
-    prompt "Do you want to create this cluster?"
+# This command has a confirmation already
+if [[ "${FORCE_CLUSTER}" == "true" ]]; then
+    yes | gcloud container clusters delete --zone ${ZONE} ${CLUSTER_NAME}
+else
+    run_echo gcloud container clusters delete --zone ${ZONE} ${CLUSTER_NAME}
 fi
-
-# Create the cluster
-run_echo minikube start --nodes=${SIZE}
-install_operator ${SCRIPT_DIR} ${REPOSITORY} ${BRANCH}
-
-# Show nodes
-run_echo kubectl get nodes
-
-run_echo kubectl get namespace
-run_echo kubectl describe namespace operator-system

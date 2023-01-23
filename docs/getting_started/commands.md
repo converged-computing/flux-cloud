@@ -1,6 +1,11 @@
 # Commands
 
-The following commands are provided by Flux Cloud.
+The following commands are provided by Flux Cloud. For running jobs, you can either do:
+
+- **apply**/**run**: A single/multi job submission intended for different containers to re-create pods each time.
+- **batch**/**submit**: A single/multi job submission intended for a common container base where we use the same set of pods.
+
+Both are described in the following sections.
 
 ## list
 
@@ -42,6 +47,8 @@ $ flux-cloud apply -e k8s-size-8-m5.large --size 2
 ```
 
 ## run
+
+> Up, apply, down in one command, ideal for completely headless runs and jobs with different containers.
 
 The main command is a "run" that is going to, for each cluster:
 
@@ -131,7 +138,9 @@ $ flux-cloud up -e n1-standard-1-2 --force-cluster
 
 ## apply
 
-And then run experiments (as you feel) with "apply."
+> Ideal for running multiple jobs with different containers.
+
+After "up" you can choose to run experiments (as you feel) with "apply."
 
 ```bash
 $ flux-cloud apply
@@ -150,8 +159,60 @@ To force overwrite of existing results (by default they are skipped)
 $ flux-cloud apply -e n1-standard-1-2 --force
 ```
 
-Note that by default, we always wait for a previous run to be cleaned up
+Apply is going to be creating on CRD per job, so that's a lot of
+pod creation and deletion. This is in comparison to "submit" that
+brings up a MiniCluster once, and then executes commands to it, allowing
+Flux to serve as the scheduler. Note that by default, we always wait for a previous run to be cleaned up
 before continuing.
+
+## submit
+
+> Ideal for one or more commands across the same container(s) and MiniCluster size.
+
+```bash
+$ flux-cloud up --cloud minikube
+$ flux-cloud submit --cloud minikube
+$ flux-cloud down --cloud minikube
+```
+
+The submit will always check if the MiniCluster is already created, and if not, create it
+to submit jobs. For submit (and the equivalent to bring it up and down with batch)
+your commands aren't provided in the CRD,
+but rather to the Flux Restful API. Submit / batch will also generate one CRD
+per MiniCluster size, but use the same MiniCluster across jobs. This is different
+from apply, which generates one CRD per job to run.
+
+## batch
+
+> Up, submit, down in one command, ideal for jobs with the same container(s)
+
+The "batch" command is comparable to "run" except we are running commands
+across the same set of containers. We don't need to bring pods up/down each time,
+and we are using Flux in our cluster to handle scheduling.
+This command is going to:
+
+1. Create the cluster
+2. Run each of the experiments, saving output and timing, on the same pods
+3. Bring down the cluster
+
+The output is organized in the same way, and as before, you can choose to run a single
+command with "submit"
+
+```bash
+$ flux-cloud batch --cloud aws
+```
+
+Note that since we are communicating with the FluxRestful API, you are required to
+provide a `FLUX_USER` and `FLUX_TOKEN` for the API. If you are running this programmatically,
+the Flux Restful Client will handle this, however if you, for example, press control C to
+cancel a run, you'll need to copy paste the username and token that was previously shown
+before running submit again to continue where you left off. Batch is equivalent to:
+
+```bash
+$ flux-cloud up
+$ flux-cloud submit
+$ flux-cloud down
+```
 
 ## down
 
@@ -173,6 +234,7 @@ You can also use `--force-cluster` here:
 ```bash
 $ flux-cloud down --force-cluster
 ```
+
 
 ## debug
 
