@@ -133,8 +133,11 @@ function with_exponential_backoff {
 }
 
 NAMESPACE="flux-operator"
-CRD="/home/vanessa/Desktop/Code/flux/flux-cloud/tests/lammps/data/k8s-size-4-local/.scripts/minicluster.yaml"
-JOB="lammps"
+CRD="/home/vanessa/Desktop/Code/flux/flux-cloud/examples/up-submit-down/data/k8s-size-4-n1-standard-1/.scripts/minicluster-size-2.yaml"
+JOB="lammps-job"
+
+# Size -1 to account for certificate generator
+SIZE=2
 
 print_magenta "  apply : ${CRD}"
 print_magenta "    job : ${JOB}"
@@ -144,72 +147,73 @@ is_installed kubectl
 # Create the namespace (ok if already exists)
 run_echo_allow_fail kubectl create namespace ${NAMESPACE}
 
-# Ensure we have a MiniCluster of the right namespace running
+# Always cleanup a previous one so tokens don't get stale
+run_echo_allow_fail kubectl delete -f ${CRD}
 echo
 podsCleaned="false"
-brokerPrefix="${JOB}-0"
-print_blue "Looking for existing MiniCluster..."
-state=$(kubectl get pods --namespace ${NAMESPACE} 2>&1)
-lines=$(echo $state | wc -l)
-if [[ "${lines}" == "1" ]] && [[ "${state}" == *"No resources found in"* ]]; then
-    echo
-    print_green "🌀️ Creating MiniCluster in ${NAMESPACE}"
-    # Apply the job, get pods
+print_blue "Waiting for previous MiniCluster to be cleaned up..."
+while [[ "${podsCleaned}" == "false" ]]; do
+    echo -n "."
+    sleep 2
+    state=$(kubectl get pods --namespace ${NAMESPACE} 2>&1)
+    lines=$(echo $state | wc -l)
+    if [[ "${lines}" == "1" ]] && [[ "${state}" == *"No resources found in"* ]]; then
+        echo
+        print_green "🌀️ Previous pods are cleaned up."
+        podsCleaned="true"
+        break
+    fi
+done
+
+# Ensure we have a MiniCluster of the right namespace running
+echo
+print_green "🌀️ Creating MiniCluster in ${NAMESPACE}"
+# Apply the job, get pods
 run_echo kubectl apply -f ${CRD}
 run_echo kubectl get -n ${NAMESPACE} pods
 
 # continue until we find the index-0 pod
-brokerPrefix="${JOB}-0"
-brokerReady="false"
+podsReady="false"
 
 echo
-print_blue "Waiting for broker pod with prefix ${brokerPrefix} to be created..."
-while [[ "${brokerReady}" == "false" ]]; do
+print_blue "Waiting for MiniCluster of size ${SIZE} to be ready..."
+while [[ "${podsReady}" == "false" ]]; do
     echo -n "."
     sleep 2
-    for pod in $(kubectl get pods --selector=job-name=${JOB} --namespace ${NAMESPACE} --output=jsonpath='{.items[*].metadata.name}'); do
-        if [[ "${pod}" == ${brokerPrefix}* ]]; then
+    pods=$(kubectl get pods --namespace ${NAMESPACE} --field-selector=status.phase=Running --output=name | wc -l)
+    if [[ "${pods}" == "${SIZE}" ]]; then
             echo
-            print_green "🌀️ Broker pod is created."
-            brokerReady="true"
+            print_green "🌀️ All pods are running."
+            podsReady="true"
             break
-        fi
-    done
+    fi
 done
 
-# Now broker pod needs to be running
 echo
-print_blue "Waiting for broker pod with prefix ${brokerPrefix} to be running..."
-brokerReady="false"
-while [[ "${brokerReady}" == "false" ]]; do
-    echo -n "."
-
-    # TODO - we likely want to check for running OR completed, it's rare but sometimes they can complete too fast.
+brokerPod=""
+brokerPrefix="${JOB}-0"
+while [[ "${brokerPod}" == "" ]]; do
     for pod in $(kubectl get pods --namespace ${NAMESPACE} --field-selector=status.phase=Running --output=jsonpath='{.items[*].metadata.name}'); do
         if [[ "${pod}" == ${brokerPrefix}* ]]; then
             echo
-            print_green "🌀️ Broker pod is running."
-            brokerReady="true"
+            brokerPod=${pod}
             break
         fi
     done
 done
-    echo
-print_blue "Creating port forward to interact with RESTful API..."
-for pod in $(kubectl get pods --namespace ${NAMESPACE} --field-selector=status.phase=Running --output=jsonpath='{.items[*].metadata.name}'); do
-    if [[ "${pod}" == ${brokerPrefix}* ]]; then
-        run_echo kubectl port-forward -n flux-operator ${pod} 5000:5000
-        break
+
+echo
+serverReady="false"
+print_blue "Waiting for Flux Restful API Server to be ready..."
+while [[ "${serverReady}" == "false" ]]; do
+    echo -n "."
+    sleep 2
+    logs=$(kubectl logs --namespace ${NAMESPACE} ${brokerPod} | grep "Uvicorn running")
+    retval=$?
+    if [[ "${retval}" == "0" ]]; then
+            echo
+            serverReady="true"
+            print_green "🌀️ Flux RestFul API Server is Ready."
+            break
     fi
 done
-else
-    echo
-print_blue "Creating port forward to interact with RESTful API..."
-for pod in $(kubectl get pods --namespace ${NAMESPACE} --field-selector=status.phase=Running --output=jsonpath='{.items[*].metadata.name}'); do
-    if [[ "${pod}" == ${brokerPrefix}* ]]; then
-        run_echo kubectl port-forward -n flux-operator ${pod} 5000:5000
-        break
-    fi
-done
-    print_green "🌀️ Found existing MiniCluster in ${NAMESPACE}"
-fi
