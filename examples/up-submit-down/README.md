@@ -46,6 +46,16 @@ $ flux-cloud batch --cloud minikube
 $ flux-cloud batch --cloud google
 ```
 
+## UI
+
+If you want to just bring up the cluster and open the user interface to interact with:
+
+```bash
+$ flux-cloud up --cloud minikube
+$ flux-cloud ui --cloud minikube
+$ flux-cloud down --cloud minikube
+```
+
 
 ## Plot
 

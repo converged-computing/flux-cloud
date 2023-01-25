@@ -17,7 +17,7 @@ spec:
 
   # Optional credentials if running the flux restful api
   fluxRestful:
-    token: "b6223555-a19a-4035-b40f-68a6ce4dd5a5"
+    token: "6b8a7393-129b-4e2d-83a7-795a5a7c9d9b"
     username: "fluxuser"
 
   # TODO add pod resources, if needed

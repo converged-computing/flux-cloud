@@ -22,4 +22,5 @@ which was actually run as:
 ```bash
 $ flux-cloud run
 ```
+
 for the purposes of the demo, and runs a lammps job on two tiny nodes!

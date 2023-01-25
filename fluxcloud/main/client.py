@@ -5,6 +5,7 @@
 
 import os
 import shutil
+import time
 
 import fluxcloud.utils as utils
 from fluxcloud.logger import logger
@@ -92,29 +93,91 @@ class ExperimentClient:
         raise NotImplementedError
 
     @save_meta
+    def open_ui(self, setup, experiment, size, api=None, persistent=False):
+        """
+        Launch a CRD that opens the UI only.
+        """
+        # The MiniCluster can vary on size
+        minicluster = experiment.minicluster
+
+        # Create a FluxRestful API to submit to
+        created = False
+        if api is None:
+            api = APIClient()
+            created = True
+
+        logger.info(f"\n🌀 Bringing up MiniCluster of size {size}")
+
+        # Get the global "job" for the size (and validate only one image)
+        # This will raise error if > 1 image, or no image.
+        image = experiment.get_persistent_image(size)
+        job = {"image": image, "token": api.token, "user": api.user}
+
+        # Pre-pull containers, etc.
+        if hasattr(self, "pre_apply"):
+            self.pre_apply(experiment, "global-job", job=job)
+
+        # Create the minicluster via a CRD without a command
+        crd = experiment.generate_crd(job, size)
+
+        # Create one MiniCluster CRD (without a command) to run the Flux Restful API
+        kwargs = {
+            "minicluster": minicluster,
+            "crd": crd,
+            "token": api.token,
+            "user": api.user,
+            "size": size,
+        }
+        submit_script = experiment.get_shared_script(
+            "minicluster-create-persistent", kwargs, suffix=f"-size-{size}"
+        )
+        # Start the MiniCluster! This should probably be done better...
+        self.run_timed(
+            f"minicluster-create-persistent-size-{size}", ["/bin/bash", submit_script]
+        )
+
+        # Ensure our credentials still work, and open port forward
+        api.check(experiment)
+        logger.info(f"\n🌀 MiniCluster of size {size} is up.\n")
+
+        # If created for the first time, show credentials
+        if created:
+            logger.info(
+                "Save these if you want to log into the Flux RESTFul interface, there are specific to the MiniCluster"
+            )
+            logger.info(f"export FLUX_USER={api.user}")
+            logger.info(f"export FLUX_TOKEN={api.token}")
+
+        # If we exit, the port forward will close.
+        if persistent:
+            try:
+                logger.info("Press Control+c to Disconnect.")
+                while True:
+                    time.sleep(10)
+            except KeyboardInterrupt:
+                logger.info("🧽️ Cleaning up!")
+                self.run_timed(
+                    f"minicluster-persistent-destroy-size-{size}",
+                    ["kubectl", "delete", "-f", crd],
+                )
+
+        return api, kwargs
+
+    @save_meta
     def submit(self, setup, experiment):
         """
         Submit a Job via the Restful API
         """
-        # The MiniCluster can vary on size
-        minicluster = experiment.minicluster
         if not experiment.jobs:
             logger.warning(
                 f"Experiment {experiment.expid} has no jobs, nothing to run."
             )
             return
 
-        # Create a FluxRestful API to submit to
-        # This will get creds from the environment or create new ones
-        api = APIClient()
-        logger.info(
-            "Save these if you want to log into the Flux RESTFul interface, there are specific to the MiniCluster"
-        )
-        logger.info(f"export FLUX_USER={api.user}")
-        logger.info(f"export FLUX_TOKEN={api.token}")
+        api = None
 
         # Iterate through all the cluster sizes
-        for size in minicluster["size"]:
+        for size in experiment.minicluster["size"]:
 
             # We can't run if the minicluster > the experiment size
             if size > experiment.size:
@@ -123,38 +186,9 @@ class ExperimentClient:
                 )
                 continue
 
+            # Open the api for the size
+            api, uiattrs = self.open_ui(setup, experiment, size, api)
             logger.info(f"\n🌀 Bringing up MiniCluster of size {size}")
-
-            # Get the global "job" for the size (and validate only one image)
-            # This will raise error if > 1 image, or no image.
-            image = experiment.get_persistent_image(size)
-            job = {"image": image, "token": api.token, "user": api.user}
-
-            # Pre-pull containers, etc.
-            if hasattr(self, "pre_apply"):
-                self.pre_apply(experiment, "global-job", job=job)
-
-            # Create the minicluster via a CRD without a command
-            crd = experiment.generate_crd(job, size)
-
-            # Create one MiniCluster CRD (without a command) to run the Flux Restful API
-            kwargs = {
-                "minicluster": minicluster,
-                "crd": crd,
-                "token": api.token,
-                "user": api.user,
-                "size": size,
-            }
-            submit_script = experiment.get_shared_script(
-                "minicluster-submit", kwargs, suffix=f"-size-{size}"
-            )
-            # Start the MiniCluster! This should probably be done better...
-            self.run_timed(
-                f"minicluster-submit-size-{size}", ["/bin/bash", submit_script]
-            )
-
-            # Ensure our credentials still work, and open port forward
-            api.check(experiment)
 
             # Save times (and logs in submit) as we go
             for jobid, info in api.submit(setup, experiment, size):
@@ -164,7 +198,8 @@ class ExperimentClient:
 
             logger.info(f"\n🌀 MiniCluster of size {size} is finished")
             self.run_timed(
-                f"minicluster-destroy-size-{size}", ["kubectl", "delete", "-f", crd]
+                f"minicluster-persistent-destroy-size-{size}",
+                ["kubectl", "delete", "-f", uiattrs["crd"]],
             )
 
     @save_meta
