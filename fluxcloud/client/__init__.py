@@ -130,6 +130,11 @@ flux-cloud config add cloud aws""",
         description="Bring the cluster up, run experiments via applying CRDs, and bring it down.",
         formatter_class=argparse.RawTextHelpFormatter,
     )
+    ui = subparsers.add_parser(
+        "ui",
+        description="Once the cluster is up, create/open the user interface.",
+        formatter_class=argparse.RawTextHelpFormatter,
+    )
     batch = subparsers.add_parser(
         "batch",
         description="Bring the cluster up, run experiments via a Flux Restful API submit, and bring it down.",
@@ -168,7 +173,7 @@ flux-cloud config add cloud aws""",
         description="List experiment ids available.",
         formatter_class=argparse.RawTextHelpFormatter,
     )
-    for command in run, up, down, apply, listing, batch, submit:
+    for command in run, up, down, apply, listing, batch, submit, ui:
         command.add_argument(
             "experiments",
             default="experiments.yaml",
@@ -183,7 +188,7 @@ flux-cloud config add cloud aws""",
             choices=clouds.cloud_names,
         )
 
-    for command in apply, up, down, run, batch, submit:
+    for command in apply, up, down, run, batch, submit, ui:
         command.add_argument(
             "--force-cluster",
             dest="force_cluster",
@@ -292,6 +297,8 @@ def run():
         from .run import batch as main
     elif args.command == "config":
         from .config import main
+    elif args.command == "ui":
+        from .ui import main
     elif args.command == "up":
         from .up import main
     elif args.command == "down":

@@ -1,24 +1,26 @@
 {
     "times": {
         "destroy-cluster": 324.709,
-        "create-cluster": 491.577,
+        "create-cluster": 86.521,
         "minicluster-submit-size-2": 183.626,
         "reaxc-hns-1-minicluster-size-2": 32.1847505569458,
         "reaxc-hns-2-minicluster-size-2": 33.41048860549927,
         "reaxc-hns-3-minicluster-size-2": 30.96457529067993,
         "reaxc-hns-4-minicluster-size-2": 30.777089595794678,
         "reaxc-hns-5-minicluster-size-2": 31.048890829086304,
-        "sleep-1-minicluster-size-2": 5.0783607959747314,
-        "sleep-2-minicluster-size-2": 5.040483474731445,
-        "sleep-3-minicluster-size-2": 5.04453706741333,
-        "sleep-4-minicluster-size-2": 5.048432111740112,
-        "sleep-5-minicluster-size-2": 5.058692455291748,
+        "sleep-1-minicluster-size-2": 5.028888463973999,
+        "sleep-2-minicluster-size-2": 5.045725584030151,
+        "sleep-3-minicluster-size-2": 5.072444677352905,
+        "sleep-4-minicluster-size-2": 5.034207582473755,
+        "sleep-5-minicluster-size-2": 5.025948762893677,
         "hello-world-1-minicluster-size-2": 0.07241106033325195,
         "hello-world-2-minicluster-size-2": 0.052734375,
         "hello-world-3-minicluster-size-2": 0.04248523712158203,
         "hello-world-4-minicluster-size-2": 0.045003652572631836,
         "hello-world-5-minicluster-size-2": 0.05110311508178711,
-        "minicluster-destroy-size-2": 0.277
+        "minicluster-destroy-size-2": 0.277,
+        "minicluster-create-persistent-size-2": 42.606,
+        "minicluster-persistent-destroy-size-2": 0.164
     },
     "size": 4,
     "machine": "n1-standard-1",
@@ -313,15 +315,15 @@
             "start_to_output_seconds": 92.92412114143372
         },
         "sleep-1-minicluster-size-2": {
-            "id": 6190792704000,
+            "id": 461004341248,
             "userid": 1234,
             "urgency": 16,
             "priority": 16,
-            "t_submit": 1674445129.2985795,
-            "t_depend": 1674445129.2985795,
-            "t_run": 1674445129.3183057,
-            "t_cleanup": 1674445134.3966665,
-            "t_inactive": 1674445134.400485,
+            "t_submit": 1674677415.8718548,
+            "t_depend": 1674677415.8718548,
+            "t_run": 1674677415.8845603,
+            "t_cleanup": 1674677420.9134488,
+            "t_inactive": 1674677420.9152129,
             "state": "INACTIVE",
             "name": "sleep",
             "ntasks": 1,
@@ -331,7 +333,7 @@
             "success": true,
             "exception_occurred": false,
             "result": "COMPLETED",
-            "expiration": 1675049929.0,
+            "expiration": 1675282215.0,
             "annotations": {
                 "sched": {
                     "queue": "default"
@@ -339,7 +341,7 @@
             },
             "waitstatus": 0,
             "returncode": 0,
-            "runtime": 5.0783607959747314,
+            "runtime": 5.028888463973999,
             "exception": {
                 "occurred": false,
                 "severity": "",
@@ -347,29 +349,29 @@
                 "note": ""
             },
             "duration": "",
-            "start_to_info_seconds": 62.536019802093506,
-            "start_to_output_seconds": 62.61232876777649
+            "start_to_info_seconds": 14.840466737747192,
+            "start_to_output_seconds": 17.383413314819336
         },
         "sleep-2-minicluster-size-2": {
-            "id": 7241700737024,
+            "id": 717628637184,
             "userid": 1234,
             "urgency": 16,
             "priority": 16,
-            "t_submit": 1674445191.9373004,
-            "t_depend": 1674445191.9373004,
-            "t_run": 1674445191.9571338,
-            "t_cleanup": 1674445196.9976172,
-            "t_inactive": 1674445197.001546,
+            "t_submit": 1674677431.16695,
+            "t_depend": 1674677431.16695,
+            "t_run": 1674677431.1903481,
+            "t_cleanup": 1674677436.2360737,
+            "t_inactive": 1674677436.2395134,
             "state": "INACTIVE",
             "name": "sleep",
             "ntasks": 1,
             "nnodes": 1,
-            "ranks": "1",
-            "nodelist": "lammps-job-1",
+            "ranks": "0",
+            "nodelist": "lammps-job-0",
             "success": true,
             "exception_occurred": false,
             "result": "COMPLETED",
-            "expiration": 1675049991.0,
+            "expiration": 1675282231.0,
             "annotations": {
                 "sched": {
                     "queue": "default"
@@ -377,7 +379,7 @@
             },
             "waitstatus": 0,
             "returncode": 0,
-            "runtime": 5.040483474731445,
+            "runtime": 5.045725584030151,
             "exception": {
                 "occurred": false,
                 "severity": "",
@@ -385,19 +387,19 @@
                 "note": ""
             },
             "duration": "",
-            "start_to_info_seconds": 13.608879566192627,
-            "start_to_output_seconds": 16.584359407424927
+            "start_to_info_seconds": 12.824117660522461,
+            "start_to_output_seconds": 15.347451210021973
         },
         "sleep-3-minicluster-size-2": {
-            "id": 7520689061888,
+            "id": 975108571136,
             "userid": 1234,
             "urgency": 16,
             "priority": 16,
-            "t_submit": 1674445208.5661342,
-            "t_depend": 1674445208.5661342,
-            "t_run": 1674445208.588134,
-            "t_cleanup": 1674445213.632671,
-            "t_inactive": 1674445213.63706,
+            "t_submit": 1674677446.5178363,
+            "t_depend": 1674677446.5178363,
+            "t_run": 1674677446.534995,
+            "t_cleanup": 1674677451.6074398,
+            "t_inactive": 1674677451.613382,
             "state": "INACTIVE",
             "name": "sleep",
             "ntasks": 1,
@@ -407,7 +409,7 @@
             "success": true,
             "exception_occurred": false,
             "result": "COMPLETED",
-            "expiration": 1675050008.0,
+            "expiration": 1675282246.0,
             "annotations": {
                 "sched": {
                     "queue": "default"
@@ -415,7 +417,7 @@
             },
             "waitstatus": 0,
             "returncode": 0,
-            "runtime": 5.04453706741333,
+            "runtime": 5.072444677352905,
             "exception": {
                 "occurred": false,
                 "severity": "",
@@ -423,19 +425,19 @@
                 "note": ""
             },
             "duration": "",
-            "start_to_info_seconds": 13.602198600769043,
-            "start_to_output_seconds": 16.66467046737671
+            "start_to_info_seconds": 12.840857744216919,
+            "start_to_output_seconds": 15.384143352508545
         },
         "sleep-4-minicluster-size-2": {
-            "id": 7800382029824,
+            "id": 1234333335552,
             "userid": 1234,
             "urgency": 16,
             "priority": 16,
-            "t_submit": 1674445225.2364438,
-            "t_depend": 1674445225.2364438,
-            "t_run": 1674445225.2567546,
-            "t_cleanup": 1674445230.3051867,
-            "t_inactive": 1674445230.309494,
+            "t_submit": 1674677461.9656863,
+            "t_depend": 1674677461.9656863,
+            "t_run": 1674677461.9789429,
+            "t_cleanup": 1674677467.0131505,
+            "t_inactive": 1674677467.0233643,
             "state": "INACTIVE",
             "name": "sleep",
             "ntasks": 1,
@@ -445,7 +447,7 @@
             "success": true,
             "exception_occurred": false,
             "result": "COMPLETED",
-            "expiration": 1675050025.0,
+            "expiration": 1675282261.0,
             "annotations": {
                 "sched": {
                     "queue": "default"
@@ -453,7 +455,7 @@
             },
             "waitstatus": 0,
             "returncode": 0,
-            "runtime": 5.048432111740112,
+            "runtime": 5.034207582473755,
             "exception": {
                 "occurred": false,
                 "severity": "",
@@ -461,19 +463,19 @@
                 "note": ""
             },
             "duration": "",
-            "start_to_info_seconds": 13.53053617477417,
-            "start_to_output_seconds": 16.569458484649658
+            "start_to_info_seconds": 12.951504468917847,
+            "start_to_output_seconds": 15.509077787399292
         },
         "sleep-5-minicluster-size-2": {
-            "id": 8079202582528,
+            "id": 1495168712704,
             "userid": 1234,
             "urgency": 16,
             "priority": 16,
-            "t_submit": 1674445241.855504,
-            "t_depend": 1674445241.855504,
-            "t_run": 1674445241.8752344,
-            "t_cleanup": 1674445246.9339268,
-            "t_inactive": 1674445246.9379504,
+            "t_submit": 1674677477.5129235,
+            "t_depend": 1674677477.5129235,
+            "t_run": 1674677477.5259533,
+            "t_cleanup": 1674677482.551902,
+            "t_inactive": 1674677482.555279,
             "state": "INACTIVE",
             "name": "sleep",
             "ntasks": 1,
@@ -483,7 +485,7 @@
             "success": true,
             "exception_occurred": false,
             "result": "COMPLETED",
-            "expiration": 1675050041.0,
+            "expiration": 1675282277.0,
             "annotations": {
                 "sched": {
                     "queue": "default"
@@ -491,7 +493,7 @@
             },
             "waitstatus": 0,
             "returncode": 0,
-            "runtime": 5.058692455291748,
+            "runtime": 5.025948762893677,
             "exception": {
                 "occurred": false,
                 "severity": "",
@@ -499,8 +501,8 @@
                 "note": ""
             },
             "duration": "",
-            "start_to_info_seconds": 13.458645582199097,
-            "start_to_output_seconds": 16.474400281906128
+            "start_to_info_seconds": 12.880193948745728,
+            "start_to_output_seconds": 15.410512447357178
         },
         "hello-world-1-minicluster-size-2": {
             "id": 8356177641472,
