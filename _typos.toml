@@ -1,0 +1,4 @@
+# Ignore until we can skip regex
+# https://github.com/crate-ci/typos/issues/651
+[default.extend-words]
+"Fpr" = "Fpr"
