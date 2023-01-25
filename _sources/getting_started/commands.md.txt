@@ -214,6 +214,32 @@ $ flux-cloud submit
 $ flux-cloud down
 ```
 
+## ui
+
+If you are interested in interactive submission on your own, either in the user interface
+or via one of our client SDKs, you can bring up the MiniCluster and it's interface with
+the Flux Restful API with `ui`:
+
+```bash
+$ flux-cloud ui --cloud minikube
+```
+
+If you have many sizes of MiniClusters, you'll need to specify the one that you want:
+
+```bash
+$ flux-cloud ui --cloud minikube --size 4
+```
+
+By default, it will use your single MiniCluster size.
+
+<script id="asciicast-ie6CeWWNIw3NnNpEYGKfRTFpr" src="https://asciinema.org/a/ie6CeWWNIw3NnNpEYGKfRTFpr.js" data-speed="2" async></script>
+
+Which then looks like this in the browser, available for submission via the interface itself
+or the restful API until the user presses control+c to close the port forward and delete
+the MiniCluster.
+
+![img/ui.png](img/ui.png)
+
 ## down
 
 And then bring down your first (or named) cluster:

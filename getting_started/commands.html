@@ -473,6 +473,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#ui" class="md-nav__link">
+    <span title="/getting_started/commands.md#ui (reference label)" class="md-ellipsis">ui</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#down" class="md-nav__link">
     <span title="/getting_started/commands.md#down (reference label)" class="md-ellipsis">down</span>
   </a>
@@ -864,6 +871,23 @@ $<span class="w"> </span>flux-cloud<span class="w"> </span>submit
 $<span class="w"> </span>flux-cloud<span class="w"> </span>down
 </code></pre></div>
 </div>
+<h2 id="ui">ui<a class="headerlink" href="#ui" title="Permalink to this heading">¶</a></h2>
+<p>If you are interested in interactive submission on your own, either in the user interface
+or via one of our client SDKs, you can bring up the MiniCluster and it’s interface with
+the Flux Restful API with <code class="docutils literal notranslate"><span class="pre">ui</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>flux-cloud<span class="w"> </span>ui<span class="w"> </span>--cloud<span class="w"> </span>minikube
+</code></pre></div>
+</div>
+<p>If you have many sizes of MiniClusters, you’ll need to specify the one that you want:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>flux-cloud<span class="w"> </span>ui<span class="w"> </span>--cloud<span class="w"> </span>minikube<span class="w"> </span>--size<span class="w"> </span><span class="m">4</span>
+</code></pre></div>
+</div>
+<p>By default, it will use your single MiniCluster size.</p>
+<script id="asciicast-ie6CeWWNIw3NnNpEYGKfRTFpr" src="https://asciinema.org/a/ie6CeWWNIw3NnNpEYGKfRTFpr.js" data-speed="2" async></script>
+<p>Which then looks like this in the browser, available for submission via the interface itself
+or the restful API until the user presses control+c to close the port forward and delete
+the MiniCluster.</p>
+<p><img alt="img/ui.png" src="../_images/ui.png" /></p>
 <h2 id="down">down<a class="headerlink" href="#down" title="Permalink to this heading">¶</a></h2>
 <p>And then bring down your first (or named) cluster:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>flux-cloud<span class="w"> </span>down
@@ -931,7 +955,7 @@ however if the user decides to launch more than one, it might be harder. More th
   <small>
     
       Last update:
-      Jan 23, 2023
+      Jan 25, 2023
     
   </small>
 </div>
