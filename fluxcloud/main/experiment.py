@@ -193,31 +193,32 @@ class Experiment:
 
                 yield size, jobname, job
 
-    def get_persistent_image(self, size):
+    def get_persistent_variables(self, size, required=None):
         """
-        A persistent image is a job image used across a size of MiniCluster
+        Get persistent variables that should be used across the MiniCluster
         """
-        image = None
+        jobvars = {}
         for _, job in self.jobs.items():
 
             # Skip jobs targeted for a different size
             if "size" in job and job["size"] != size:
                 continue
 
-            if "image" in job and not image:
-                image = job["image"]
-                continue
-            if "image" in job and image != job["image"]:
-                raise ValueError(
-                    f"Submit uses a consistent container image, but found two images under size {size}: {image} and {job['image']}"
+            for key, value in job.items():
+                if key not in jobvars or (key in jobvars and jobvars[key] == value):
+                    jobvars[key] = value
+                    continue
+                logger.warning(
+                    f'Inconsistent job variable between MiniCluster jobs: {value} vs. {jobvars["value"]}'
                 )
 
         # If we get here and we don't have an image
-        if not image:
-            raise ValueError(
-                'Submit requires a container "image" under at least one job spec to create the MiniCluster.'
-            )
-        return image
+        for req in required or []:
+            if req not in jobvars:
+                raise ValueError(
+                    f'Submit requires a "{req}" field under at least one job spec to create the MiniCluster.'
+                )
+        return jobvars
 
     @property
     def script_dir(self):
