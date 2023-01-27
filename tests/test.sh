@@ -45,6 +45,12 @@ fi
 # Check output
 for filename in $(find ./data -type f -print); do
     echo "Checking $filename";
+    filebase=$(basename ${filename})
+
+    # Don't check this file, likely to change
+    if [[ "${filebase}" == "flux-operator.yaml" ]]; then
+        continue
+    fi
     suffix=$(echo ${filename:7})
     outfile="$output/$suffix"
     if [[ ! -e "${outfile}" ]]; then
