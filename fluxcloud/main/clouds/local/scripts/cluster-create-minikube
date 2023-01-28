@@ -21,12 +21,28 @@ print_magenta "     branch : ${BRANCH}"
 is_installed minikube
 is_installed wget
 
+function save_versions () {
+
+    SCRIPT_DIR=${1}
+    SIZE=${2}
+
+    # Save versions of kubectl, minikube
+    run_echo kubectl version --output=yaml > "${SCRIPT_DIR}/kubectl-version.yaml"
+    run_echo minikube version --output=yaml --components=true > "${SCRIPT_DIR}/minikube-version.json"
+
+    # Show nodes and save metadata to script directory
+    run_echo kubectl get nodes
+    run_echo kubectl get nodes -o json > "${SCRIPT_DIR}/nodes-size-${SIZE}.json"
+    run_echo kubectl describe nodes > "${SCRIPT_DIR}/nodes-size-${SIZE}.txt"
+}
+
 # Check if it already exists
 minikube status
 retval=$?
 if [[ "${retval}" == "0" ]]; then
     print_blue "A MiniKube cluster already exists."
     install_operator ${SCRIPT_DIR} ${REPOSITORY} ${BRANCH}
+    save_versions ${SCRIPT_DIR} ${SIZE}
     echo
     exit 0
 fi
@@ -44,3 +60,4 @@ run_echo kubectl get nodes
 
 run_echo kubectl get namespace
 run_echo kubectl describe namespace operator-system
+save_versions ${SCRIPT_DIR} ${SIZE}

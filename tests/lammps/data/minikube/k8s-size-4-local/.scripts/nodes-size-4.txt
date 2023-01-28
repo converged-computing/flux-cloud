@@ -1,0 +1,89 @@
+
+[0;32mkubectl describe nodes[0m
+Name:               minikube
+Roles:              control-plane
+Labels:             beta.kubernetes.io/arch=amd64
+                    beta.kubernetes.io/os=linux
+                    kubernetes.io/arch=amd64
+                    kubernetes.io/hostname=minikube
+                    kubernetes.io/os=linux
+                    minikube.k8s.io/commit=62e108c3dfdec8029a890ad6d8ef96b6461426dc
+                    minikube.k8s.io/name=minikube
+                    minikube.k8s.io/primary=true
+                    minikube.k8s.io/updated_at=2023_01_26T13_59_07_0700
+                    minikube.k8s.io/version=v1.26.1
+                    node-role.kubernetes.io/control-plane=
+                    node.kubernetes.io/exclude-from-external-load-balancers=
+Annotations:        kubeadm.alpha.kubernetes.io/cri-socket: unix:///var/run/cri-dockerd.sock
+                    node.alpha.kubernetes.io/ttl: 0
+                    volumes.kubernetes.io/controller-managed-attach-detach: true
+CreationTimestamp:  Thu, 26 Jan 2023 13:59:03 -0700
+Taints:             <none>
+Unschedulable:      false
+Lease:
+  HolderIdentity:  minikube
+  AcquireTime:     <unset>
+  RenewTime:       Sat, 28 Jan 2023 16:31:53 -0700
+Conditions:
+  Type             Status  LastHeartbeatTime                 LastTransitionTime                Reason                       Message
+  ----             ------  -----------------                 ------------------                ------                       -------
+  MemoryPressure   False   Sat, 28 Jan 2023 16:31:47 -0700   Thu, 26 Jan 2023 13:59:02 -0700   KubeletHasSufficientMemory   kubelet has sufficient memory available
+  DiskPressure     False   Sat, 28 Jan 2023 16:31:47 -0700   Thu, 26 Jan 2023 13:59:02 -0700   KubeletHasNoDiskPressure     kubelet has no disk pressure
+  PIDPressure      False   Sat, 28 Jan 2023 16:31:47 -0700   Thu, 26 Jan 2023 13:59:02 -0700   KubeletHasSufficientPID      kubelet has sufficient PID available
+  Ready            True    Sat, 28 Jan 2023 16:31:47 -0700   Thu, 26 Jan 2023 13:59:04 -0700   KubeletReady                 kubelet is posting ready status
+Addresses:
+  InternalIP:  192.168.49.2
+  Hostname:    minikube
+Capacity:
+  cpu:                8
+  ephemeral-storage:  490617784Ki
+  hugepages-1Gi:      0
+  hugepages-2Mi:      0
+  memory:             16063412Ki
+  pods:               110
+Allocatable:
+  cpu:                8
+  ephemeral-storage:  490617784Ki
+  hugepages-1Gi:      0
+  hugepages-2Mi:      0
+  memory:             16063412Ki
+  pods:               110
+System Info:
+  Machine ID:                 4c192b04687c403f8fbb9bc7975b21b3
+  System UUID:                98ec1c8c-3065-4202-a205-609412f594c1
+  Boot ID:                    e79e066c-0c73-47a0-af4a-7da769e1e766
+  Kernel Version:             5.15.0-58-generic
+  OS Image:                   Ubuntu 20.04.4 LTS
+  Operating System:           linux
+  Architecture:               amd64
+  Container Runtime Version:  docker://20.10.17
+  Kubelet Version:            v1.24.3
+  Kube-Proxy Version:         v1.24.3
+PodCIDR:                      10.244.0.0/24
+PodCIDRs:                     10.244.0.0/24
+Non-terminated Pods:          (8 in total)
+  Namespace                   Name                                            CPU Requests  CPU Limits  Memory Requests  Memory Limits  Age
+  ---------                   ----                                            ------------  ----------  ---------------  -------------  ---
+  kube-system                 coredns-6d4b75cb6d-x75qd                        100m (1%)     0 (0%)      70Mi (0%)        170Mi (1%)     2d2h
+  kube-system                 etcd-minikube                                   100m (1%)     0 (0%)      100Mi (0%)       0 (0%)         2d2h
+  kube-system                 kube-apiserver-minikube                         250m (3%)     0 (0%)      0 (0%)           0 (0%)         2d2h
+  kube-system                 kube-controller-manager-minikube                200m (2%)     0 (0%)      0 (0%)           0 (0%)         2d2h
+  kube-system                 kube-proxy-nj4fk                                0 (0%)        0 (0%)      0 (0%)           0 (0%)         2d2h
+  kube-system                 kube-scheduler-minikube                         100m (1%)     0 (0%)      0 (0%)           0 (0%)         2d2h
+  kube-system                 storage-provisioner                             0 (0%)        0 (0%)      0 (0%)           0 (0%)         2d2h
+  operator-system             operator-controller-manager-65d89d4ffb-w226b    15m (0%)      1 (12%)     128Mi (0%)       256Mi (1%)     12m
+Allocated resources:
+  (Total limits may be over 100 percent, i.e., overcommitted.)
+  Resource           Requests    Limits
+  --------           --------    ------
+  cpu                765m (9%)   1 (12%)
+  memory             298Mi (1%)  426Mi (2%)
+  ephemeral-storage  0 (0%)      0 (0%)
+  hugepages-1Gi      0 (0%)      0 (0%)
+  hugepages-2Mi      0 (0%)      0 (0%)
+Events:
+  Type    Reason          Age   From             Message
+  ----    ------          ----  ----             -------
+  Normal  Starting        31m   kube-proxy       
+  Normal  Starting        31m   kube-proxy       
+  Normal  RegisteredNode  31m   node-controller  Node minikube event: Registered Node minikube in Controller

@@ -133,9 +133,9 @@ function with_exponential_backoff {
 }
 
 NAMESPACE="flux-operator"
-CRD="/tmp/lammps-data-PeHJF2/k8s-size-4-local/.scripts/minicluster-size-2.yaml"
+CRD="/home/vanessa/Desktop/Code/flux/flux-cloud/tests/lammps/data/minikube/k8s-size-4-local/.scripts/minicluster-size-2.yaml"
 JOB="lammps"
-LOGFILE="/tmp/lammps-data-PeHJF2/k8s-size-4-local/lmp-size-2-minicluster-size-2/log.out"
+LOGFILE="/home/vanessa/Desktop/Code/flux/flux-cloud/tests/lammps/data/minikube/k8s-size-4-local/lmp-size-2-minicluster-size-2/log.out"
 
 print_magenta "  apply : ${CRD}"
 print_magenta "    job : ${JOB}"

@@ -161,7 +161,7 @@ class Experiment:
     @property
     def root_dir(self):
         """
-        Consistent means to get experiment.
+        Consistent means to get experiment, also namespaced to cloud/runner.
         """
         return os.path.join(self.outdir, self.expid)
 

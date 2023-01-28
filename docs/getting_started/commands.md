@@ -295,21 +295,30 @@ managedNodeGroups:
 By default, flux cloud keeps all scripts that the job renders in the experiment output directory under `.scripts`. If you
 want to cleanup instead, you can add the `--cleanup` flag. We do this so you can inspect a script to debug, or if you
 just want to keep them for reproducibility. As an example, here is outfrom from a run with multiple repeats of the
-same command, across two MiniCluster cluster sizes (2 and 4):
+same command, across two MiniCluster cluster sizes (2 and 4). As of version `0.1.17` the data is also organized
+by the runner (e.g., minikube vs google) so you can run the experiments across multiple clouds without conflict.
 
 ```console
-$ tree data/k8s-size-4-n1-standard-1/.scripts/
-├── cluster-create.sh
-├── cluster-destroy.sh
-├── eksctl-config.yaml
-├── flux-operator.yaml
-├── minicluster-run-lmp-16-10-minicluster-size-16.sh
-├── minicluster-run-lmp-16-11-minicluster-size-16.sh
-├── minicluster-run-lmp-16-12-minicluster-size-16.sh
-...
-├── minicluster-run-lmp-64-8-minicluster-size-64.sh
-├── minicluster-run-lmp-64-9-minicluster-size-64.sh
-└── minicluster.yaml
+$ tree -a ./data/
+./data/
+└── minikube
+    └── k8s-size-4-local
+        ├── lmp-size-2-minicluster-size-2
+        │   └── log.out
+        ├── lmp-size-4-minicluster-size-4
+        │   └── log.out
+        ├── meta.json
+        └── .scripts
+            ├── cluster-create-minikube.sh
+            ├── flux-operator.yaml
+            ├── kubectl-version.yaml
+            ├── minicluster-run-lmp-size-2-minicluster-size-2.sh
+            ├── minicluster-run-lmp-size-4-minicluster-size-4.sh
+            ├── minicluster-size-2.yaml
+            ├── minicluster-size-4.yaml
+            ├── minikube-version.json
+            ├── nodes-size-4.json
+            └── nodes-size-4.txt
 ```
 
 And that's it! I think there might be a more elegant way to determine what cluster is running,
