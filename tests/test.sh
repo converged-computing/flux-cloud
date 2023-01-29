@@ -47,11 +47,11 @@ for filename in $(find ./data -type f -print); do
     echo "Checking $filename";
     filebase=$(basename ${filename})
 
-    # Don't check these file, likely to change
+    # Don't check these files, likely to change
     if [[ "${filebase}" == "flux-operator.yaml" ]]; then
         continue
     fi
-    if [[ "${filebase}" == "node-sizes"* ]]; then
+    if [[ "${filebase}" == "nodes-size"* ]]; then
         continue
     fi
     suffix=$(echo ${filename:7})
