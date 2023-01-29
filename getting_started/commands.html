@@ -931,19 +931,28 @@ the cluster config created for eksctl:</p>
 <p>By default, flux cloud keeps all scripts that the job renders in the experiment output directory under <code class="docutils literal notranslate"><span class="pre">.scripts</span></code>. If you
 want to cleanup instead, you can add the <code class="docutils literal notranslate"><span class="pre">--cleanup</span></code> flag. We do this so you can inspect a script to debug, or if you
 just want to keep them for reproducibility. As an example, here is outfrom from a run with multiple repeats of the
-same command, across two MiniCluster cluster sizes (2 and 4):</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><code><span class="gp">$ </span>tree<span class="w"> </span>data/k8s-size-4-n1-standard-1/.scripts/
-<span class="go">├── cluster-create.sh</span>
-<span class="go">├── cluster-destroy.sh</span>
-<span class="go">├── eksctl-config.yaml</span>
-<span class="go">├── flux-operator.yaml</span>
-<span class="go">├── minicluster-run-lmp-16-10-minicluster-size-16.sh</span>
-<span class="go">├── minicluster-run-lmp-16-11-minicluster-size-16.sh</span>
-<span class="go">├── minicluster-run-lmp-16-12-minicluster-size-16.sh</span>
-<span class="go">...</span>
-<span class="go">├── minicluster-run-lmp-64-8-minicluster-size-64.sh</span>
-<span class="go">├── minicluster-run-lmp-64-9-minicluster-size-64.sh</span>
-<span class="go">└── minicluster.yaml</span>
+same command, across two MiniCluster cluster sizes (2 and 4). As of version <code class="docutils literal notranslate"><span class="pre">0.1.17</span></code> the data is also organized
+by the runner (e.g., minikube vs google) so you can run the experiments across multiple clouds without conflict.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><code><span class="gp">$ </span>tree<span class="w"> </span>-a<span class="w"> </span>./data/
+<span class="go">./data/</span>
+<span class="go">└── minikube</span>
+<span class="go">    └── k8s-size-4-local</span>
+<span class="go">        ├── lmp-size-2-minicluster-size-2</span>
+<span class="go">        │   └── log.out</span>
+<span class="go">        ├── lmp-size-4-minicluster-size-4</span>
+<span class="go">        │   └── log.out</span>
+<span class="go">        ├── meta.json</span>
+<span class="go">        └── .scripts</span>
+<span class="go">            ├── cluster-create-minikube.sh</span>
+<span class="go">            ├── flux-operator.yaml</span>
+<span class="go">            ├── kubectl-version.yaml</span>
+<span class="go">            ├── minicluster-run-lmp-size-2-minicluster-size-2.sh</span>
+<span class="go">            ├── minicluster-run-lmp-size-4-minicluster-size-4.sh</span>
+<span class="go">            ├── minicluster-size-2.yaml</span>
+<span class="go">            ├── minicluster-size-4.yaml</span>
+<span class="go">            ├── minikube-version.json</span>
+<span class="go">            ├── nodes-size-4.json</span>
+<span class="go">            └── nodes-size-4.txt</span>
 </code></pre></div>
 </div>
 <p>And that’s it! I think there might be a more elegant way to determine what cluster is running,
@@ -955,7 +964,7 @@ however if the user decides to launch more than one, it might be harder. More th
   <small>
     
       Last update:
-      Jan 25, 2023
+      Jan 29, 2023
     
   </small>
 </div>
