@@ -62,10 +62,11 @@ fi
 
 run_echo eksctl create cluster -f ${CONFIG_FILE}
 
-# Show nodes
-run_echo kubectl get nodes
-
 # Deploy the operator TODO should be variables here
 install_operator ${SCRIPT_DIR} ${REPOSITORY} ${BRANCH}
 run_echo kubectl get namespace
 run_echo kubectl describe namespace operator-system
+
+# Save versions of kubectl, eksctl
+run_echo_save "${SCRIPT_DIR}/eksctl-version.json" eksctl version --output=json -d --verbose 5
+save_common_metadata ${SCRIPT_DIR} ${SIZE}

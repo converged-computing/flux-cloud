@@ -54,12 +54,34 @@ function install_operator() {
     kubectl apply -f $tmpfile
 }
 
+function save_common_metadata() {
+    # Save common versions across clouds for kubectl and the cluster nodes
+    SCRIPT_DIR="${1}"
+    SIZE="${2}"
+
+    run_echo_save "${SCRIPT_DIR}/kubectl-version.yaml" kubectl version --output=yaml
+
+    # Show nodes and save metadata to script directory
+    run_echo kubectl get nodes
+    run_echo_save "${SCRIPT_DIR}/nodes-size-${SIZE}.json" kubectl get nodes -o json
+    run_echo_save "${SCRIPT_DIR}/nodes-size-${SIZE}.txt" kubectl describe nodes
+}
+
+
 
 function run_echo() {
     # Show the user the command then run it
     echo
     print_green "$@"
     retry $@
+}
+
+function run_echo_save() {
+    echo
+    save_to="${1}"
+    shift
+    print_green "$@ > ${save_to}"
+    $@ > ${save_to}
 }
 
 function run_echo_allow_fail() {
@@ -133,9 +155,9 @@ function with_exponential_backoff {
 }
 
 NAMESPACE="flux-operator"
-CRD="/tmp/lammps-data-PeHJF2/k8s-size-4-local/.scripts/minicluster-size-2.yaml"
+CRD="/home/vanessa/Desktop/Code/flux/flux-cloud/tests/lammps/data/minikube/k8s-size-4-local/.scripts/minicluster-size-4.yaml"
 JOB="lammps"
-LOGFILE="/tmp/lammps-data-PeHJF2/k8s-size-4-local/lmp-size-2-minicluster-size-2/log.out"
+LOGFILE="/home/vanessa/Desktop/Code/flux/flux-cloud/tests/lammps/data/minikube/k8s-size-4-local/lmp-size-4-minicluster-size-4/log.out"
 
 print_magenta "  apply : ${CRD}"
 print_magenta "    job : ${JOB}"

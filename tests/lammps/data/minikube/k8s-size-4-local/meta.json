@@ -1,9 +1,9 @@
 {
     "times": {
-        "create-cluster": 101.871,
-        "minicluster-run-lmp-size-2-minicluster-size-2": 29.376,
-        "minicluster-run-lmp-size-4-minicluster-size-4": 156.728,
-        "destroy-cluster": 13.656
+        "create-cluster": 100.363,
+        "minicluster-run-lmp-size-2-minicluster-size-2": 61.381,
+        "minicluster-run-lmp-size-4-minicluster-size-4": 64.028,
+        "destroy-cluster": 13.718
     },
     "size": 4,
     "minicluster": {

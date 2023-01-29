@@ -77,3 +77,7 @@ install_operator ${SCRIPT_DIR} ${REPOSITORY} ${BRANCH}
 
 run_echo kubectl get namespace
 run_echo kubectl describe namespace operator-system
+
+# Save versions of kubectl, gcloud
+run_echo_save "${SCRIPT_DIR}/gcloud-version.json" gcloud version --format=json
+save_common_metadata ${SCRIPT_DIR} ${SIZE}

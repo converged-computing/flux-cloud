@@ -50,12 +50,34 @@ function install_operator() {
     kubectl apply -f $tmpfile
 }
 
+function save_common_metadata() {
+    # Save common versions across clouds for kubectl and the cluster nodes
+    SCRIPT_DIR="${1}"
+    SIZE="${2}"
+
+    run_echo_save "${SCRIPT_DIR}/kubectl-version.yaml" kubectl version --output=yaml
+
+    # Show nodes and save metadata to script directory
+    run_echo kubectl get nodes
+    run_echo_save "${SCRIPT_DIR}/nodes-size-${SIZE}.json" kubectl get nodes -o json
+    run_echo_save "${SCRIPT_DIR}/nodes-size-${SIZE}.txt" kubectl describe nodes
+}
+
+
 
 function run_echo() {
     # Show the user the command then run it
     echo
     print_green "$@"
     retry $@
+}
+
+function run_echo_save() {
+    echo
+    save_to="${1}"
+    shift
+    print_green "$@ > ${save_to}"
+    $@ > ${save_to}
 }
 
 function run_echo_allow_fail() {
@@ -129,19 +151,54 @@ function with_exponential_backoff {
 }
 
 # Defaults - these are in the config but left here for information
-FORCE_CLUSTER="true"
+CLUSTER_NAME="flux-cluster"
+CLUSTER_VERSION="1.23"
+FORCE_CLUSTER="false"
+SIZE=4
+REPOSITORY="flux-framework/flux-operator"
+BRANCH="main"
+SCRIPT_DIR="/home/vanessa/Desktop/Code/flux/flux-cloud/tests/lammps/data/minikube/k8s-size-4-local/.scripts"
+
+print_magenta "   cluster  : ${CLUSTER_NAME}"
+print_magenta "    version : ${CLUSTER_VERSION}"
+print_magenta "     size   : ${SIZE}"
+print_magenta "repository  : ${REPOSITORY}"
+print_magenta "     branch : ${BRANCH}"
 
 is_installed minikube
-is_installed yes
+is_installed wget
+
+function save_versions () {
+
+    SCRIPT_DIR=${1}
+    SIZE=${2}
+
+    run_echo_save "${SCRIPT_DIR}/minikube-version.yaml" minikube version --output=yaml --components=true
+    save_common_metadata ${SCRIPT_DIR} ${SIZE}
+}
 
 # Check if it already exists
 minikube status
 retval=$?
-if [[ "${retval}" != "0" ]]; then
-    print_blue "There is no MiniKube cluster running."
+if [[ "${retval}" == "0" ]]; then
+    print_blue "A MiniKube cluster already exists."
+    install_operator ${SCRIPT_DIR} ${REPOSITORY} ${BRANCH}
+    save_versions ${SCRIPT_DIR} ${SIZE}
     echo
     exit 0
 fi
 
-# No force option here
-run_echo minikube delete
+if [[ "${FORCE_CLUSTER}" != "true" ]]; then
+    prompt "Do you want to create this cluster?"
+fi
+
+# Create the cluster
+run_echo minikube start --nodes=${SIZE}
+install_operator ${SCRIPT_DIR} ${REPOSITORY} ${BRANCH}
+
+# Show nodes
+run_echo kubectl get nodes
+
+run_echo kubectl get namespace
+run_echo kubectl describe namespace operator-system
+save_versions ${SCRIPT_DIR} ${SIZE}

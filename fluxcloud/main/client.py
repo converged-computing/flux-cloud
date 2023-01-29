@@ -108,10 +108,13 @@ class ExperimentClient:
 
         logger.info(f"\n🌀 Bringing up MiniCluster of size {size}")
 
-        # Get the global "job" for the size (and validate only one image)
-        # This will raise error if > 1 image, or no image.
-        image = experiment.get_persistent_image(size)
-        job = {"image": image, "token": api.token, "user": api.user}
+        # Get persistent variables for this job size, image is required
+        job = experiment.get_persistent_variables(size, required=["image"])
+        job.update({"token": api.token, "user": api.user})
+
+        # We can't have a command
+        if "command" in job:
+            del job["command"]
 
         # Pre-pull containers, etc.
         if hasattr(self, "pre_apply"):

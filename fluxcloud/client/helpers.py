@@ -3,6 +3,8 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+import os
+
 import fluxcloud.utils as utils
 from fluxcloud.logger import logger
 from fluxcloud.main import get_experiment_client
@@ -21,7 +23,8 @@ def prepare_client(args, extra):
         force_cluster=args.force_cluster,
         template=args.template,
         cleanup=args.cleanup,
-        outdir=args.output_dir,
+        # Ensure the output directory is namespaced by the cloud name
+        outdir=os.path.join(args.output_dir, cli.name),
         test=args.test,
         quiet=True,
     )
