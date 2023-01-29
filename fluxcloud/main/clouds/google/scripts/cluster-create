@@ -79,10 +79,5 @@ run_echo kubectl get namespace
 run_echo kubectl describe namespace operator-system
 
 # Save versions of kubectl, gcloud
-run_echo kubectl version --output=yaml > "${SCRIPT_DIR}/kubectl-version.yaml"
-run_echo gcloud version --format=json > "${SCRIPT_DIR}/gcloud-version.json"
-
-# Show nodes and save metadata to script directory
-run_echo kubectl get nodes
-run_echo kubectl get nodes -o json > "${SCRIPT_DIR}/nodes-size-${SIZE}.json"
-run_echo kubectl describe nodes > "${SCRIPT_DIR}/nodes-size-${SIZE}.txt"
+run_echo_save "${SCRIPT_DIR}/gcloud-version.json" gcloud version --format=json
+save_common_metadata ${SCRIPT_DIR} ${SIZE}

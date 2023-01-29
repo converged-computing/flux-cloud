@@ -50,12 +50,34 @@ function install_operator() {
     kubectl apply -f $tmpfile
 }
 
+function save_common_metadata() {
+    # Save common versions across clouds for kubectl and the cluster nodes
+    SCRIPT_DIR="${1}"
+    SIZE="${2}"
+
+    run_echo_save "${SCRIPT_DIR}/kubectl-version.yaml" kubectl version --output=yaml
+
+    # Show nodes and save metadata to script directory
+    run_echo kubectl get nodes
+    run_echo_save "${SCRIPT_DIR}/nodes-size-${SIZE}.json" kubectl get nodes -o json
+    run_echo_save "${SCRIPT_DIR}/nodes-size-${SIZE}.txt" kubectl describe nodes
+}
+
+
 
 function run_echo() {
     # Show the user the command then run it
     echo
     print_green "$@"
     retry $@
+}
+
+function run_echo_save() {
+    echo
+    save_to="${1}"
+    shift
+    print_green "$@ > ${save_to}"
+    $@ > ${save_to}
 }
 
 function run_echo_allow_fail() {
@@ -151,14 +173,8 @@ function save_versions () {
     SCRIPT_DIR=${1}
     SIZE=${2}
 
-    # Save versions of kubectl, minikube
-    run_echo kubectl version --output=yaml > "${SCRIPT_DIR}/kubectl-version.yaml"
-    run_echo minikube version --output=yaml --components=true > "${SCRIPT_DIR}/minikube-version.json"
-
-    # Show nodes and save metadata to script directory
-    run_echo kubectl get nodes
-    run_echo kubectl get nodes -o json > "${SCRIPT_DIR}/nodes-size-${SIZE}.json"
-    run_echo kubectl describe nodes > "${SCRIPT_DIR}/nodes-size-${SIZE}.txt"
+    run_echo_save "${SCRIPT_DIR}/minikube-version.yaml" minikube version --output=yaml --components=true
+    save_common_metadata ${SCRIPT_DIR} ${SIZE}
 }
 
 # Check if it already exists

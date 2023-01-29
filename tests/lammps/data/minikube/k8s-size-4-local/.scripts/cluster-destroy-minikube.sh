@@ -1,10 +1,6 @@
 #!/bin/bash
 
-# This is a template that will be populated with variables by Flux-Cloud
-# It used to be a script proper with getopt, but in practice this was
-# erroneous on different operating systems.
-
-# Include shared helper scripts
+# Source shared helper scripts
 # Colors
 red='\033[0;31m'
 green='\033[0;32m'
@@ -154,91 +150,20 @@ function with_exponential_backoff {
     return $exitcode
 }
 
-NAMESPACE="flux-operator"
-CRD="/home/vanessa/Desktop/Code/flux/flux-cloud/tests/lammps/data/minikube/k8s-size-4-local/.scripts/minicluster-size-2.yaml"
-JOB="lammps"
-LOGFILE="/home/vanessa/Desktop/Code/flux/flux-cloud/tests/lammps/data/minikube/k8s-size-4-local/lmp-size-2-minicluster-size-2/log.out"
+# Defaults - these are in the config but left here for information
+FORCE_CLUSTER="false"
 
-print_magenta "  apply : ${CRD}"
-print_magenta "    job : ${JOB}"
-print_magenta "logfile : ${LOGFILE}"
+is_installed minikube
+is_installed yes
 
-is_installed kubectl
+# Check if it already exists
+minikube status
+retval=$?
+if [[ "${retval}" != "0" ]]; then
+    print_blue "There is no MiniKube cluster running."
+    echo
+    exit 0
+fi
 
-# Ensure we wait for the space to be cleaned up
-echo
-podsCleaned="false"
-print_blue "Waiting for previous MiniCluster to be cleaned up..."
-while [[ "${podsCleaned}" == "false" ]]; do
-    echo -n "."
-    sleep 2
-    state=$(kubectl get pods --namespace ${NAMESPACE} 2>&1)
-    lines=$(echo $state | wc -l)
-    if [[ "${lines}" == "1" ]] && [[ "${state}" == *"No resources found in"* ]]; then
-        echo
-        print_green "🌀️ Previous pods are cleaned up."
-        podsCleaned="true"
-        break
-    fi
-done
-
-# Create the namespace (ok if already exists)
-run_echo_allow_fail kubectl create namespace ${NAMESPACE}
-
-# Apply the job, get pods
-run_echo kubectl apply -f ${CRD}
-run_echo kubectl get -n ${NAMESPACE} pods
-
-# continue until we find the index-0 pod
-brokerPrefix="${JOB}-0"
-brokerReady="false"
-
-echo
-print_blue "Waiting for broker pod with prefix ${brokerPrefix} to be created..."
-while [[ "${brokerReady}" == "false" ]]; do
-    echo -n "."
-    sleep 2
-    for pod in $(kubectl get pods --selector=job-name=${JOB} --namespace ${NAMESPACE} --output=jsonpath='{.items[*].metadata.name}'); do
-        if [[ "${pod}" == ${brokerPrefix}* ]]; then
-            echo
-            print_green "🌀️ Broker pod is created."
-            brokerReady="true"
-            break
-        fi
-    done
-done
-
-# Now broker pod needs to be running
-echo
-print_blue "Waiting for broker pod with prefix ${brokerPrefix} to be running..."
-brokerReady="false"
-while [[ "${brokerReady}" == "false" ]]; do
-    echo -n "."
-
-    # TODO - we likely want to check for running OR completed, it's rare but sometimes they can complete too fast.
-    for pod in $(kubectl get pods --namespace ${NAMESPACE} --field-selector=status.phase=Running --output=jsonpath='{.items[*].metadata.name}'); do
-        if [[ "${pod}" == ${brokerPrefix}* ]]; then
-            echo
-            print_green "🌀️ Broker pod is running."
-            brokerReady="true"
-            break
-        fi
-    done
-done
-
-# Get the name of the pods
-pods=($(kubectl get pods --selector=job-name=${JOB} --namespace ${NAMESPACE} --output=jsonpath='{.items[*].metadata.name}'))
-brokerpod=${pods[0]}
-
-# This will hang like this until the job finishes running
-echo
-print_green "kubectl -n ${NAMESPACE} logs ${brokerpod} -f > ${LOGFILE}"
-kubectl -n ${NAMESPACE} logs ${brokerpod} -f > ${LOGFILE}
-
-for exitcode in $(kubectl get -n ${NAMESPACE} pod --selector=job-name=${JOB} --output=jsonpath={.items...containerStatuses..state.terminated.exitCode}); do
-    if [[ "${exitcode}" != "0" ]]; then
-       echo "Container in ${JOB} had nonzero exit code"
-    fi
-done
-
-run_echo kubectl delete -f ${CRD}
+# No force option here
+run_echo minikube delete

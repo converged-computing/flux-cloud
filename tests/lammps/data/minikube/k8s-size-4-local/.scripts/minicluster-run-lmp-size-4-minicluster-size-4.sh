@@ -54,12 +54,34 @@ function install_operator() {
     kubectl apply -f $tmpfile
 }
 
+function save_common_metadata() {
+    # Save common versions across clouds for kubectl and the cluster nodes
+    SCRIPT_DIR="${1}"
+    SIZE="${2}"
+
+    run_echo_save "${SCRIPT_DIR}/kubectl-version.yaml" kubectl version --output=yaml
+
+    # Show nodes and save metadata to script directory
+    run_echo kubectl get nodes
+    run_echo_save "${SCRIPT_DIR}/nodes-size-${SIZE}.json" kubectl get nodes -o json
+    run_echo_save "${SCRIPT_DIR}/nodes-size-${SIZE}.txt" kubectl describe nodes
+}
+
+
 
 function run_echo() {
     # Show the user the command then run it
     echo
     print_green "$@"
     retry $@
+}
+
+function run_echo_save() {
+    echo
+    save_to="${1}"
+    shift
+    print_green "$@ > ${save_to}"
+    $@ > ${save_to}
 }
 
 function run_echo_allow_fail() {

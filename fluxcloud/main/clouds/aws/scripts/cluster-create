@@ -68,10 +68,5 @@ run_echo kubectl get namespace
 run_echo kubectl describe namespace operator-system
 
 # Save versions of kubectl, eksctl
-run_echo kubectl version --output=yaml > "${SCRIPT_DIR}/kubectl-version.yaml"
-run_echo eksctl version --output=json -d --verbose 5 > "${SCRIPT_DIR}/eksctl-version.json"
-
-# Show nodes and save metadata to script directory
-run_echo kubectl get nodes
-run_echo kubectl get nodes -o json > "${SCRIPT_DIR}/nodes-size-${SIZE}.json"
-run_echo kubectl describe nodes > "${SCRIPT_DIR}/nodes-size-${SIZE}.txt"
+run_echo_save "${SCRIPT_DIR}/eksctl-version.json" eksctl version --output=json -d --verbose 5
+save_common_metadata ${SCRIPT_DIR} ${SIZE}
