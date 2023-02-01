@@ -173,7 +173,6 @@ class Experiment:
 
         # Iterate through all the cluster sizes
         for size in minicluster["size"]:
-
             # We can't run if the minicluster > the experiment size
             if size > self.size:
                 logger.warning(
@@ -183,7 +182,6 @@ class Experiment:
 
             # Jobname is used for output
             for jobname, job in self.jobs.items():
-
                 # Do we want to run this job for this size and machine?
                 if not self.check_job_run(job, size):
                     logger.debug(
@@ -199,7 +197,6 @@ class Experiment:
         """
         jobvars = {}
         for _, job in self.jobs.items():
-
             # Skip jobs targeted for a different size
             if "size" in job and job["size"] != size:
                 continue
@@ -302,7 +299,6 @@ class Experiment:
 
         # If all job output files exist, experiment is considered run
         for size in self.minicluster["size"]:
-
             # We can't run if the minicluster > the experiment size
             if size > self.size:
                 logger.warning(
@@ -312,7 +308,6 @@ class Experiment:
 
             # Jobname is used for output
             for jobname, job in self.jobs.items():
-
                 # Do we want to run this job for this size and machine?
                 if not self.check_job_run(job, size):
                     logger.debug(

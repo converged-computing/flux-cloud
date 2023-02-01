@@ -12,7 +12,6 @@ from fluxcloud.main import get_experiment_client
 
 
 def main(args, parser, extra, subparser):
-
     fluxcloud.utils.ensure_no_extra(extra)
 
     # If nothing provided, show help

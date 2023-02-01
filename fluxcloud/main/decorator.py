@@ -22,7 +22,6 @@ class save_meta(Decorator):
     """
 
     def __call__(self, cls, *args, **kwargs):
-
         # Name of the key is after command
         idx = 0
         if "setup" in kwargs:
@@ -52,7 +51,6 @@ class timed(Decorator):
     """
 
     def __call__(self, cls, *args, **kwargs):
-
         # Name of the key is after command
         if "name" in kwargs:
             key = kwargs["name"]
