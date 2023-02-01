@@ -66,6 +66,10 @@ variables:
 
     # Customize availability zones for this experiment
     availability_zones: [us-east-1a, us-east-1b]
+
+    # Important for instance types only in one zone (hpc instances)
+    # Select your node group availability zone:
+    node_group_availability_zone: us-east-2b
 ```
 
 Note that we currently take a simple approach for boolean values - if it's present (e.g., the examples)

@@ -181,7 +181,6 @@ class ExperimentClient:
 
         # Iterate through all the cluster sizes
         for size in experiment.minicluster["size"]:
-
             # We can't run if the minicluster > the experiment size
             if size > experiment.size:
                 logger.warning(
@@ -223,7 +222,6 @@ class ExperimentClient:
         experiment_dir = experiment.root_dir
 
         for size, jobname, job in experiment.iter_jobs():
-
             # Add the size
             jobname = f"{jobname}-minicluster-size-{size}"
             job_output = os.path.join(experiment_dir, jobname)
@@ -265,13 +263,15 @@ class ExperimentClient:
             # Apply the job, and save to output directory
             self.run_timed(f"{self.job_prefix}-{jobname}", ["/bin/bash", apply_script])
 
+            # Save times between experiment runs
+            experiment.save_metadata(self.times, self.info)
+
     def clear_minicluster_times(self):
         """
         Update times to not include jobs
         """
         times = {}
         for key, value in self.times.items():
-
             # Don't add back a job that was already saved
             if key.startswith(self.job_prefix):
                 continue

@@ -84,7 +84,6 @@ class APIClient:
         # Sleep time will be time of last job, assuming they are similar
         sleep_time = 5
         for jobname, job in experiment.jobs.items():
-
             # Do we want to run this job for this size and machine?
             if not experiment.check_job_run(job, size):
                 logger.debug(

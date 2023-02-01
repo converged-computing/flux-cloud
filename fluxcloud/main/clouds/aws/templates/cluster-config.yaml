@@ -16,6 +16,7 @@ managedNodeGroups:
     minSize: {{ experiment.size }}
     maxSize: {{ experiment.size }}
     labels: { "fluxoperator": "true" }
+    {% if variables['node_group_availability_zone'] %}availabilityZones: ["{{ variables['node_group_availability_zone'] }}"]{% endif %}
     {% if variables['ssh_key'] %}ssh:
       allow: true
       publicKeyPath: {{ variables['ssh_key'] }}{% endif %}
