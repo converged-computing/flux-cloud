@@ -716,6 +716,10 @@ for Amazon in an <code class="docutils literal notranslate"><span class="pre">ex
 
 <span class="w">    </span><span class="c1"># Customize availability zones for this experiment</span>
 <span class="w">    </span><span class="nt">availability_zones</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">us-east-1a</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">us-east-1b</span><span class="p p-Indicator">]</span>
+
+<span class="w">    </span><span class="c1"># Important for instance types only in one zone (hpc instances)</span>
+<span class="w">    </span><span class="c1"># Select your node group availability zone:</span>
+<span class="w">    </span><span class="nt">node_group_availability_zone</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">us-east-2b</span>
 </code></pre></div>
 </div>
 <p>Note that we currently take a simple approach for boolean values - if it’s present (e.g., the examples)
@@ -754,7 +758,7 @@ Note that machines and size are required for the matrix, and variables get piped
   <small>
     
       Last update:
-      Jan 29, 2023
+      Feb 01, 2023
     
   </small>
 </div>
