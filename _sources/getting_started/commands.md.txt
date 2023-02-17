@@ -56,23 +56,28 @@ The main command is a "run" that is going to, for each cluster:
 2. Run each of the experiments, saving output and timing
 3. Bring down the cluster
 
-And output will be organized based on machine, size, and command identifier. E.g.,:
+And output will be organized based on executor, machine, size, and command identifier. E.g.,:
 
 ```bash
 data/
-└── k8s-size-64-hpc6a.48xlarge
-    ├── lmp-16-10-minicluster-size-16
-    │   └── log.out
-    ├── lmp-16-11-minicluster-size-16
-    │   └── log.out
-    ...
-    ├── lmp-64-9-minicluster-size-64
-    │   └── log.out
-    └── meta.json
+└── aws
+    └── k8s-size-8-hpc6a.48xlarge
+        ├── _lmp-8-1-minicluster-size-8
+        │   └── log.out
+        ├── lmp-8-2-minicluster-size-8
+        │   └── log.out
+        ├── lmp-8-3-minicluster-size-8
+        │   └── log.out
+        ├── lmp-8-4-minicluster-size-8
+        │   └── log.out
+        ├── lmp-8-5-minicluster-size-8
+        │   └── log.out
+        └── meta.json
 ```
 
-In the above, the top level directory `k8s-size-64-hpc6a.48xlarge` corresponds to our
-Kubernetes cluster size and machine type. The subdirectories under that correspond
+In the above, the top level directory `aws` corresponds to the flux-cloud cloud backend,
+the second level `k8s-size-64-hpc6a.48xlarge` corresponds to our
+Kubernetes cluster size and machine type, and the subdirectories under that correspond
 to specific jobs and repeat numbers and sizes, and the `meta.json` includes a summary
 of your experiments across those in json. Thus, to run everything:
 

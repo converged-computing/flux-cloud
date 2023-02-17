@@ -746,21 +746,26 @@ with <code class="docutils literal notranslate"><span class="pre">-e</span></cod
 <li><p>Run each of the experiments, saving output and timing</p></li>
 <li><p>Bring down the cluster</p></li>
 </ol>
-<p>And output will be organized based on machine, size, and command identifier. E.g.,:</p>
+<p>And output will be organized based on executor, machine, size, and command identifier. E.g.,:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>data/
-└──<span class="w"> </span>k8s-size-64-hpc6a.48xlarge
-<span class="w">    </span>├──<span class="w"> </span>lmp-16-10-minicluster-size-16
-<span class="w">    </span>│<span class="w">   </span>└──<span class="w"> </span>log.out
-<span class="w">    </span>├──<span class="w"> </span>lmp-16-11-minicluster-size-16
-<span class="w">    </span>│<span class="w">   </span>└──<span class="w"> </span>log.out
-<span class="w">    </span>...
-<span class="w">    </span>├──<span class="w"> </span>lmp-64-9-minicluster-size-64
-<span class="w">    </span>│<span class="w">   </span>└──<span class="w"> </span>log.out
-<span class="w">    </span>└──<span class="w"> </span>meta.json
+└──<span class="w"> </span>aws
+<span class="w">    </span>└──<span class="w"> </span>k8s-size-8-hpc6a.48xlarge
+<span class="w">        </span>├──<span class="w"> </span>_lmp-8-1-minicluster-size-8
+<span class="w">        </span>│<span class="w">   </span>└──<span class="w"> </span>log.out
+<span class="w">        </span>├──<span class="w"> </span>lmp-8-2-minicluster-size-8
+<span class="w">        </span>│<span class="w">   </span>└──<span class="w"> </span>log.out
+<span class="w">        </span>├──<span class="w"> </span>lmp-8-3-minicluster-size-8
+<span class="w">        </span>│<span class="w">   </span>└──<span class="w"> </span>log.out
+<span class="w">        </span>├──<span class="w"> </span>lmp-8-4-minicluster-size-8
+<span class="w">        </span>│<span class="w">   </span>└──<span class="w"> </span>log.out
+<span class="w">        </span>├──<span class="w"> </span>lmp-8-5-minicluster-size-8
+<span class="w">        </span>│<span class="w">   </span>└──<span class="w"> </span>log.out
+<span class="w">        </span>└──<span class="w"> </span>meta.json
 </code></pre></div>
 </div>
-<p>In the above, the top level directory <code class="docutils literal notranslate"><span class="pre">k8s-size-64-hpc6a.48xlarge</span></code> corresponds to our
-Kubernetes cluster size and machine type. The subdirectories under that correspond
+<p>In the above, the top level directory <code class="docutils literal notranslate"><span class="pre">aws</span></code> corresponds to the flux-cloud cloud backend,
+the second level <code class="docutils literal notranslate"><span class="pre">k8s-size-64-hpc6a.48xlarge</span></code> corresponds to our
+Kubernetes cluster size and machine type, and the subdirectories under that correspond
 to specific jobs and repeat numbers and sizes, and the <code class="docutils literal notranslate"><span class="pre">meta.json</span></code> includes a summary
 of your experiments across those in json. Thus, to run everything:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>flux-cloud<span class="w"> </span>run
@@ -964,7 +969,7 @@ however if the user decides to launch more than one, it might be harder. More th
   <small>
     
       Last update:
-      Feb 01, 2023
+      Feb 17, 2023
     
   </small>
 </div>
