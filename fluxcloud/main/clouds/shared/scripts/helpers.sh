@@ -89,7 +89,7 @@ function retry() {
     do
         $@
         retval=$?
-        if [[ ${retval} -ne 0 ]]; then
+        if [[ ${retval} -eq 0 ]]; then
             return
         fi
         print_blue "That command was not successful. Do you want to try again? 🤔️"
