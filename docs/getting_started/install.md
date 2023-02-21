@@ -5,7 +5,7 @@
 Note that if you first want to create user-level settings, do:
 
 ```bash
-$ flux-cloud inituser
+$ flux-cloud config inituser
 ```
 
 You should then edit the defaults in your settings.yml, either via directly editing

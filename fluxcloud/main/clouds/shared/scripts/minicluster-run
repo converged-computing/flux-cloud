@@ -36,7 +36,7 @@ print_green "kubectl -n ${NAMESPACE} logs ${brokerpod} -f > ${LOGFILE}"
 kubectl -n ${NAMESPACE} logs ${brokerpod} -f > ${LOGFILE}
 
 for exitcode in $(kubectl get -n ${NAMESPACE} pod --selector=job-name=${JOB} --output=jsonpath={.items...containerStatuses..state.terminated.exitCode}); do
-    if [[ "${exitcode}" != "0" ]]; then
+    if [[ ${exitcode} -ne 0 ]]; then
        echo "Container in ${JOB} had nonzero exit code"
     fi
 done

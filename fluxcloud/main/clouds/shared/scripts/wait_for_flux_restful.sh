@@ -20,7 +20,7 @@ while [[ "${serverReady}" == "false" ]]; do
     sleep 2
     logs=$(kubectl logs --namespace ${NAMESPACE} ${brokerPod} | grep "Uvicorn running")
     retval=$?
-    if [[ "${retval}" == "0" ]]; then
+    if [[ ${retval} -eq 0 ]]; then
             echo
             serverReady="true"
             print_green "🌀️ Flux RestFul API Server is Ready."

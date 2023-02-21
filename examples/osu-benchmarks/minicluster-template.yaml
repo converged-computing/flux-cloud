@@ -4,7 +4,6 @@ metadata:
   name: {{ minicluster.name }}
   namespace: {{ minicluster.namespace }}
 spec:
-  localDeploy: false
 
   # Number of pods to create for MiniCluster
   size: {{ size }}
@@ -22,9 +21,10 @@ spec:
       fluxOptionFlags: "-ompi=openmpi@5"
 
       # custom preCommand logic (run at start of script)
-      preCommand: |
-        source /etc/profile.d/z10_spack_environment.sh
-        asFlux="sudo -u flux -E PYTHONPATH=$PYTHONPATH"
+      commands:
+        pre: |
+          source /etc/profile.d/z10_spack_environment.sh
+          asFlux="sudo -u flux -E PYTHONPATH=$PYTHONPATH"
 
       # All osu-benchmark experiments share the same working directory
       workingDir: /opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/one-sided

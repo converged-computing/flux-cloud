@@ -11,7 +11,7 @@ while [[ "${podsReady}" == "false" ]]; do
     echo -n "."
     sleep 2
     pods=$(kubectl get pods --namespace ${NAMESPACE} --field-selector=status.phase=Running --output=name | wc -l)
-    if [[ "${pods}" == "${SIZE}" ]]; then
+    if [[ ${pods} -eq ${SIZE} ]]; then
             echo
             print_green "🌀️ All pods are running."
             podsReady="true"
