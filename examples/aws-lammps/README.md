@@ -30,7 +30,7 @@ This is used so you can ssh (connect) to your workers!
 
 ### Cloud
 
-we will be using [Flux Cloud](https://github.com/converged-computing/flux-cloud) 
+we will be using [Flux Cloud](https://github.com/converged-computing/flux-cloud)
 to run the Operator on Google Cloud Kubernetes engine.
 
 ```bash
@@ -69,4 +69,3 @@ $ flux-cloud --debug down --cloud aws
 ```
 
 By default, results will be written to a [./data](data) directory, but you can customize this with `--outdir`.
-
