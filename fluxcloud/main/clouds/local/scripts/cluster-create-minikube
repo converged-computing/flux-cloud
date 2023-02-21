@@ -33,7 +33,7 @@ function save_versions () {
 # Check if it already exists
 minikube status
 retval=$?
-if [[ "${retval}" == "0" ]]; then
+if [[ ${retval} -eq 0 ]]; then
     print_blue "A MiniKube cluster already exists."
     install_operator ${SCRIPT_DIR} ${REPOSITORY} ${BRANCH}
     save_versions ${SCRIPT_DIR} ${SIZE}
