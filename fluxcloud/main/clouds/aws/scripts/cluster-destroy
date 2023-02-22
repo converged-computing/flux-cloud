@@ -20,7 +20,7 @@ is_installed eksctl
 # The cluster must exist to delete it
 eksctl get clusters --name ${CLUSTER_NAME} --region ${REGION} --color fabulous
 retval=$?
-if [[ "${retval}" != "0" ]]; then
+if [[ ${retval} -ne 0 ]]; then
     print_blue "${CLUSTER_NAME} in ${REGION} does not exist."
     echo
     exit 0

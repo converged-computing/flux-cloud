@@ -14,6 +14,7 @@ and **Merged pull requests**. Critical items to know are:
 The versions coincide with releases on pip. Only major versions will be released as tags on Github.
 
 ## [0.0.x](https://github.com/converged-computing/flux-cloud/tree/main) (0.0.x)
+ - fix bash script bugs (0.1.19)
  - support for node group level aws avail. zones, save times on each experiment apply (0.1.18)
  - data should be namespaced by cloud type (so multiple experiments can be run alongside) (0.1.17)
  - add flux-cloud ui to just bring up (and down) a user interface (0.1.16)

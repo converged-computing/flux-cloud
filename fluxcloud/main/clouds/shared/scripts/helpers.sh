@@ -89,7 +89,7 @@ function retry() {
     do
         $@
         retval=$?
-        if [[ "${retval}" == "0" ]]; then
+        if [[ ${retval} -eq 0 ]]; then
             return
         fi
         print_blue "That command was not successful. Do you want to try again? 🤔️"
@@ -131,7 +131,7 @@ function with_exponential_backoff {
       "$@"
       exitcode=$?
 
-      if [[ $exitcode == 0 ]]; then
+      if [[ $exitcode -eq 0 ]]; then
         break
       fi
 
@@ -141,7 +141,7 @@ function with_exponential_backoff {
       timeout=$(( timeout * 2 ))
     done
 
-    if [[ $exitCode != 0 ]]; then
+    if [[ $exitCode -ne 0 ]]; then
       echo "You've failed me for the last time! ($@)" 1>&2
     fi
     return $exitcode

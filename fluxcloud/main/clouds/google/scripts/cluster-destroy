@@ -22,7 +22,7 @@ is_installed yes || FORCE_CLUSTER="false"
 # Check if it already exists
 gcloud container clusters list --zone ${ZONE} | grep ${CLUSTER_NAME}
 retval=$?
-if [[ "${retval}" != "0" ]]; then
+if [[ ${retval} -ne 0 ]]; then
     print_blue "${CLUSTER_NAME} in ${ZONE} does not exist."
     echo
     exit 0

@@ -50,7 +50,7 @@ is_installed wget
 # Check if it already exists
 eksctl get clusters --name ${CLUSTER_NAME} --region ${REGION} --color fabulous
 retval=$?
-if [[ "${retval}" == "0" ]]; then
+if [[ ${retval} -eq 0 ]]; then
     print_blue "${CLUSTER_NAME} in ${REGION} already exists."
     echo
     exit 0
@@ -62,7 +62,7 @@ fi
 
 run_echo eksctl create cluster -f ${CONFIG_FILE}
 
-# Deploy the operator TODO should be variables here
+# Deploy the operator
 install_operator ${SCRIPT_DIR} ${REPOSITORY} ${BRANCH}
 run_echo kubectl get namespace
 run_echo kubectl describe namespace operator-system
