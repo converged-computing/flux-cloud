@@ -99,9 +99,6 @@ metadata:
   name: {{ minicluster.name }}
   namespace: {{ minicluster.namespace }}
 spec:
-  # localDeploy needs to be false
-  localDeploy: false
-
   # Number of pods to create for MiniCluster
   size: {{ minicluster.size }}
 
