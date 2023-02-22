@@ -6,7 +6,7 @@ metadata:
   namespace: flux-operator
 spec:
   # Number of pods to create for MiniCluster
-  size: 4
+  size: 2
 
   # Disable verbose output
   logging:
