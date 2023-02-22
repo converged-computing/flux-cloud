@@ -5,9 +5,6 @@ metadata:
   name: lammps
   namespace: flux-operator
 spec:
-  # localDeploy needs to be false
-  localDeploy: false
-
   # Number of pods to create for MiniCluster
   size: 4
 
