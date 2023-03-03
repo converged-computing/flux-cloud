@@ -25,7 +25,7 @@ spec:
   # TODO add pod resources, if needed
   containers:
     - image: {{ job.image }}
-      {% if job.workdir %}workingDir: {{ job.workdir }}{% endif %}
+      {% if job.working_dir %}workingDir: {{ job.working_dir }}{% endif %}
       {% if job.command %}command: {{ job.command }}{% endif %}
       {% if job.flux_option_flags %}fluxOptionFlags: "-ompi=openmpi@5"{% endif %}
       cores: {% if job.cores %}{{ job.cores }}{% else %}1{% endif %}

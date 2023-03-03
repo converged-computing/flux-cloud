@@ -46,7 +46,7 @@ class ExperimentSetup:
         self.run_cleanup = cleanup
 
         # Show the user the template file
-        if template:
+        if self.template is not None:
             logger.debug(f"Using template {self.template}")
 
         # Rewrite existing outputs
@@ -191,31 +191,32 @@ class Experiment:
 
                 yield size, jobname, job
 
-    def get_persistent_variables(self, size, required=None):
+    def get_submit_miniclusters(self, size):
         """
-        Get persistent variables that should be used across the MiniCluster
+        Return Miniclusters organized by unique sizes and containers
         """
-        jobvars = {}
-        for _, job in self.jobs.items():
-            # Skip jobs targeted for a different size
+        images = set()
+        for name, job in self.jobs.items():
             if "size" in job and job["size"] != size:
                 continue
+            if "image" not in job:
+                logger.warning(f"Job {name} is missing an image and cannot be run.")
+            images.add(job["image"])
 
-            for key, value in job.items():
-                if key not in jobvars or (key in jobvars and jobvars[key] == value):
-                    jobvars[key] = value
-                    continue
-                logger.warning(
-                    f'Inconsistent job variable between MiniCluster jobs: {value} vs. {jobvars["value"]}'
-                )
+        # Prepare a MiniCluster for each image
+        miniclusters = []
+        for image in images:
+            minicluster = copy.deepcopy(self.minicluster)
+            minicluster["image"] = image
 
-        # If we get here and we don't have an image
-        for req in required or []:
-            if req not in jobvars:
-                raise ValueError(
-                    f'Submit requires a "{req}" field under at least one job spec to create the MiniCluster.'
-                )
-        return jobvars
+            # Replace the list size with a single size
+            minicluster["size"] = size
+            miniclusters.append(minicluster)
+
+        logger.debug(
+            f"Job experiments file generated {len(miniclusters)} MiniCluster(s)."
+        )
+        return miniclusters
 
     @property
     def script_dir(self):
@@ -325,10 +326,12 @@ class Experiment:
                     return False
         return True
 
-    def check_job_run(self, job, size):
+    def check_job_run(self, job, size, image=None):
         """
         Determine if a job is marked for a MiniCluster size.
         """
+        if "image" in job and image is not None and job["image"] != image:
+            return False
         if "sizes" in job and size not in job["sizes"]:
             return False
         if "size" in job and job["size"] != size:
@@ -338,6 +341,18 @@ class Experiment:
         if "machines" in job and self.machine and self.machine not in job["machines"]:
             return False
         return True
+
+    def save_json(self, obj, filename):
+        """
+        Save a json dump of something to a filename in the experiment directory.
+        """
+        experiment_dir = self.root_dir
+        save_file = os.path.join(experiment_dir, ".scripts", filename)
+        save_dir = os.path.dirname(save_file)
+        if not os.path.exists(save_dir):
+            utils.mkdir_p(save_dir)
+        utils.write_json(obj, save_file)
+        return save_file
 
     def save_metadata(self, times, info=None):
         """

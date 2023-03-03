@@ -24,7 +24,7 @@ job_spec = {
     "properties": {
         "command": {"type": "string"},
         "repeats": {"type": "number"},
-        "workdir": {"type": "string"},
+        "working_dir": {"type": "string"},
         "image": {"type": "string"},
         "machine": {"type": "string"},
         "machines": {"type": "array", "items": {"type": "string"}},

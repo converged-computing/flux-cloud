@@ -1,6 +1,8 @@
 # This is intended for MiniKube, so no machine needed
 matrix:
   size: [4]
+
+  # This is only used for Google Cloud
   machine: [n1-standard-1]
 
 # Flux Mini Cluster experiment attributes

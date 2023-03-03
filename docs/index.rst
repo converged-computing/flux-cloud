@@ -61,6 +61,7 @@ Would you like to request a feature or contribute?
   :maxdepth: 1
 
   getting_started/index.md
+  tutorials/index.md
 
 .. toctree::
   :caption: About

@@ -1,7 +1,7 @@
 # Copyright 2022-2023 Lawrence Livermore National Security, LLC
 # SPDX-License-Identifier: Apache-2.0
 
-__version__ = "0.1.19"
+__version__ = "0.1.2"
 AUTHOR = "Vanessa Sochat"
 EMAIL = "vsoch@users.noreply.github.com"
 NAME = "flux-cloud"
@@ -14,6 +14,8 @@ LICENSE = "LICENSE"
 # Global requirements
 
 INSTALL_REQUIRES = (
+    ("kubernetes", {"min_version": None}),
+    ("fluxoperator", {"min_version": None}),
     ("ruamel.yaml", {"min_version": None}),
     ("jsonschema", {"min_version": None}),
     ("requests", {"min_version": None}),

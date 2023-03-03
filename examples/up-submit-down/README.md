@@ -10,7 +10,8 @@ and we only provide basic metadata needed for a single experiment.
 ## Up
 
 ```bash
-$ flux-cloud up
+$ flux-cloud up --cloud minikube
+$ flux-cloud up --cloud google
 ```
 
 This will bring up your cluster, per the size and machine type defined

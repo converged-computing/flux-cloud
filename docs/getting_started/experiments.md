@@ -167,7 +167,7 @@ jobs:
   osu_get_latency:
     command: './osu_get_latency'
     image: ghcr.io/awesome/science:latest
-    workdir: /path/to/science
+    working_dir: /path/to/science
     repeats: 3
 ```
 
@@ -235,7 +235,7 @@ The following are specific to the job and required:
 
 The following are specific to the job but not required:
 
-- job.workdir
+- job.working_dir
 - job.tasks (recommended for better control of flux, as this would default to 1)
 - job.flux_option_flags (e.g., "-ompi=openmpi@5")
 - job.cores (defaults to 1 if not set, likely not ideal for your experiment)
