@@ -1,11 +1,74 @@
 # Commands
 
-The following commands are provided by Flux Cloud. For running jobs, you can either do:
+## experiment
 
-- **apply**/**run**: A single/multi job submission intended for different containers to re-create pods each time.
-- **batch**/**submit**: A single/multi job submission intended for a common container base where we use the same set of pods.
+### init
 
-Both are described in the following sections.
+When you want to create a new experiment, do:
+
+```bash
+$ mkdir -p my-experiment
+$ cd my-experiment
+
+# Create a new experiment for minikube
+$ flux-cloud experiment init --cloud minikube
+$ flux-cloud experiment init --cloud aws
+$ flux-cloud experiment init --cloud google
+```
+
+This will create an `experiments.yaml` template with custom variables for your
+cloud of choice, and robustry commented.
+
+<details>
+
+<summary>View Example Output of flux-cloud experiment init</summary>
+
+```bash
+$ flux-cloud experiment init --cloud google > experiments.yaml
+```
+```yaml
+matrix:
+  size: [4]
+
+  # This is a Google Cloud machine
+  machine: [n1-standard-1]
+
+variables:
+    # Customize zone just for this experiment
+    # otherwise defaults to your settings.yml
+    zone: us-central1-a
+
+
+# Flux MiniCluster experiment attributes
+minicluster:
+  name: my-job
+  namespace: flux-operator
+  # Each of these sizes will be brought up and have commands run across it
+  # They must be smaller than the Kubernetes cluster size or not possible to run!
+  size: [2, 4]
+
+# Under jobs should be named jobs (output orgainzed by name) where
+# each is required to have a command and image. Repeats is the number
+# of times to run each job
+jobs:
+  reaxc-hns:
+    command: 'lmp -v x 2 -v y 2 -v z 2 -in in.reaxc.hns -nocite'
+    image: ghcr.io/rse-ops/lammps:flux-sched-focal-v0.24.0
+    repeats: 5
+    working_dir: /home/flux/examples/reaxff/HNS
+  sleep:
+    command: 'sleep 5'
+    image: ghcr.io/rse-ops/lammps:flux-sched-focal-v0.24.0
+    repeats: 5
+    working_dir: /home/flux/examples/reaxff/HNS
+  hello-world:
+    command: 'echo hello world'
+    image: ghcr.io/rse-ops/lammps:flux-sched-focal-v0.24.0
+    repeats: 5
+    working_dir: /home/flux/examples/reaxff/HNS
+```
+
+</details>
 
 ## list
 
@@ -46,9 +109,74 @@ And this will run across sizes. To ask for a specific size:
 $ flux-cloud apply -e k8s-size-8-m5.large --size 2
 ```
 
-## run
+### up
 
-> Up, apply, down in one command, ideal for completely headless runs and jobs with different containers.
+Here is how to bring up a cluster (with the operator installed). For this command,
+we will either select the first in the matrix (default):
+
+```bash
+$ flux-cloud up
+```
+```console
+No experiment ID provided, assuming first experiment n1-standard-1-2.
+```
+
+or if you want to specify an experiment identifier based on the machine and size, you can do that:
+
+```bash
+$ flux-cloud up -e n1-standard-1-2
+```
+```console
+Selected experiment n1-standard-1-2.
+```
+
+And to force up without a prompt:
+
+```bash
+$ flux-cloud up -e n1-standard-1-2 --force-cluster
+```
+
+## Ways to run jobs
+
+The following commands are provided by Flux Cloud. For running jobs, you can either do:
+
+- **apply**/**run**: A single/multi job submission intended for different containers to re-create pods each time.
+- **batch**/**submit**: A batch mode, where we submit / schedule many jobs on the fewest MiniClusters
+
+Both are described in the following sections.
+
+### apply / run
+
+> Ideal for running multiple jobs with different containers.
+
+#### apply
+
+After "up" you can choose to run experiments (as you feel) with "apply."
+
+```bash
+$ flux-cloud apply
+```
+
+The same convention applies - not providing the identifier runs the
+first entry, otherwise we use the identifier you provide.
+
+```bash
+$ flux-cloud apply -e n1-standard-1-2
+```
+
+To force overwrite of existing results (by default they are skipped)
+
+```bash
+$ flux-cloud apply -e n1-standard-1-2 --force
+```
+
+Apply is going to be creating on CRD per job, so that's a lot of
+pod creation and deletion. This is in comparison to "submit" that
+brings up a MiniCluster once, and then executes commands to it, allowing
+Flux to serve as the scheduler. Note that by default, we always wait for a previous run to be cleaned up
+before continuing.
+
+#### run
 
 The main command is a "run" that is going to, for each cluster:
 
@@ -112,67 +240,16 @@ $ flux-cloud apply -e n1-standard-1-2
 $ flux-cloud down -e n1-standard-1-2
 ```
 
-These commands are discussed in more next.
+### submit / batch
 
-### up
+> Ideal for one or more commands and/or containers across persistent MiniClusters.
 
-Here is how to bring up a cluster (with the operator installed). For this command,
-we will either select the first in the matrix (default):
+These commands submit multiple jobs to the same MiniCluster and actually use Flux
+as a scheduler.
 
-```bash
-$ flux-cloud up
-```
-```console
-No experiment ID provided, assuming first experiment n1-standard-1-2.
-```
+#### submit
 
-or if you want to specify an experiment identifier based on the machine and size, you can do that:
-
-```bash
-$ flux-cloud up -e n1-standard-1-2
-```
-```console
-Selected experiment n1-standard-1-2.
-```
-
-And to force up without a prompt:
-
-```bash
-$ flux-cloud up -e n1-standard-1-2 --force-cluster
-```
-
-## apply
-
-> Ideal for running multiple jobs with different containers.
-
-After "up" you can choose to run experiments (as you feel) with "apply."
-
-```bash
-$ flux-cloud apply
-```
-
-The same convention applies - not providing the identifier runs the
-first entry, otherwise we use the identifier you provide.
-
-```bash
-$ flux-cloud apply -e n1-standard-1-2
-```
-
-To force overwrite of existing results (by default they are skipped)
-
-```bash
-$ flux-cloud apply -e n1-standard-1-2 --force
-```
-
-Apply is going to be creating on CRD per job, so that's a lot of
-pod creation and deletion. This is in comparison to "submit" that
-brings up a MiniCluster once, and then executes commands to it, allowing
-Flux to serve as the scheduler. Note that by default, we always wait for a previous run to be cleaned up
-before continuing.
-
-## submit
-
-> Ideal for one or more commands across the same container(s) and MiniCluster size.
+The entire flow might look like:
 
 ```bash
 $ flux-cloud up --cloud minikube
@@ -187,25 +264,22 @@ but rather to the Flux Restful API. Submit / batch will also generate one CRD
 per MiniCluster size, but use the same MiniCluster across jobs. This is different
 from apply, which generates one CRD per job to run.
 
-## batch
+#### batch
 
-> Up, submit, down in one command, ideal for jobs with the same container(s)
+This is the equivalent of "submit" but includes the up and down for the larger
+Kubernetes cluster.
 
-The "batch" command is comparable to "run" except we are running commands
-across the same set of containers. We don't need to bring pods up/down each time,
-and we are using Flux in our cluster to handle scheduling.
+```bash
+$ flux-cloud batch --cloud aws
+```
+
 This command is going to:
 
 1. Create the cluster
 2. Run each of the experiments, saving output and timing, on the same pods
 3. Bring down the cluster
 
-The output is organized in the same way, and as before, you can choose to run a single
-command with "submit"
-
-```bash
-$ flux-cloud batch --cloud aws
-```
+The output is organized in the same way,
 
 Note that since we are communicating with the FluxRestful API, you are required to
 provide a `FLUX_USER` and `FLUX_TOKEN` for the API. If you are running this programmatically,
@@ -218,32 +292,6 @@ $ flux-cloud up
 $ flux-cloud submit
 $ flux-cloud down
 ```
-
-## ui
-
-If you are interested in interactive submission on your own, either in the user interface
-or via one of our client SDKs, you can bring up the MiniCluster and it's interface with
-the Flux Restful API with `ui`:
-
-```bash
-$ flux-cloud ui --cloud minikube
-```
-
-If you have many sizes of MiniClusters, you'll need to specify the one that you want:
-
-```bash
-$ flux-cloud ui --cloud minikube --size 4
-```
-
-By default, it will use your single MiniCluster size.
-
-<script id="asciicast-ie6CeWWNIw3NnNpEYGKfRTFpr" src="https://asciinema.org/a/ie6CeWWNIw3NnNpEYGKfRTFpr.js" data-speed="2" async></script>
-
-Which then looks like this in the browser, available for submission via the interface itself
-or the restful API until the user presses control+c to close the port forward and delete
-the MiniCluster.
-
-![img/ui.png](img/ui.png)
 
 ## down
 

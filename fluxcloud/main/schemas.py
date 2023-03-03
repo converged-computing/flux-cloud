@@ -31,7 +31,7 @@ job_spec = {
         "size": {"type": "number"},
         "sizes": {"type": "array", "items": {"type": "number"}},
     },
-    "required": ["command"],
+    "required": ["command", "image"],
 }
 
 jobs_properties = {

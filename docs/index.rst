@@ -58,7 +58,7 @@ Would you like to request a feature or contribute?
 
 .. toctree::
   :caption: Getting Started
-  :maxdepth: 1
+  :maxdepth: 2
 
   getting_started/index.md
   tutorials/index.md

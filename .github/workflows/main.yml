@@ -29,8 +29,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test: ["lammps"]
-
+        command: [["apply", "lammps"], ["submit", "./examples/up-submit-down"]]
     steps:
     - name: Clone the code
       uses: actions/checkout@v3
@@ -50,9 +49,10 @@ jobs:
     - name: Start minikube
       uses: medyagh/setup-minikube@697f2b7aaed5f70bf2a94ee21a4ec3dde7b12f92 # v0.0.9
 
-    - name: Test ${{ matrix.test }}
+    - name: Test ${{ matrix.command }}
       env:
-        name: ${{ matrix.test }}
+        name: ${{ matrix.command[1] }}
+      if: (matrix.command[0] == 'apply')
       run: |
         export PATH="/usr/share/miniconda/bin:$PATH"
         source activate fc
@@ -61,3 +61,15 @@ jobs:
         # We need to delete the minikube cluster to bring it up again
         minikube delete
         /bin/bash ./tests/test.sh ${name}
+
+    - name: Test ${{ matrix.command }}
+      env:
+        workdir: ${{ matrix.command[1] }}
+      if: (matrix.command[0] == 'submit')
+      run: |
+        export PATH="/usr/share/miniconda/bin:$PATH"
+        source activate fc
+        export SHELL=/bin/bash
+        eval $(minikube -p minikube docker-env)
+        cd ${workdir}
+        flux-cloud --debug submit

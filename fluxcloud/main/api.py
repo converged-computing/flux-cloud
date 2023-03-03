@@ -35,6 +35,75 @@ class APIClient:
         logger.info(f"  FLUX_USER={self.user}")
         logger.info(f"  FLUX_TOKEN={self.token}")
 
+    def _create_minicluster(self, operator, minicluster, experiment):
+        """
+        Shared function to take an operator handle and create the minicluster.
+
+        This can be used for apply or submit!
+        """
+        namespace = minicluster["namespace"]
+        image = minicluster["image"]
+        name = minicluster["name"]
+        size = minicluster["size"]
+
+        # The operator will time creation through pods being ready
+        try:
+            result = operator.create_minicluster(
+                name=name,
+                size=size,
+                image=image,
+                user=self.user,
+                token=self.token,
+                namespace=namespace,
+                command=minicluster.get("command"),
+            )
+        except Exception as e:
+            logger.exit(f"There was an issue creating the MiniCluster: {e}")
+
+        # Wait for pods to be ready to include in minicluster up time
+        self.show_credentials()
+
+        # Save MiniCluster metadata
+        image_slug = re.sub("(:|/)", "-", image)
+        experiment.save_json(
+            result, f"minicluster-size-{size}-{name}-{image_slug}.json"
+        )
+
+        return result
+
+    def apply(self, experiment, minicluster, outfile=None, stdout=True):
+        """
+        Use the client to apply (1:1 job,minicluster) the jobs programatically.
+        """
+        namespace = minicluster["namespace"]
+        name = minicluster["name"]
+
+        # Interact with the Flux Operator Python SDK
+        operator = FluxOperator(namespace)
+        self._create_minicluster(operator, minicluster, experiment)
+
+        # Get the broker pod (this would also wait for all pods to be ready)
+        broker = operator.get_broker_pod()
+
+        # Time from when broker pod (and all pods are ready)
+        start = time.time()
+
+        # Get the pod to stream output from directly
+        if outfile is not None:
+            operator.stream_output(outfile, pod=broker, stdout=stdout)
+
+        # When output done streaming, job is done
+        end = time.time()
+        logger.info(f"Job {name} is complete! Cleaning up MiniCluster...")
+
+        # This also waits for termination (and pods to be gone) and times it
+        operator.delete_minicluster(name=name, namespace=namespace)
+
+        # TODO likely need to separate minicluster up/down times.
+        results = {"times": operator.times}
+        results["times"][name] = end - start
+        return results
+
     def submit(self, setup, experiment, minicluster, poll_seconds=20):
         """
         Use the client to submit the jobs programatically.
@@ -46,28 +115,7 @@ class APIClient:
 
         # Interact with the Flux Operator Python SDK
         operator = FluxOperator(namespace)
-
-        # The operator will time creation through pods being ready
-        try:
-            result = operator.create_minicluster(
-                name=name,
-                size=size,
-                namespace=namespace,
-                user=self.user,
-                token=self.token,
-                image=image,
-            )
-        except Exception as e:
-            logger.exit(f"There was an issue creating the MiniCluster: {e}")
-
-        # Save MiniCluster metadata
-        image_slug = re.sub("(:|/)", "-", image)
-        experiment.save_json(
-            result, f"minicluster-size-{size}-{name}-{image_slug}.json"
-        )
-
-        # Wait for pods to be ready to include in minicluster up time
-        self.show_credentials()
+        self._create_minicluster(operator, minicluster, experiment)
 
         # Get the broker pod (this would also wait for all pods to be ready)
         broker = operator.get_broker_pod()

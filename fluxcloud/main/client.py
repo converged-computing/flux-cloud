@@ -3,6 +3,8 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+import copy
+import logging
 import os
 import shutil
 
@@ -195,22 +197,20 @@ class ExperimentClient:
             # Create job directory anew
             utils.mkdir_p(job_output)
 
-            # Generate the populated crd from the template
-            crd = experiment.generate_crd(job, size)
+            # Prepare the client for one minicluster
+            cli = api.APIClient()
 
-            # Prepare specific .crd for template
-            # Note the output directory is already specific to the job index
-            kwargs = {
-                "minicluster": experiment.minicluster,
-                "logfile": logfile,
-                "crd": crd,
-            }
-            apply_script = experiment.get_shared_script(
-                "minicluster-run", kwargs, suffix=f"-{jobname}"
+            # Prepare a specific MiniCluster for this size
+            minicluster = copy.deepcopy(experiment.minicluster)
+            minicluster.update(job)
+            minicluster["size"] = size
+
+            # Get back results with times (for minicluster assets) and jobs
+            # If debug level, print job output to terminal too :)
+            results = cli.apply(
+                experiment, minicluster, logfile, stdout=logger.level == logging.DEBUG
             )
-
-            # Apply the job, and save to output directory
-            self.run_timed(f"{self.job_prefix}-{jobname}", ["/bin/bash", apply_script])
+            self.times[jobname] = results["times"]
 
             # Save times between experiment runs
             experiment.save_metadata(self.times, self.info)

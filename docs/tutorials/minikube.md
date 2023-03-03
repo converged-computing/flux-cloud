@@ -28,11 +28,8 @@ and kubectl.
 
 ## Run Experiments
 
-- TODO make a table that shows mapping of CRD variables to experiment.yaml
-- TODO there should be a command to generate an "empty" experiment.yaml template
-- TODO there should be a tutorial to do this
+- TODO finish refactor apply here,
 - TODO move other tutorials under this section after testing
-
 
 Let's start with a simple `experiments.yaml` file, where we have defined a number of different
 experiments to run on MiniKube. `flux-cloud submit` relies entirely on this experiment file,
@@ -117,93 +114,41 @@ jobs:
 ```
 
 Each experiment is defined by the matrix and variables in an `experiment.yaml`, as shown above.
-If you want to make an empty template to start with:
+Note that the easiest way to get started is to use an existing example, or run:
 
 ```bash
-# TODO
-$ flux-cloud experiment init
+$ flux-cloud experiment init --cloud minikube
 ```
 
+In the example above, we are targeting minikube.
 
 
 ### Apply / Run
 
 > Ideal if you need to run multiple jobs on different containers
 
-```bash
-$ flux-cloud run --cloud minikube experiments.yaml
-```
-
-Or set to the default:
+This apply/run workflow will create a new MiniCluster each time (pods up and down)
+and not use Flux as a scheduler proper. A workflow might look like:
 
 ```bash
-$ flux-cloud config set default_cloud:minikube
+$ flux-cloud up --cloud minikube
+$ flux-cloud apply --cloud minikube
+$ flux-cloud down --cloud minikube
 ```
-
-Given MiniKube is the default, since the experiments file defaults to that name, you can also just do:
+Or achieve all three with:
 
 ```bash
-$ flux-cloud run
+$ flux-cloud run --cloud minikube
 ```
 
-Given an experiments.yaml in the present working directory. Take a look at an `experients.yaml` in an example directory.
-Note that only size is required for the matrix for MiniKube (there is currently no concept of a machine,
-although there could be), and variables get piped into all experiments (in full). Under variables,
-both "commands" and "ids" are required, and must be equal in length (each command is assigned to one id
-for output). To just run the first entry in the matrix (test mode) do:
+Let's run this with our `experiments.yaml` above in the present working directory,
+and after having already run `up`:
 
 ```bash
-$ flux-cloud run experiments.yaml --test
+$ flux-cloud apply --cloud minikube
 ```
 
-Note that you can also use the other commands in place of a single run, notably "up" "apply" and "down."
-By default, results will be written to a temporary output directory, but you can customize this with `--outdir`.
-Finally, since MiniKube often has trouble pulling images, we recommend you include the container image as a variable
-in the experiment.yaml so it can be pulled before the experiment is run. E.g., this experiment:
 
-```yaml
-matrix:
-  size: [4]
-
-# Flux Mini Cluster experiment attributes
-minicluster:
-  name: lammps
-  namespace: flux-operator
-  size: [2, 4]
-
-# Each job can have a command and working directory
-jobs:
-  lmp:
-    command: lmp -v x 2 -v y 2 -v z 2 -in in.reaxc.hns -nocite
-    repeats: 2
-    image: ghcr.io/rse-ops/lammps:flux-sched-focal-v0.24.0
-```
-
-And this config file:
-
-```yaml
-apiVersion: flux-framework.org/v1alpha1
-kind: MiniCluster
-metadata:
-  name: {{ minicluster.name }}
-  namespace: {{ minicluster.namespace }}
-spec:
-  # Number of pods to create for MiniCluster
-  size: {{ minicluster.size }}
-
-  # Disable verbose output
-  logging:
-    quiet: true
-
-  # This is a list because a pod can support multiple containers
-  containers:
-    # The container URI to pull (currently needs to be public)
-    - image: {{ job.image }}
-
-      # You can set the working directory if your container WORKDIR is not correct.
-      workingDir: /home/flux/examples/reaxff/HNS
-      command: {{ job.command }}
-```
 
 ### Submit
 
