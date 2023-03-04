@@ -10,17 +10,10 @@ import os
 import fluxcloud.utils as utils
 from fluxcloud.main.experiment import ExperimentSetup
 
-from kubernetes import client, config
-
 from .helpers import here, init_client
 
 here = os.path.abspath(os.path.dirname(__file__))
 root = os.path.dirname(os.path.dirname(here))
-
-try:
-    config.load_kube_config()
-except:
-    config.load_incluster_config()
 
 def _test_example(dirname, tmp_path, check):
     """
