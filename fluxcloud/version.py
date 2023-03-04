@@ -15,7 +15,7 @@ LICENSE = "LICENSE"
 
 INSTALL_REQUIRES = (
     ("kubernetes", {"min_version": None}),
-    ("fluxoperator", {"min_version": None}),
+    ("fluxoperator", {"min_version": "0.0.12"}),
     ("ruamel.yaml", {"min_version": None}),
     ("jsonschema", {"min_version": None}),
     ("requests", {"min_version": None}),
