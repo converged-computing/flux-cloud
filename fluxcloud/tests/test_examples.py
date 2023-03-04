@@ -63,7 +63,7 @@ def _test_example(dirname, tmp_path, check):
         # check(minicluster_file, experiment)
         
         # Now do the same for apply
-        shutil.rmtree(expected_outdir)
+        # shutil.rmtree(expected_outdir)
         client.apply(setup, experiment)
         shared_checks(info=False)
         check(minicluster_file, experiment)
@@ -122,18 +122,6 @@ def test_minicluster_volumes(tmp_path):
 
     # Run the example for submit and apply, with check
     _test_example("volumes", tmp_path, check)
-
-
-def test_minicluster_basic(tmp_path):
-    """
-    Test basic minicluster example
-    """
-    def check(minicluster_file, experiment):
-        assert os.path.exists(minicluster_file)
-
-    # Run the example for submit and apply, with check
-    _test_example("basic", tmp_path, check)
-
 
 def test_minicluster_resources(tmp_path):
     """

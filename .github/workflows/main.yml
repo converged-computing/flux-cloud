@@ -58,7 +58,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        command: [["apply", "lammps"], ["submit", "./examples/up-submit-down"]]
+        command: [["apply", "lammps"], ["submit", "./examples/minikube/basic"]]
     steps:
     - name: Clone the code
       uses: actions/checkout@v3
