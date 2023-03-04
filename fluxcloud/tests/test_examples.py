@@ -7,14 +7,20 @@
 
 import os
 
-import shutil
 import fluxcloud.utils as utils
 from fluxcloud.main.experiment import ExperimentSetup
+
+from kubernetes import client, config
 
 from .helpers import here, init_client
 
 here = os.path.abspath(os.path.dirname(__file__))
 root = os.path.dirname(os.path.dirname(here))
+
+try:
+    config.load_kube_config()
+except:
+    config.load_incluster_config()
 
 def _test_example(dirname, tmp_path, check):
     """
@@ -58,9 +64,9 @@ def _test_example(dirname, tmp_path, check):
     # Run the experiment in the working directory
     with utils.working_dir(experiment_dir):
         # This won't work in the CI it seems
-        # client.submit(setup, experiment)
-        # shared_checks()
-        # check(minicluster_file, experiment)
+        client.submit(setup, experiment)
+        shared_checks()
+        check(minicluster_file, experiment)
         
         # Now do the same for apply
         # shutil.rmtree(expected_outdir)

@@ -201,6 +201,10 @@ class Experiment:
             # Update the job and warn the user for differences
             else:
                 for k, v in job.items():
+                    # Skip the command
+                    if k == "command":
+                        continue
+
                     # This shared job for the image doesn't have the attribute defined yet
                     if k not in images[job["image"]]:
                         images[job["image"]][k] = v
