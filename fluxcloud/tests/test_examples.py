@@ -37,6 +37,7 @@ def _test_example(dirname, tmp_path, check):
 
     # Select the first (only) experiment!
     experiment = setup.matrices[0]
+    client.up(setup, experiment=experiment)
 
     # Expected output directory
     expected_outdir = os.path.join(outdir, f'k8s-size-{experiment.size}-local')
@@ -73,6 +74,8 @@ def _test_example(dirname, tmp_path, check):
         client.apply(setup, experiment)
         shared_checks(info=False)
         check(minicluster_file, experiment)
+
+    client.down(setup, experiment=experiment)
 
 
 def test_minicluster_logging(tmp_path):

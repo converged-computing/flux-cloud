@@ -44,6 +44,7 @@ def init_client(tmpdir, cloud=None):
     """
     new_settings = get_settings(tmpdir)
     client = ExperimentClient(
+        force_cluster=True,
         quiet=False,
         settings_file=new_settings,
         clouds=cloud,
