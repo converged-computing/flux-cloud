@@ -84,7 +84,7 @@ class APIClient:
 
         # Interact with the Flux Operator Python SDK
         operator = FluxOperator(namespace)
-        operator.create_namespace()
+
         self._create_minicluster(operator, minicluster, experiment, job)
 
         # Get the broker pod (this would also wait for all pods to be ready)
@@ -120,7 +120,7 @@ class APIClient:
 
         # Interact with the Flux Operator Python SDK
         operator = FluxOperator(namespace)
-        operator.create_namespace()
+
         self._create_minicluster(operator, minicluster, experiment, job)
 
         # Get the broker pod (this would also wait for all pods to be ready)

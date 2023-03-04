@@ -425,6 +425,13 @@ class Experiment:
         return minicluster
 
     @property
+    def minicluster_namespace(self):
+        """
+        Get mini cluster namespace
+        """
+        return self.minicluster["namespace"]
+
+    @property
     def machine(self):
         return self.experiment.get("machine") or self.settings.google["machine"]
 
