@@ -52,7 +52,11 @@ jobs:
         source activate fc
         export SHELL=/bin/bash
         eval $(minikube -p minikube docker-env)
+        # We need to delete the minikube cluster to bring it up again
+        minikube delete
+        flux-cloud up --cloud minikube
         pytest -xs ./fluxcloud/tests/test_*.py
+        flux-cloud down --cloud minikube
 
   test-runs:
     runs-on: ubuntu-latest
@@ -101,5 +105,8 @@ jobs:
         source activate fc
         export SHELL=/bin/bash
         eval $(minikube -p minikube docker-env)
+        minikube delete
         cd ${workdir}
+        flux-cloud up --cloud minikube
         flux-cloud --debug submit
+        flux-cloud down --cloud minikube
