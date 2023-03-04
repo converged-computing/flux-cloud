@@ -12,6 +12,7 @@ import shutil
 
 from fluxcloud.client import get_parser
 from fluxcloud.main.client import ExperimentClient
+from fluxcloud.main import get_experiment_client
 
 here = os.path.dirname(os.path.abspath(__file__))
 root = os.path.dirname(here)
@@ -43,11 +44,5 @@ def init_client(tmpdir, cloud=None):
     Get a common client for some container technology and module system
     """
     new_settings = get_settings(tmpdir)
-    client = ExperimentClient(
-        force_cluster=True,
-        quiet=False,
-        settings_file=new_settings,
-        clouds=cloud,
-        debug=True,
-    )
+    client = get_experiment_client(cloud, debug=True, quiet=False, settings_file=new_settings)
     return client

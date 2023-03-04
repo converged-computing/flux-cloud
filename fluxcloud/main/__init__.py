@@ -1,10 +1,10 @@
-# Copyright 2022 Lawrence Livermore National Security, LLC and other
+# Copyright 2022-2023 Lawrence Livermore National Security, LLC and other
 # This is part of Flux Framework. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: Apache-2.0
 
 
-def get_experiment_client(cloud=None, force_cluster=False, debug=False):
+def get_experiment_client(cloud=None, **kwargs):
     """
     Create the cloud experiment client.
     """
@@ -19,4 +19,4 @@ def get_experiment_client(cloud=None, force_cluster=False, debug=False):
         cloud = clouds.get_cloud(cloud)
     else:
         cloud = clients.ExperimentClient
-    return cloud(force_cluster=force_cluster, debug=debug)
+    return cloud(**kwargs)
