@@ -54,7 +54,7 @@ jobs:
         eval $(minikube -p minikube docker-env)
         # We need to delete the minikube cluster to bring it up again
         minikube delete
-        flux-cloud up --cloud minikube
+        flux-cloud up --cloud minikube --force-cluster
         pytest -xs ./fluxcloud/tests/test_*.py
         flux-cloud down --cloud minikube
 
@@ -107,6 +107,6 @@ jobs:
         eval $(minikube -p minikube docker-env)
         minikube delete
         cd ${workdir}
-        flux-cloud up --cloud minikube
+        flux-cloud up --cloud minikube --force-cluster
         flux-cloud --debug submit
         flux-cloud down --cloud minikube
