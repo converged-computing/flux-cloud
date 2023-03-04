@@ -44,5 +44,4 @@ def init_client(tmpdir, cloud=None):
     Get a common client for some container technology and module system
     """
     new_settings = get_settings(tmpdir)
-    client = get_experiment_client(cloud, debug=True, quiet=False, settings_file=new_settings)
-    return client
+    return get_experiment_client(cloud, debug=True, quiet=False, force_cluster=True, settings_file=new_settings)

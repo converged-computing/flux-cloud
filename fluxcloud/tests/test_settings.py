@@ -36,7 +36,7 @@ def test_set_get(tmp_path):
     settings = UserSettings(get_settings(tmp_path))
 
     zone = "us-central1-a"
-    assert settings.google['zone'] == zone
+    assert settings.google["zone"] == zone
 
     # Cannot add invalid parameter
     with pytest.raises(SystemExit):
