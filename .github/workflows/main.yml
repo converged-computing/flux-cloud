@@ -40,6 +40,10 @@ jobs:
         conda create --quiet --name fc jinja2
         export PATH="/usr/share/miniconda/bin:$PATH"
         source activate fc
+        git clone -b add/create-namespace-python-sdk --depth 1 https://github.com/flux-framework/flux-operator /tmp/operator
+        cd /tmp/operator/sdk/python/v1alpha1
+        pip install -e .
+        cd -
         pip install .[all]
         pip install kubernetes
 
@@ -77,6 +81,10 @@ jobs:
         conda create --quiet --name fc jinja2
         export PATH="/usr/share/miniconda/bin:$PATH"
         source activate fc
+        git clone -b add/create-namespace-python-sdk --depth 1 https://github.com/flux-framework/flux-operator /tmp/operator
+        cd /tmp/operator/sdk/python/v1alpha1
+        pip install -e .
+        cd -
         pip install .[all]
 
     - name: Start minikube
