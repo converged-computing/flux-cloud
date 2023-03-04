@@ -35,43 +35,47 @@ class APIClient:
         logger.info(f"  FLUX_USER={self.user}")
         logger.info(f"  FLUX_TOKEN={self.token}")
 
-    def _create_minicluster(self, operator, minicluster, experiment):
+    def _create_minicluster(self, operator, minicluster, experiment, job):
         """
         Shared function to take an operator handle and create the minicluster.
 
-        This can be used for apply or submit!
+        This can be used for apply or submit! We separate minicluster (gets
+        piped into the MiniClusterSpec) from job (gets piped into a
+        MiniClusterContainer spec).
         """
         namespace = minicluster["namespace"]
-        image = minicluster["image"]
+        image = job["image"]
         name = minicluster["name"]
         size = minicluster["size"]
 
+        # Add Flux Restful user and token
+        minicluster["flux_restful"] = {"username": self.user, "token": self.token}
+
         # The operator will time creation through pods being ready
         try:
-            result = operator.create_minicluster(
-                name=name,
-                size=size,
-                image=image,
-                user=self.user,
-                token=self.token,
-                namespace=namespace,
-                command=minicluster.get("command"),
-            )
+            result = operator.create_minicluster(**minicluster, container=job)
         except Exception as e:
-            logger.exit(f"There was an issue creating the MiniCluster: {e}")
+            msg = f"Try: 'kubectl delete -n {namespace} minicluster {name}'"
+            logger.exit(f"There was an issue creating the MiniCluster: {e}\n{msg}")
 
         # Wait for pods to be ready to include in minicluster up time
         self.show_credentials()
 
         # Save MiniCluster metadata
         image_slug = re.sub("(:|/)", "-", image)
-        experiment.save_json(
-            result, f"minicluster-size-{size}-{name}-{image_slug}.json"
-        )
+        uid = f"{size}-{name}-{image_slug}"
+        experiment.save_json(result, f"minicluster-size-{uid}.json")
 
+        # This is a good point to also save nodes metadata
+        nodes = operator.get_nodes()
+        operator.wait_pods(quiet=True)
+        pods = operator.get_pods()
+
+        experiment.save_file(nodes.to_str(), f"nodes-{uid}.json")
+        experiment.save_file(pods.to_str(), f"pods-size-{uid}.json")
         return result
 
-    def apply(self, experiment, minicluster, outfile=None, stdout=True):
+    def apply(self, experiment, minicluster, job=None, outfile=None, stdout=True):
         """
         Use the client to apply (1:1 job,minicluster) the jobs programatically.
         """
@@ -80,7 +84,7 @@ class APIClient:
 
         # Interact with the Flux Operator Python SDK
         operator = FluxOperator(namespace)
-        self._create_minicluster(operator, minicluster, experiment)
+        self._create_minicluster(operator, minicluster, experiment, job)
 
         # Get the broker pod (this would also wait for all pods to be ready)
         broker = operator.get_broker_pod()
@@ -104,18 +108,18 @@ class APIClient:
         results["times"][name] = end - start
         return results
 
-    def submit(self, setup, experiment, minicluster, poll_seconds=20):
+    def submit(self, setup, experiment, minicluster, job, poll_seconds=20):
         """
         Use the client to submit the jobs programatically.
         """
         namespace = minicluster["namespace"]
-        image = minicluster["image"]
+        image = job["image"]
         name = minicluster["name"]
         size = minicluster["size"]
 
         # Interact with the Flux Operator Python SDK
         operator = FluxOperator(namespace)
-        self._create_minicluster(operator, minicluster, experiment)
+        self._create_minicluster(operator, minicluster, experiment, job)
 
         # Get the broker pod (this would also wait for all pods to be ready)
         broker = operator.get_broker_pod()

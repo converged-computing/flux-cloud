@@ -17,7 +17,7 @@ $ flux-cloud experiment init --cloud google
 ```
 
 This will create an `experiments.yaml` template with custom variables for your
-cloud of choice, and robustry commented.
+cloud of choice, and robustly commented.
 
 <details>
 
@@ -37,7 +37,6 @@ variables:
     # Customize zone just for this experiment
     # otherwise defaults to your settings.yml
     zone: us-central1-a
-
 
 # Flux MiniCluster experiment attributes
 minicluster:
@@ -149,6 +148,11 @@ Both are described in the following sections.
 
 > Ideal for running multiple jobs with different containers.
 
+An apply assumes that you want to create a separate MiniCluster each time, meaning
+bringing up an entire set of pods, running a single command, and then bringing everything
+down. This is ideal for longing running experiments, but note that it does not take advantage
+of using Flux as a scheduler. Flux is basically running one job and going away.
+
 #### apply
 
 After "up" you can choose to run experiments (as you feel) with "apply."
@@ -245,7 +249,9 @@ $ flux-cloud down -e n1-standard-1-2
 > Ideal for one or more commands and/or containers across persistent MiniClusters.
 
 These commands submit multiple jobs to the same MiniCluster and actually use Flux
-as a scheduler.
+as a scheduler! This means we get the unique set of images and MiniCluster sizes for
+your experiments, and then bring up each one, submitting the matching jobs to it.
+We submit all jobs at once, and then poll Flux until they are completed to get output.
 
 #### submit
 
@@ -314,7 +320,6 @@ You can also use `--force-cluster` here:
 $ flux-cloud down --force-cluster
 ```
 
-
 ## debug
 
 For any command, you can add `--debug` as a main client argument to see additional information. E.g.,
@@ -345,11 +350,10 @@ managedNodeGroups:
 
 ## scripts
 
-By default, flux cloud keeps all scripts that the job renders in the experiment output directory under `.scripts`. If you
-want to cleanup instead, you can add the `--cleanup` flag. We do this so you can inspect a script to debug, or if you
-just want to keep them for reproducibility. As an example, here is outfrom from a run with multiple repeats of the
-same command, across two MiniCluster cluster sizes (2 and 4). As of version `0.1.17` the data is also organized
-by the runner (e.g., minikube vs google) so you can run the experiments across multiple clouds without conflict.
+Flux cloud (prior to version 0.2.0) ran each job with a script, and it would save each script. Since version 0.2.0,
+we refactored to do everything with Python APIs/SDKs, so we no longer save submit scripts. However, we still save
+scripts for bringing up an down each cluster, along with node and pod metadata (as json). We save this in in the
+hidden `.scripts` directory.
 
 ```console
 $ tree -a ./data/
@@ -362,17 +366,11 @@ $ tree -a ./data/
         │   └── log.out
         ├── meta.json
         └── .scripts
-            ├── cluster-create-minikube.sh
-            ├── flux-operator.yaml
-            ├── kubectl-version.yaml
-            ├── minicluster-run-lmp-size-2-minicluster-size-2.sh
-            ├── minicluster-run-lmp-size-4-minicluster-size-4.sh
-            ├── minicluster-size-2.yaml
-            ├── minicluster-size-4.yaml
-            ├── minikube-version.json
-            ├── nodes-size-4.json
-            └── nodes-size-4.txt
+            ├── minicluster-size-2-lammps-job-ghcr.io-rse-ops-lammps-flux-sched-focal-v0.24.0.json
+            ├── nodes-2-lammps-job-ghcr.io-rse-ops-lammps-flux-sched-focal-v0.24.0.json
+            └── pods-size-2-lammps-job-ghcr.io-rse-ops-lammps-flux-sched-focal-v0.24.0.json
 ```
 
-And that's it! I think there might be a more elegant way to determine what cluster is running,
-however if the user decides to launch more than one, it might be harder. More thinking / docs / examples coming soon.
+And that's it! We recommend you look at [examples](examples.md) or [tutorials](../tutorials/index.md) for
+getting started. If you are brave, just run `flux-cloud experiment init --cloud <cloud>` to create
+your own experiment from scratch.

@@ -240,11 +240,6 @@ flux-cloud config add cloud aws""",
             action="store_true",
         )
         command.add_argument(
-            "--template",
-            help="minicluster yaml template to populate for experiments (defaults to minicluster-template.yaml",
-            default="minicluster-template.yaml",
-        )
-        command.add_argument(
             "--force",
             help="force re-run if experiment already exists.",
             default=False,

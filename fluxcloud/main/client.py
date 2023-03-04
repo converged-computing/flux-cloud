@@ -4,7 +4,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import copy
-import logging
 import os
 import shutil
 
@@ -27,6 +26,7 @@ class ExperimentClient:
         self.settings = settings.Settings
         self.info = {}
         self.times = {}
+        self.debug = kwargs.get("debug", False)
 
         # Job prefix is used for organizing time entries
         self.job_prefix = "minicluster-run"
@@ -115,9 +115,10 @@ class ExperimentClient:
 
             # Launch a unique Minicluster per container image. E.g.,
             # if the user provides 2 images for size 4, we create two MiniClusters
-            for minicluster in experiment.get_submit_miniclusters(size):
+            # This will provide all shared volumes across the jobs
+            for minicluster, job in experiment.get_submit_miniclusters(size):
                 logger.info(
-                    f"\n🌀 Bringing up MiniCluster of size {size} with image {minicluster['image']}"
+                    f"\n🌀 Bringing up MiniCluster of size {size} with image {job['image']}"
                 )
 
                 # Create the API client (creates the user and token for the cluster)
@@ -125,14 +126,10 @@ class ExperimentClient:
 
                 # Pre-pull containers, etc.
                 if hasattr(self, "pre_apply"):
-                    self.pre_apply(
-                        experiment,
-                        minicluster["name"],
-                        job={"image": minicluster["image"]},
-                    )
+                    self.pre_apply(experiment, minicluster["name"], job=job)
 
                 # Get back results with times (for minicluster assets) and jobs
-                results = cli.submit(setup, experiment, minicluster)
+                results = cli.submit(setup, experiment, minicluster, job=job)
 
                 # Save times and output files for jobs
                 for job in results.get("jobs", []):
@@ -142,7 +139,7 @@ class ExperimentClient:
         """
         Save the job and add times to our times listing.
         """
-        jobid = f"{job['id']}"
+        jobid = f"job_{job['id']}"
         self.times[jobid] = job["info"]["runtime"]
 
         # Do we have an output file and output?
@@ -202,13 +199,16 @@ class ExperimentClient:
 
             # Prepare a specific MiniCluster for this size
             minicluster = copy.deepcopy(experiment.minicluster)
-            minicluster.update(job)
             minicluster["size"] = size
 
             # Get back results with times (for minicluster assets) and jobs
             # If debug level, print job output to terminal too :)
             results = cli.apply(
-                experiment, minicluster, logfile, stdout=logger.level == logging.DEBUG
+                experiment=experiment,
+                minicluster=minicluster,
+                outfile=logfile,
+                stdout=self.debug,
+                job=job,
             )
             self.times[jobname] = results["times"]
 

@@ -13,9 +13,6 @@ reps = {"$install_dir": install_dir, "$root_dir": os.path.dirname(install_dir)}
 # The default settings file in the install root
 default_settings_file = os.path.join(reps["$install_dir"], "settings.yml")
 
-# Default template if one is not provided
-default_minicluster_template = os.path.join(install_dir, "minicluster-template.yaml")
-
 # User home
 userhome = os.path.expanduser("~/.fluxcloud")
 

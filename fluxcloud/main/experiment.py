@@ -8,7 +8,6 @@ import itertools
 import os
 import shutil
 
-import jinja2
 import jsonschema
 
 import fluxcloud.defaults as defaults
@@ -22,7 +21,6 @@ class ExperimentSetup:
     def __init__(
         self,
         experiments,
-        template=None,
         outdir=None,
         validate=True,
         cleanup=True,
@@ -34,20 +32,11 @@ class ExperimentSetup:
         An experiment setup is a light wrapper around a group of experiments.
         """
         self.experiment_file = os.path.abspath(experiments)
-        self.template = (
-            os.path.abspath(template)
-            if template is not None and os.path.exists(template)
-            else None
-        )
         self.outdir = outdir
         self.test = test
         self.settings = settings.Settings
         self.quiet = quiet
         self.run_cleanup = cleanup
-
-        # Show the user the template file
-        if self.template is not None:
-            logger.debug(f"Using template {self.template}")
 
         # Rewrite existing outputs
         self.force = kwargs.get("force") or False
@@ -99,7 +88,7 @@ class ExperimentSetup:
         validate_experiments(self.spec)
 
         # Sploot out into matrices
-        matrices = expand_experiments(self.spec, self.outdir, self.template)
+        matrices = expand_experiments(self.spec, self.outdir)
         if not matrices:
             raise ValueError(
                 "No matrices generated. Did you include any empty variables in your matrix?"
@@ -134,11 +123,10 @@ class Experiment:
     An experiment wrapper to make it easy to get variables in templates.
     """
 
-    def __init__(self, experiment, outdir=None, template=None):
+    def __init__(self, experiment, outdir=None):
         self.experiment = experiment
         self.settings = settings.Settings
         self._outdir = outdir
-        self.template = template or defaults.default_minicluster_template
 
     @property
     def outdir(self):
@@ -194,29 +182,53 @@ class Experiment:
     def get_submit_miniclusters(self, size):
         """
         Return Miniclusters organized by unique sizes and containers
+
+        For each, we return a faux job that includes (potentially) the job volumes.
         """
-        images = set()
+        # A faux job is provided that includes all volumes
+        images = {}
         for name, job in self.jobs.items():
             if "size" in job and job["size"] != size:
                 continue
             if "image" not in job:
                 logger.warning(f"Job {name} is missing an image and cannot be run.")
-            images.add(job["image"])
 
-        # Prepare a MiniCluster for each image
-        miniclusters = []
+            # Add the image if we don't know about it already
+            # This is where we can define shared minicluster container attributes (the job)
+            if job["image"] not in images:
+                images[job["image"]] = copy.deepcopy(job)
+
+            # Update the job and warn the user for differences
+            else:
+                for k, v in job.items():
+                    # This shared job for the image doesn't have the attribute defined yet
+                    if k not in images[job["image"]]:
+                        images[job["image"]][k] = v
+                        continue
+                    current = images[job["image"]][k]
+
+                    # If it's a dictionary, just update
+                    if isinstance(current, dict) and isinstance(v, dict):
+                        images[job["image"]][k].update(v)
+
+                    # Otherwise give a warning we won't be updating
+                    elif current != v:
+                        logger.warning(
+                            f"Found different definition of {k}, {v}. Using first discovered {current}"
+                        )
+
+        logger.debug(f"Job experiments file generated {len(images)} MiniCluster(s).")
+
+        # Prepare a MiniCluster and job for each image
         for image in images:
             minicluster = copy.deepcopy(self.minicluster)
-            minicluster["image"] = image
-
-            # Replace the list size with a single size
             minicluster["size"] = size
-            miniclusters.append(minicluster)
+            job = images[image]
 
-        logger.debug(
-            f"Job experiments file generated {len(miniclusters)} MiniCluster(s)."
-        )
-        return miniclusters
+            # A shared MiniCluster starts with no command to start flux restful
+            if "command" in job:
+                del job["command"]
+            yield minicluster, job
 
     @property
     def script_dir(self):
@@ -239,15 +251,6 @@ class Experiment:
             utils.mkdir_p(outdir)
         return script.render(outfile=outfile, **render_kwargs)
 
-    def get_shared_script(self, name, render_kwargs=None, suffix="", ext="sh"):
-        """
-        Get a named shared script
-        """
-        render_kwargs = render_kwargs or {}
-        return self.get_script(
-            name, cloud="shared", render_kwargs=render_kwargs, suffix=suffix, ext=ext
-        )
-
     def cleanup(self):
         """
         Cleanup the scripts directory for the experiment!
@@ -255,36 +258,6 @@ class Experiment:
         if os.path.exists(self.script_dir):
             logger.debug(f"Cleaning up {self.script_dir}")
             shutil.rmtree(self.script_dir)
-
-    def generate_crd(self, job, minicluster_size):
-        """
-        Generate a custom resource definition for the experiment
-        """
-        template = jinja2.Template(utils.read_file(self.template))
-        experiment = copy.deepcopy(self.experiment)
-
-        # If the experiment doesn't define a minicluster, add our default
-        if "minicluster" not in experiment:
-            experiment["minicluster"] = self.settings.minicluster
-
-        # Update minicluster size to the one we want
-        experiment["minicluster"]["size"] = minicluster_size
-
-        if "jobs" in experiment:
-            del experiment["jobs"]
-        experiment["job"] = job
-        result = template.render(**experiment).strip(" ")
-        logger.debug(result)
-
-        # Write to output directory
-        outfile = os.path.join(
-            self.script_dir, f"minicluster-size-{minicluster_size}.yaml"
-        )
-        outdir = os.path.dirname(outfile)
-        if not os.path.exists(outdir):
-            logger.info(f"Creating output directory for scripts {outdir}")
-            utils.mkdir_p(outdir)
-        return utils.write_file(result, outfile)
 
     @property
     def jobs(self):
@@ -342,7 +315,7 @@ class Experiment:
             return False
         return True
 
-    def save_json(self, obj, filename):
+    def save_file(self, obj, filename, is_json=False):
         """
         Save a json dump of something to a filename in the experiment directory.
         """
@@ -351,8 +324,17 @@ class Experiment:
         save_dir = os.path.dirname(save_file)
         if not os.path.exists(save_dir):
             utils.mkdir_p(save_dir)
-        utils.write_json(obj, save_file)
+        if is_json:
+            utils.write_json(obj, save_file)
+        else:
+            utils.write_file(obj, save_file)
         return save_file
+
+    def save_json(self, obj, filename):
+        """
+        Save a json dump of something to a filename in the experiment directory.
+        """
+        return self.save_file(obj, filename, is_json=True)
 
     def save_metadata(self, times, info=None):
         """
@@ -470,7 +452,7 @@ class Experiment:
         )
 
 
-def expand_experiments(experiments, outdir, template=None):
+def expand_experiments(experiments, outdir):
     """
     Given a valid experiments.yaml, expand out into experiments
     """
@@ -499,7 +481,7 @@ def expand_experiments(experiments, outdir, template=None):
     # Put in final matrix form
     final = []
     for entry in matrix:
-        final.append(Experiment(entry, outdir, template))
+        final.append(Experiment(entry, outdir))
     return final
 
 

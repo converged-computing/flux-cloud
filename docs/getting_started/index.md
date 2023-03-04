@@ -11,7 +11,5 @@ commands
 examples
 experiments
 settings
-google
-aws
 minikube
 ```

@@ -6,4 +6,6 @@ any questions or issues, please [let us know](https://github.com/flux-framework/
 ```{toctree}
 :maxdepth: 3
 minikube
+google
+aws
 ```

@@ -39,7 +39,7 @@ matrix:
 
   # This is a Google Cloud machine
   machine: [n1-standard-1]
-    
+
 variables:
     # Customize zone just for this experiment
     # otherwise defaults to your settings.yml
@@ -57,7 +57,7 @@ matrix:
 
 {experiment_base}
 """
-  
+
 aws_experiment_template = f"""
 matrix:
 

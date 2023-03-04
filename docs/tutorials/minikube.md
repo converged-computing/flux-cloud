@@ -2,24 +2,15 @@
 
 > Running on a local MiniKube cluster
 
-Flux Cloud (as of version 0.1.0) can run on MiniKube! The main steps of running experiments with
-different container bases are:
+Flux Cloud (as of version 0.1.0) can run on MiniKube! There are two primary use cases for using flux-cloud:
 
- - **up** to bring up a cluster
- - **apply** to apply one or more CRDs from experiments defined by an experiments.yaml
- - **down** to destroy a cluster
+ - **apply** is good for many larger experiments that require different container bases and / or take a longer time to run.
+ - **submit** is good for smaller experiments that might use the same container bases and / or take a shorter time to run.
 
-or one or more commands with the same container base(s):
+For the latter (submit) we will bring up the minimum number of MiniClusters required (unique based on container image size)
+and launch all jobs across them, using Flux as a scheduler. As of version 0.2.0 both commands both use the fluxoperator Python
+SDK, so we only use bash scripts to bring up and down cloud-specific clusters.
 
- - **up** to bring up a cluster
- - **submit** to submit one or more experiments to the same set of pods defined by an experiments.yaml
- - **down** to destroy a cluster
-
-Each of these commands can be run in isolation, and we provide a single command **run** to
-automate the entire thing. We emphasize the term "wrapper" as we are using scripts on your
-machine to do the work (e.g., minikube and kubectl) and importantly, for every step we show
-you the command, and if it fails, give you a chance to bail out. We do this so if you
-want to remove the abstraction at any point and run the commands on your own, you can.
 
 ## Pre-requisites
 
@@ -27,9 +18,6 @@ You should first [install minikube](https://minikube.sigs.k8s.io/docs/start/)
 and kubectl.
 
 ## Run Experiments
-
-- TODO finish refactor apply here,
-- TODO move other tutorials under this section after testing
 
 Let's start with a simple `experiments.yaml` file, where we have defined a number of different
 experiments to run on MiniKube. `flux-cloud submit` relies entirely on this experiment file,
@@ -145,10 +133,19 @@ Let's run this with our `experiments.yaml` above in the present working director
 and after having already run `up`:
 
 ```bash
+# Also print output to the terminal (so you can watch!)
+$ flux-cloud --debug apply --cloud minikube
+
+# Only save output to output files
 $ flux-cloud apply --cloud minikube
 ```
 
+At the end of the run, you'll have an organized output directory with all of your
+output logs, along with saved metadata about the minicluster, pods, and nodes.
 
+```bash
+
+```
 
 ### Submit
 
