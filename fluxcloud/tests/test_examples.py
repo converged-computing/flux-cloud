@@ -29,7 +29,7 @@ def _test_example(dirname, tmp_path, check):
     experiment_dir = os.path.join(tmp_path, "experiment")
     outdir = os.path.join(experiment_dir, "data")
     utils.mkdir_p(experiment_dir)
-    setup = ExperimentSetup(experiment_file, outdir=outdir)
+    setup = ExperimentSetup(experiment_file, outdir=outdir, force_cluster=True, quiet=False)
 
     # Select the first (only) experiment!
     experiment = setup.matrices[0]

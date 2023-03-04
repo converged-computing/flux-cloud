@@ -29,7 +29,7 @@ class ExperimentClient:
         self.debug = kwargs.get("debug", False)
 
         # Job prefix is used for organizing time entries
-        self.job_prefix = "minicluster-run"
+        self.job_prefix = "job_"
 
     def __repr__(self):
         return str(self)
@@ -139,7 +139,7 @@ class ExperimentClient:
         """
         Save the job and add times to our times listing.
         """
-        jobid = f"job_{job['id']}"
+        jobid = f"{self.job_prefix}{job['id']}"
         self.times[jobid] = job["info"]["runtime"]
 
         # Do we have an output file and output?
