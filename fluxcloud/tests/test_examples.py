@@ -15,8 +15,18 @@ from .helpers import here, init_client
 here = os.path.abspath(os.path.dirname(__file__))
 root = os.path.dirname(os.path.dirname(here))
 
+def check_lammps(minicluster_file):
+    """
+    Checks for examples that run lammps.
+    """
+    expected_outdir = os.path.dirname(os.path.dirname(minicluster_file))
+    for out in utils.recursive_find(expected_outdir, "log.out"):
+        content = utils.read_file(out)
+        assert "Total wall time" in content
+        assert "LAMMPS" in content
 
-def _test_example(dirname, tmp_path, check):
+
+def _test_example(dirname, tmp_path, check, test_apply=True):
     """
     Shared function to test an example in a dirname, with a check function
     """
@@ -51,12 +61,6 @@ def _test_example(dirname, tmp_path, check):
         assert meta["minicluster"]
         assert meta["jobs"]
 
-        # All examples use lammps
-        for out in utils.recursive_find(expected_outdir, "log.out"):
-            content = utils.read_file(out)
-            assert "Total wall time" in content
-            assert "LAMMPS" in content
-
         # Info is only present for submit
         if info:
             assert meta["info"]
@@ -70,9 +74,10 @@ def _test_example(dirname, tmp_path, check):
 
         # Now do the same for apply
         # shutil.rmtree(expected_outdir)
-        client.apply(setup, experiment)
-        shared_checks(info=False)
-        check(minicluster_file, experiment)
+        if test_apply:
+            client.apply(setup, experiment)
+            shared_checks(info=False)
+            check(minicluster_file, experiment)
 
     client.down(setup, experiment=experiment)
 
@@ -92,6 +97,8 @@ def test_minicluster_logging(tmp_path):
             assert level in minicluster["spec"]["logging"]
             assert minicluster["spec"]["logging"][level] == value
 
+        check_lammps(minicluster_file)
+
     # Run the example for submit and apply, with check
     _test_example("logging", tmp_path, check)
 
@@ -107,6 +114,8 @@ def test_minicluster_volumes(tmp_path):
         # Assert that the logging spec matches
         minicluster = utils.read_json(minicluster_file)
         assert "volumes" in minicluster["spec"]
+
+        check_lammps(minicluster_file)
 
         # And container level volumes
         assert "volumes" in minicluster["spec"]["containers"][0]
@@ -135,6 +144,32 @@ def test_minicluster_volumes(tmp_path):
     _test_example("volumes", tmp_path, check)
 
 
+def test_osu_benchmarks(tmp_path):
+    """
+    Ensure we can explicitly specify resources
+    """
+    def check(minicluster_file, experiment):
+        assert os.path.exists(minicluster_file)
+
+        # Assert that the logging spec matches
+        minicluster = utils.read_json(minicluster_file)
+
+        print('TEST OSU')
+        import IPython 
+        IPython.embed()
+        sys.exit()
+
+        assert "resources" in minicluster["spec"]["containers"][0]
+        resources = minicluster["spec"]["containers"][0]["resources"]
+
+        for rtype, rvalue in experiment.jobs["reaxc-hns-1"]["resources"].items():
+            assert rtype in resources
+            assert resources[rtype] == rvalue
+
+    # Run the example for submit and apply, with check
+    _test_example("osu-benchmarks", tmp_path, check, test_apply=False)
+
+
 def test_minicluster_resources(tmp_path):
     """
     Ensure that the resources example works as expected.
@@ -145,6 +180,7 @@ def test_minicluster_resources(tmp_path):
 
         # Assert that the logging spec matches
         minicluster = utils.read_json(minicluster_file)
+        check_lammps(minicluster_file)
 
         assert "resources" in minicluster["spec"]["containers"][0]
         resources = minicluster["spec"]["containers"][0]["resources"]

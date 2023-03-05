@@ -10,6 +10,6 @@ install
 commands
 examples
 experiments
+debugging
 settings
-minikube
 ```

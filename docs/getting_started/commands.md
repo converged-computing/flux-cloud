@@ -1,5 +1,36 @@
 # Commands
 
+Welcome to the commands section! You can learn the details of each command below, or
+check out an [example](examples.md) or [cloud tutorial](../tutorials/index.md).
+The general steps you want to take are:
+
+1. Generate or find an `experiments.yaml` configuration.
+2. Decide if you want to use `submit` or `apply`
+3. Create the cluster, run experiments, and clean up.
+
+If you don't want to use an existing example, see [experiment init](#init) for how to create an `experiments.yaml` from scratch.
+
+> What's the difference between submit and apply?
+
+For `apply`, we are running one job per Minicluster (the Flux Operator custom resource definition). This means
+we bring up an entire set of pods for each container (each entry under "jobs" in your experiment.yaml),
+run the single job directly with `flux start -> flux submit` to provide the command to the broker, and then
+when it finished the container will exit and the job clean up. This approach likely is suited to fewer jobs
+that are longer running, and if you want to see output appear as it's available (we stream the log from the broker pod).
+For `apply` we also skip creating the [Flux RESTFul API](https;//github.com/flux-framework/flux-restful-api) server,
+so it's one less dependency to worry about, and you also don't need to think about exposing an API or users.
+
+For `submit`, we take advantage of Flux as a scheduler, bringing up the fewest number of MiniClusters we can
+derive based on the unique containers and sizes in your `experiments.yaml`. This means that, for each unique
+set, we bring up one MiniCluster, and then submit all your jobs at once, allowing Flux to act as a scheduler.
+We poll the server every 30 seconds to get an update on running jobs, and when they are all complete, jobs
+output and results are saved. This approach is more ideal for many smaller jobs, as the MiniClusters are
+only brought up once (and you don't need to wait for pods to go up and down for each job). The cons of this
+approach are getting logs at the end, unless you decide to interact with the Flux RESTFul API on your own
+earlier.
+
+Next, read about how to use these commands in detail.
+
 ## experiment
 
 ### init

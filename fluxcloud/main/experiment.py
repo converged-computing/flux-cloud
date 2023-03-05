@@ -422,6 +422,8 @@ class Experiment:
         minicluster = self.experiment.get("minicluster") or self.settings.minicluster
         if "namespace" not in minicluster or not minicluster["namespace"]:
             minicluster["namespace"] = defaults.default_namespace
+        if "size" not in minicluster:
+            minicluster["size"] = [self.experiment.get("size")]
         return minicluster
 
     @property

@@ -9,11 +9,8 @@ the Flux Operator on GKE. The main steps of running experiments are:
  - **apply/submit** to apply or submit one or more experiments defined by an experiments.yaml
  - **down** to destroy a cluster
 
-Each of these commands can be run in isolation, and we provide a single command **run** to
-automate the entire thing. We emphasize the term "wrapper" as we are using scripts on your
-machine to do the work (e.g., kubectl and gcloud) and importantly, for every step we show
-you the command, and if it fails, give you a chance to bail out. We do this so if you
-want to remove the abstraction at any point and run the commands on your own, you can.
+Each of these commands can be run in isolation, and we provide single commands **run/batch** to
+automate the entire thing. For Google Cloud, you can see a small collection of [examples here](https://github.com/converged-computing/flux-cloud/tree/main/examples/google).
 
 ## Pre-requisites
 
@@ -72,11 +69,12 @@ meaning creating a separate MiniCluster per job:
 $ flux-cloud run --cloud google
 
 # Manual up / apply / down (recommended)
-$ flux-cloud up --cloud google
-$ flux-cloud apply --cloud google
-$ flux-cloud down --cloud google
+$ flux-cloud --debug up --cloud google
+$ flux-cloud --debug apply --cloud google
+$ flux-cloud --debug down --cloud google
 ```
 
+For any of the commands here, add `--debug` after `flux-cloud` to see more verbosity.
 Or submit, creating shared MiniClusters to submit multiple jobs to:
 
 ```bash
@@ -84,9 +82,10 @@ Or submit, creating shared MiniClusters to submit multiple jobs to:
 $ flux-cloud batch --cloud google
 
 # Manual up / submit / down (recommended)
-$ flux-cloud up --cloud google
-$ flux-cloud submit --cloud google
-$ flux-cloud down --cloud google
+$ flux-cloud --debug up --cloud google
+$ flux-cloud --debug submit --cloud google
+$ flux-cloud --debug down --cloud google
 ```
 
-Note that machines and size are required for the matrix.
+Note that machines and size are required for the matrix. See our [debugging guide](../getting-started/debugging.md)
+for the Flux Operator for interacting with Flux Operator containers or debugging.

@@ -187,6 +187,9 @@ experiment_schema = {
             "required": ["size"],
         },
     },
+    "patternProperties": {
+        "x-*": {"type": "object"},
+    },
     "additionalProperties": False,
 }
 

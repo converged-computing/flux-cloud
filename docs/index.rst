@@ -52,8 +52,7 @@ to unite the worlds and technologies typical of cloud computing and
 high performance computing.
 
 To get started, check out the links below!
-Would you like to request a feature or contribute?
-[Open an issue](https://github.com/flux-framework/flux-cloud/issues).
+Would you like to request a feature or contribute? `Open an issue <https://github.com/flux-framework/flux-cloud/issues>`_.
 
 
 .. toctree::

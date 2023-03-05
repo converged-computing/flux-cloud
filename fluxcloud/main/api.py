@@ -12,18 +12,22 @@ import uuid
 from flux_restful_client.main import get_client
 from fluxoperator.client import FluxOperator
 
+import fluxcloud.utils as utils
 from fluxcloud.logger import logger
 
 here = os.path.dirname(os.path.abspath(__file__))
 
 
 class APIClient:
-    def __init__(self, token=None, user=None):
+    def __init__(self, token=None, user=None, secret_key=None):
         """
         API client wrapper.
         """
         self.user = token or os.environ.get("FLUX_USER") or user or "fluxuser"
         self.token = token or os.environ.get("FLUX_TOKEN") or str(uuid.uuid4())
+        self.secret_key = (
+            secret_key or os.environ.get("FLUX_SECRET_KEY") or str(uuid.uuid4())
+        )
         self.proc = None
         self.broker_pod = None
 
@@ -34,6 +38,28 @@ class APIClient:
         logger.info("MiniCluster created with credentials:")
         logger.info(f"  FLUX_USER={self.user}")
         logger.info(f"  FLUX_TOKEN={self.token}")
+
+    def _set_minicluster_credentials(self, minicluster):
+        """
+        If the user provided credentials, use
+        """
+        if "flux_restful" not in minicluster:
+            minicluster["flux_restful"] = {}
+
+        if "username" not in minicluster["flux_restful"]:
+            minicluster["flux_restful"]["username"] = self.user
+
+        if "token" not in minicluster["flux_restful"]:
+            minicluster["flux_restful"]["token"] = self.token
+
+        if "secret_key" not in minicluster["flux_restful"]:
+            minicluster["flux_restful"]["secret_key"] = self.secret_key
+
+        # Update credentials
+        self.user = minicluster["flux_restful"]["username"]
+        self.token = minicluster["flux_restful"]["token"]
+        self.secret_key = minicluster["flux_restful"]["secret_key"]
+        return minicluster
 
     def _create_minicluster(self, operator, minicluster, experiment, job):
         """
@@ -48,15 +74,30 @@ class APIClient:
         name = minicluster["name"]
         size = minicluster["size"]
 
-        # Add Flux Restful user and token
-        minicluster["flux_restful"] = {"username": self.user, "token": self.token}
+        self._set_minicluster_credentials(minicluster)
 
-        # The operator will time creation through pods being ready
         try:
+            # The operator will time creation through pods being ready
             result = operator.create_minicluster(**minicluster, container=job)
         except Exception as e:
-            msg = f"Try: 'kubectl delete -n {namespace} minicluster {name}'"
-            logger.exit(f"There was an issue creating the MiniCluster: {e}\n{msg}")
+            # Give the user the option to delete and recreate or just exit
+            logger.error(f"There was an issue creating the MiniCluster: {e}")
+            if not utils.confirm_action(
+                "Would you like to submit jobs to the current cluster? You will need to have provided the same username as password."
+            ):
+                if utils.confirm_action(
+                    "Would you like to delete this mini cluster and re-create?"
+                ):
+                    logger.info("Cleaning up MiniCluster...")
+                    operator.delete_minicluster(name=name, namespace=namespace)
+                    return self._create_minicluster(
+                        operator, minicluster, experiment, job
+                    )
+                else:
+                    logger.exit(
+                        f"Try: 'kubectl delete -n {namespace} minicluster {name}'"
+                    )
+            return
 
         # Wait for pods to be ready to include in minicluster up time
         self.show_credentials()
@@ -134,7 +175,12 @@ class APIClient:
             print(f"Port forward opened to {forward_url}")
 
             # See https://flux-framework.org/flux-restful-api/getting_started/api.html
-            cli = get_client(host=forward_url, user=self.user, token=self.token)
+            cli = get_client(
+                host=forward_url,
+                user=self.user,
+                token=self.token,
+                secret_key=self.secret_key,
+            )
             cli.set_basic_auth(self.user, self.token)
 
             # Keep a lookup of jobid and output files.
@@ -170,7 +216,19 @@ class APIClient:
                 time.sleep(poll_seconds)
                 unfinished = []
                 for job in jobs:
+                    if "id" not in job:
+                        logger.warning(
+                            f"Job {job} is missing an id or name, likely an issue or not ready, skipping."
+                        )
+                        continue
+
                     info = cli.jobs(job["id"])
+
+                    # If we don't have a name yet, it's still pending
+                    if "name" not in info:
+                        unfinished.append(job)
+                        continue
+
                     jobname = info["name"].rjust(15)
                     if info["state"] == "INACTIVE":
                         finish_time = round(info["runtime"], 2)
@@ -185,10 +243,12 @@ class APIClient:
                         unfinished.append(job)
                 jobs = unfinished
 
-        logger.info("All jobs are complete! Cleaning up MiniCluster...")
+        logger.info("All jobs are complete!")
 
         # This also waits for termination (and pods to be gone) and times it
-        operator.delete_minicluster(name=name, namespace=namespace)
+        if utils.confirm_action("Would you like to delete this mini cluster?"):
+            logger.info("Cleaning up MiniCluster...")
+            operator.delete_minicluster(name=name, namespace=namespace)
 
         # Get times recorded by FluxOperator Python SDK
         results["jobs"] = completed
@@ -222,13 +282,6 @@ class APIClient:
         kwargs = dict(job)
         del kwargs["command"]
 
-        # Assume the task gets all nodes, unless specified in job
-        # Also assume the flux restful server is using one node
-        if "nodes" not in kwargs:
-            kwargs["nodes"] = minicluster["size"] - 1
-        if "tasks" not in kwargs:
-            kwargs["tasks"] = minicluster["size"] - 1
-
         # Ensure we convert - map between job params and the flux restful api
         for convert in (
             ["num_tasks", "tasks"],
@@ -239,6 +292,7 @@ class APIClient:
         ):
             if convert[1] in kwargs:
                 kwargs[convert[0]] = kwargs[convert[1]]
+                del kwargs[convert[1]]
 
         # Submit the job, add the expected output file, and return
         logger.info(f"Submitting {jobname}: {job['command']}")

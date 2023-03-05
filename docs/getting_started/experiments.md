@@ -183,3 +183,79 @@ jobs:
 
 For repeats, we add another level to the output directory, and represent the result data as
 subdirectories of the machine and size from 1..N.
+
+#### Flux Options
+
+How do job parameters map to Flux, in the case of using `flux-cloud submit`? Good question! Here is the mapping:
+
+```yaml
+jobs:
+  example-job:
+    command: './osu_get_latency'
+    flux_option_flags: "-ompi=openmpi@5"
+    working_dir: /opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/one-sided  # workdir
+    image: ghcr.io/rse-ops/osu-microbench:test
+
+    # osu benchmarks requires exactly 2 processes
+    tasks: 2    # num_tasks
+    cores: 1    # cores_per_task
+    gpus: 0     # gpus_per_task
+    nodes: 1    # num_nodes
+```
+
+#### Yaml Tricks
+
+For your jobs, you likely will want to re-use parameters. There is a trick with YAML
+to define a named section, and then re-use it. Here is an example running the OSU
+benchmarks.
+
+```yaml
+# matrix of experiments to run - machine types and sizes are required
+# This can obviously be expanded to more sizes or machines,
+matrix:
+  size: [2]
+  machine: ["n1-standard-1", "n1-standard-2"]
+
+# An example of shared container options!
+x-container-options: &options
+  fluxOptionFlags: "-ompi=openmpi@5"
+  working_dir: /opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/one-sided
+  image: ghcr.io/rse-ops/osu-microbench:app-latest
+  # This MUST be run for the certificate generator and workers/broker
+  pre_command: source /etc/profile.d/z10_spack_environment.sh
+
+# Flux Mini Cluster experiment attributes
+minicluster:
+  name: osu-benchmarks
+  namespace: flux-operator
+
+# Each job can have a command and working directory
+jobs:
+  osu_get_latency:
+    command: './osu_get_latency'
+    <<: *options
+  osu_acc_latency:
+    command: './osu_acc_latency'
+    <<: *options
+  osu_fop_latency:
+    command: './osu_fop_latency'
+    <<: *options
+  osu_get_bw:
+    command: './osu_get_bw'
+    <<: *options
+  osu_put_bibw:
+    command: './osu_put_bibw'
+    <<: *options
+  osu_put_latency:
+    command: './osu_put_latency'
+    <<: *options
+  osu_cas_latency:
+    command: './osu_cas_latency'
+    <<: *options
+  osu_get_acc_latency:
+    command: './osu_get_acc_latency'
+    <<: *options
+  osu_put_bw:
+    command: './osu_put_bw'
+    <<: *options
+```

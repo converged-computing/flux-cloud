@@ -23,11 +23,6 @@ It will be expanded as needed.
 Code is under development and likely to change!
 In the meantime, for early documentation, see our ⭐️ [Documentation](https://converged-computing.github.io/flux-cloud/) ⭐️
 
-## TODO
-
- - test for list of experiments
- - cloud-select could estimate the cost?
- - run and add more cluster examples
 
 ## 😁️ Contributors 😁️
 
