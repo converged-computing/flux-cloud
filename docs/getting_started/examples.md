@@ -8,6 +8,7 @@ and then customize it. Here we will add examples as we create them.
   - [volumes](https://github.com/converged-computing/flux-cloud/tree/main/examples/minikube/volumes)
   - [resources](https://github.com/converged-computing/flux-cloud/tree/main/examples/minikube/resources)
   - [osu-benchmarks](https://github.com/converged-computing/flux-cloud/tree/main/examples/minikube/osu-benchmarks)
+  - [persistent](https://github.com/converged-computing/flux-cloud/tree/main/examples/minikube/persistent)
 - [google](https://github.com/converged-computing/flux-cloud/tree/main/examples/google)
   - [osu-benchmarks](https://github.com/converged-computing/flux-cloud/tree/main/examples/google/osu-benchmarks)
 
