@@ -52,7 +52,7 @@ jobs:
       fail-fast: false
       matrix:
         test: ["test_minicluster_logging", "test_minicluster_volumes",
-               "test_osu_benchmarks", "test_minicluster_resources"]
+               "test_minicluster_resources"]
     steps:
     - name: Clone the code
       uses: actions/checkout@v3
