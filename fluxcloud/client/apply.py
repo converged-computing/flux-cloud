@@ -11,7 +11,7 @@ def main(args, parser, extra, subparser):
     apply parser submits via separate CRDs.
     """
     cli, setup, experiment = prepare_client(args, extra)
-    cli.apply(setup, experiment=experiment)
+    cli.apply(setup, experiment=experiment, interactive=not args.non_interactive)
     setup.cleanup(setup.matrices)
 
 
@@ -20,5 +20,5 @@ def submit(args, parser, extra, subparser):
     submit parser submits via the Flux Restful API to one cluster
     """
     cli, setup, experiment = prepare_client(args, extra)
-    cli.submit(setup, experiment=experiment)
+    cli.submit(setup, experiment=experiment, interactive=not args.non_interactive)
     setup.cleanup(setup.matrices)

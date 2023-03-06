@@ -68,7 +68,7 @@ class ExperimentClient:
         # Each experiment has its own cluster size and machine type
         for experiment in setup.iter_experiments():
             self.up(setup, experiment=experiment)
-            self.apply(setup, experiment=experiment)
+            self.apply(setup, experiment=experiment, interactive=False)
             self.down(setup, experiment=experiment)
 
     @save_meta
@@ -83,7 +83,7 @@ class ExperimentClient:
         # Each experiment has its own cluster size and machine type
         for experiment in setup.iter_experiments():
             self.up(setup, experiment=experiment)
-            self.submit(setup, experiment=experiment)
+            self.submit(setup, experiment=experiment, interactive=False)
             self.down(setup, experiment=experiment)
 
     @save_meta

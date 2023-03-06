@@ -209,7 +209,14 @@ Apply is going to be creating on CRD per job, so that's a lot of
 pod creation and deletion. This is in comparison to "submit" that
 brings up a MiniCluster once, and then executes commands to it, allowing
 Flux to serve as the scheduler. Note that by default, we always wait for a previous run to be cleaned up
-before continuing.
+before continuing. If you don't want apply to be interactive (e.g., it will
+ask you before cleaning up) you can do:
+
+```bash
+$ flux-cloud apply --non-interactive
+```
+
+By default, apply via a "run" is non-interactive.
 
 #### run
 
@@ -299,7 +306,14 @@ to submit jobs. For submit (and the equivalent to bring it up and down with batc
 your commands aren't provided in the CRD,
 but rather to the Flux Restful API. Submit / batch will also generate one CRD
 per MiniCluster size, but use the same MiniCluster across jobs. This is different
-from apply, which generates one CRD per job to run.
+from apply, which generates one CRD per job to run. If you don't want submit to be interactive
+(e.g., it will ask you before cleaning up) you can do:
+
+```bash
+$ flux-cloud submit --non-interactive
+```
+
+By default, submit run with batch is non-interactive.
 
 #### batch
 

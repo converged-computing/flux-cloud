@@ -107,5 +107,5 @@ jobs:
         minikube delete
         cd ${workdir}
         flux-cloud up --cloud minikube --force-cluster
-        flux-cloud --debug submit
+        flux-cloud --debug submit --non-interactive
         flux-cloud down --cloud minikube

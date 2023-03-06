@@ -162,6 +162,15 @@ flux-cloud config add cloud aws""",
         help="Bring down all experiment clusters",
         dest="down_all",
     )
+    for command in submit, apply:
+        command.add_argument(
+            "--non-interactive",
+            "--ni",
+            default=False,
+            action="store_true",
+            help="Don't ask before bringing miniclusters down or re-creating.",
+            dest="non_interactive",
+        )
 
     experiment = subparsers.add_parser(
         "experiment",
