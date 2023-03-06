@@ -3,13 +3,13 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+import copy
 import os
 import shutil
-import time
 
+import fluxcloud.main.api as api
 import fluxcloud.utils as utils
 from fluxcloud.logger import logger
-from fluxcloud.main.api import APIClient
 from fluxcloud.main.decorator import save_meta, timed
 
 here = os.path.dirname(os.path.abspath(__file__))
@@ -26,9 +26,10 @@ class ExperimentClient:
         self.settings = settings.Settings
         self.info = {}
         self.times = {}
+        self.debug = kwargs.get("debug", False)
 
         # Job prefix is used for organizing time entries
-        self.job_prefix = "minicluster-run"
+        self.job_prefix = "job_"
 
     def __repr__(self):
         return str(self)
@@ -67,7 +68,7 @@ class ExperimentClient:
         # Each experiment has its own cluster size and machine type
         for experiment in setup.iter_experiments():
             self.up(setup, experiment=experiment)
-            self.apply(setup, experiment=experiment)
+            self.apply(setup, experiment=experiment, interactive=False)
             self.down(setup, experiment=experiment)
 
     @save_meta
@@ -82,7 +83,7 @@ class ExperimentClient:
         # Each experiment has its own cluster size and machine type
         for experiment in setup.iter_experiments():
             self.up(setup, experiment=experiment)
-            self.submit(setup, experiment=experiment)
+            self.submit(setup, experiment=experiment, interactive=False)
             self.down(setup, experiment=experiment)
 
     @save_meta
@@ -93,81 +94,7 @@ class ExperimentClient:
         raise NotImplementedError
 
     @save_meta
-    def open_ui(self, setup, experiment, size, api=None, persistent=False):
-        """
-        Launch a CRD that opens the UI only.
-        """
-        # The MiniCluster can vary on size
-        minicluster = experiment.minicluster
-
-        # Create a FluxRestful API to submit to
-        created = False
-        if api is None:
-            api = APIClient()
-            created = True
-
-        logger.info(f"\n🌀 Bringing up MiniCluster of size {size}")
-
-        # Get persistent variables for this job size, image is required
-        job = experiment.get_persistent_variables(size, required=["image"])
-        job.update({"token": api.token, "user": api.user})
-
-        # We can't have a command
-        if "command" in job:
-            del job["command"]
-
-        # Pre-pull containers, etc.
-        if hasattr(self, "pre_apply"):
-            self.pre_apply(experiment, "global-job", job=job)
-
-        # Create the minicluster via a CRD without a command
-        crd = experiment.generate_crd(job, size)
-
-        # Create one MiniCluster CRD (without a command) to run the Flux Restful API
-        kwargs = {
-            "minicluster": minicluster,
-            "crd": crd,
-            "token": api.token,
-            "user": api.user,
-            "size": size,
-        }
-        submit_script = experiment.get_shared_script(
-            "minicluster-create-persistent", kwargs, suffix=f"-size-{size}"
-        )
-        # Start the MiniCluster! This should probably be done better...
-        self.run_timed(
-            f"minicluster-create-persistent-size-{size}", ["/bin/bash", submit_script]
-        )
-
-        # Ensure our credentials still work, and open port forward
-        api.check(experiment)
-        logger.info(f"\n🌀 MiniCluster of size {size} is up.\n")
-
-        # If created for the first time, show credentials
-        if created:
-            logger.info(
-                "Save these if you want to log into the Flux RESTFul interface, there are specific to the MiniCluster"
-            )
-            logger.info(f"export FLUX_USER={api.user}")
-            logger.info(f"export FLUX_TOKEN={api.token}")
-
-        # If we exit, the port forward will close.
-        if persistent:
-            try:
-                logger.info("Press Control+c to Disconnect.")
-                while True:
-                    time.sleep(10)
-            except KeyboardInterrupt:
-                logger.info("🧽️ Cleaning up!")
-                self.run_timed(
-                    f"minicluster-persistent-destroy-size-{size}",
-                    ["kubectl", "delete", "-f", crd],
-                )
-
-        return api, kwargs
-
-    @save_meta
-    def submit(self, setup, experiment):
+    def submit(self, setup, experiment, interactive=True):
         """
         Submit a Job via the Restful API
         """
@@ -176,8 +103,6 @@ class ExperimentClient:
                 f"Experiment {experiment.expid} has no jobs, nothing to run."
             )
             return
-
-        api = None
 
         # Iterate through all the cluster sizes
         for size in experiment.minicluster["size"]:
@@ -188,24 +113,49 @@ class ExperimentClient:
                 )
                 continue
 
-            # Open the api for the size
-            api, uiattrs = self.open_ui(setup, experiment, size, api)
-            logger.info(f"\n🌀 Bringing up MiniCluster of size {size}")
+            # Launch a unique Minicluster per container image. E.g.,
+            # if the user provides 2 images for size 4, we create two MiniClusters
+            # This will provide all shared volumes across the jobs
+            for minicluster, job in experiment.get_submit_miniclusters(size):
+                logger.info(
+                    f"\n🌀 Bringing up MiniCluster of size {size} with image {job['image']}"
+                )
 
-            # Save times (and logs in submit) as we go
-            for jobid, info in api.submit(setup, experiment, size):
-                logger.info(f"{jobid} took {info['runtime']} seconds.")
-                self.times[jobid] = info["runtime"]
-                self.info[jobid] = info
+                # Create the API client (creates the user and token for the cluster)
+                cli = api.APIClient()
 
-            logger.info(f"\n🌀 MiniCluster of size {size} is finished")
-            self.run_timed(
-                f"minicluster-persistent-destroy-size-{size}",
-                ["kubectl", "delete", "-f", uiattrs["crd"]],
-            )
+                # Pre-pull containers, etc.
+                if hasattr(self, "pre_apply"):
+                    self.pre_apply(experiment, minicluster["name"], job=job)
+
+                # Get back results with times (for minicluster assets) and jobs
+                results = cli.submit(
+                    setup, experiment, minicluster, job=job, interactive=interactive
+                )
+
+                # Save times and output files for jobs
+                for job in results.get("jobs", []):
+                    self.save_job(job)
+
+    def save_job(self, job):
+        """
+        Save the job and add times to our times listing.
+        """
+        jobid = f"{self.job_prefix}{job['id']}"
+        self.times[jobid] = job["info"]["runtime"]
+
+        # Do we have an output file and output?
+        if job["output"]:
+            # Save to our output directory!
+            logfile = job["job_output"]
+            utils.mkdir_p(os.path.dirname(logfile))
+            utils.write_file(job["output"], logfile)
+
+        del job["output"]
+        self.info[jobid] = job
 
     @save_meta
-    def apply(self, setup, experiment):
+    def apply(self, setup, experiment, interactive=True):
         """
         Apply a CRD to run the experiment and wait for output.
 
@@ -246,22 +196,24 @@ class ExperimentClient:
             # Create job directory anew
             utils.mkdir_p(job_output)
 
-            # Generate the populated crd from the template
-            crd = experiment.generate_crd(job, size)
+            # Prepare the client for one minicluster
+            cli = api.APIClient()
 
-            # Prepare specific .crd for template
-            # Note the output directory is already specific to the job index
-            kwargs = {
-                "minicluster": experiment.minicluster,
-                "logfile": logfile,
-                "crd": crd,
-            }
-            apply_script = experiment.get_shared_script(
-                "minicluster-run", kwargs, suffix=f"-{jobname}"
+            # Prepare a specific MiniCluster for this size
+            minicluster = copy.deepcopy(experiment.minicluster)
+            minicluster["size"] = size
+
+            # Get back results with times (for minicluster assets) and jobs
+            # If debug level, print job output to terminal too :)
+            results = cli.apply(
+                experiment=experiment,
+                minicluster=minicluster,
+                outfile=logfile,
+                stdout=self.debug,
+                job=job,
+                interactive=interactive,
             )
-
-            # Apply the job, and save to output directory
-            self.run_timed(f"{self.job_prefix}-{jobname}", ["/bin/bash", apply_script])
+            self.times[jobname] = results["times"]
 
             # Save times between experiment runs
             experiment.save_metadata(self.times, self.info)

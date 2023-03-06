@@ -1,0 +1,59 @@
+# matrix of experiments to run - machine types and sizes are required
+# This can obviously be expanded to more sizes or machines,
+matrix:
+  size: [2]
+  machine: ["n1-standard-1", "n1-standard-2"]
+
+# An example of shared container options
+x-container-options: &options
+  flux_option_flags: "-ompi=openmpi@5"
+  working_dir: /opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/one-sided
+  image: ghcr.io/rse-ops/osu-microbench:test
+
+  # This will get passed during a flux submit
+  tasks: 2
+
+# res = cli.submit(command=job["command"], num_tasks=2, cores_per_task=1, workdir=kwargs['workdir'])
+
+# Flux Mini Cluster experiment attributes
+minicluster:
+  name: osu-benchmarks
+  namespace: flux-operator
+
+  # provide credentials if you want to re-use a minicluster
+  flux_restful:
+    username: fluxuser
+    token: "123456"
+
+  # osu benchmarks requires exactly 2 processes
+  tasks: 2
+
+# Each job can have a command and working directory
+jobs:
+  osu_get_latency:
+    command: './osu_get_latency'
+    <<: *options
+  osu_acc_latency:
+    command: './osu_acc_latency'
+    <<: *options
+  osu_fop_latency:
+    command: './osu_fop_latency'
+    <<: *options
+  osu_get_bw:
+    command: './osu_get_bw'
+    <<: *options
+  osu_put_bibw:
+    command: './osu_put_bibw'
+    <<: *options
+  osu_put_latency:
+    command: './osu_put_latency'
+    <<: *options
+  osu_cas_latency:
+    command: './osu_cas_latency'
+    <<: *options
+  osu_get_acc_latency:
+    command: './osu_get_acc_latency'
+    <<: *options
+  osu_put_bw:
+    command: './osu_put_bw'
+    <<: *options

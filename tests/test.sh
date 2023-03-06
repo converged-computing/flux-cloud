@@ -37,39 +37,10 @@ echo "flux-cloud run --cloud minikube --output ${output} --force-cluster"
 flux-cloud run --cloud minikube --output ${output} --force-cluster
 retval=$?
 
-if [[ "${retval}" != "0" ]]; then
+if [[ ${retval} -ne 0 ]]; then
     echo "Issue running Flux Cloud, return value ${retval}"
     exit ${retval}
 fi
-
-# Check output
-for filename in $(find ./data -type f -print); do
-    echo "Checking $filename";
-    filebase=$(basename ${filename})
-
-    # Don't check these files, likely to change
-    if [[ "${filebase}" == "flux-operator.yaml" ]]; then
-        continue
-    fi
-    if [[ "${filebase}" == "nodes-size"* ]]; then
-        continue
-    fi
-    suffix=$(echo ${filename:7})
-    outfile="$output/$suffix"
-    if [[ ! -e "${outfile}" ]]; then
-        echo "Expected output $outfile does not exist."
-        exit 1
-    fi
-    # Check the length
-    actual=$(cat $filename | wc -l)
-    found=$(cat $outfile | wc -l)
-
-    if [[ "${actual}" != "${found}" ]]; then
-        echo "Incorrect output length found for ${filename}: expected ${actual} vs found ${found}"
-        cat ${outfile}
-        exit 1
-    fi
-done
 
 echo ${output}
 rm -rf ${output}

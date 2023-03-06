@@ -4,6 +4,21 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import copy
+import os
+from contextlib import contextmanager
+
+
+@contextmanager
+def working_dir(path):
+    """
+    Sets the cwd within the context
+    """
+    here = os.getcwd()
+    try:
+        os.chdir(path)
+        yield
+    finally:
+        os.chdir(here)
 
 
 def chunks(listing, chunk_size):

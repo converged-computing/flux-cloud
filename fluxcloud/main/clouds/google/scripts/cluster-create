@@ -5,6 +5,7 @@
 
 # Defaults - these are in the config but left here for information
 CLUSTER_NAME="{% if experiment.cluster_name %}{{ experiment.cluster_name }}{% else %}flux{% endif %}"
+NAMESPACE="{% if experiment.minicluster_namespace %}{{ experiment.minicluster_namespace }}{% else %}flux-operator{% endif %}"
 ZONE="{% if zone %}{{ zone }}{% else %}us-central1-a{% endif %}"
 CLUSTER_VERSION="{% if experiment.kubernetes_version %}{{ experiment.kubernetes_version }}{% else %}1.23{% endif %}"
 MACHINE_TYPE="{% if experiment.machine %}{{ experiment.machine }}{% else %}n1-standard-1{% endif %}"
@@ -32,6 +33,7 @@ if [ -z ${MACHINE_TYPE+x} ]; then
     exit 1
 fi
 
+print_magenta "   namespace: ${NAMESPACE}"
 print_magenta "   cluster  : ${CLUSTER_NAME}"
 print_magenta "    version : ${CLUSTER_VERSION}"
 print_magenta "  project   : ${GOOGLE_PROJECT}"
@@ -74,7 +76,7 @@ run_echo kubectl get nodes
 # Deploy the operator
 mkdir -p ${SCRIPT_DIR}
 install_operator ${SCRIPT_DIR} ${REPOSITORY} ${BRANCH}
-
+run_echo kubectl create namespace ${NAMESPACE} || true
 run_echo kubectl get namespace
 run_echo kubectl describe namespace operator-system
 

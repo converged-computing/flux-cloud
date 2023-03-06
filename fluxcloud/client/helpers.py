@@ -17,11 +17,10 @@ def prepare_client(args, extra):
     """
     utils.ensure_no_extra(extra)
 
-    cli = get_experiment_client(args.cloud)
+    cli = get_experiment_client(args.cloud, debug=args.debug)
     setup = ExperimentSetup(
         args.experiments,
         force_cluster=args.force_cluster,
-        template=args.template,
         cleanup=args.cleanup,
         # Ensure the output directory is namespaced by the cloud name
         outdir=os.path.join(args.output_dir, cli.name),

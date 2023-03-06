@@ -130,11 +130,6 @@ flux-cloud config add cloud aws""",
         description="Bring the cluster up, run experiments via applying CRDs, and bring it down.",
         formatter_class=argparse.RawTextHelpFormatter,
     )
-    ui = subparsers.add_parser(
-        "ui",
-        description="Once the cluster is up, create/open the user interface.",
-        formatter_class=argparse.RawTextHelpFormatter,
-    )
     batch = subparsers.add_parser(
         "batch",
         description="Bring the cluster up, run experiments via a Flux Restful API submit, and bring it down.",
@@ -167,13 +162,38 @@ flux-cloud config add cloud aws""",
         help="Bring down all experiment clusters",
         dest="down_all",
     )
+    for command in submit, apply:
+        command.add_argument(
+            "--non-interactive",
+            "--ni",
+            default=False,
+            action="store_true",
+            help="Don't ask before bringing miniclusters down or re-creating.",
+            dest="non_interactive",
+        )
+
+    experiment = subparsers.add_parser(
+        "experiment",
+        description="Experiment controller.",
+        formatter_class=argparse.RawTextHelpFormatter,
+    )
+    experiment.add_argument(
+        "experiment_command",
+        help="Command for experiment (defaults to init)",
+    )
+    experiment.add_argument(
+        "-c",
+        "--cloud",
+        help="cloud to use",
+        choices=clouds.cloud_names,
+    )
 
     listing = subparsers.add_parser(
         "list",
         description="List experiment ids available.",
         formatter_class=argparse.RawTextHelpFormatter,
     )
-    for command in run, up, down, apply, listing, batch, submit, ui:
+    for command in run, up, down, apply, listing, batch, submit:
         command.add_argument(
             "experiments",
             default="experiments.yaml",
@@ -188,7 +208,7 @@ flux-cloud config add cloud aws""",
             choices=clouds.cloud_names,
         )
 
-    for command in apply, up, down, run, batch, submit, ui:
+    for command in apply, up, down, run, batch, submit:
         command.add_argument(
             "--force-cluster",
             dest="force_cluster",
@@ -227,11 +247,6 @@ flux-cloud config add cloud aws""",
             help="Only run first experiment in matrix (test mode)",
             default=False,
             action="store_true",
-        )
-        command.add_argument(
-            "--template",
-            help="minicluster yaml template to populate for experiments (defaults to minicluster-template.yaml",
-            default="minicluster-template.yaml",
         )
         command.add_argument(
             "--force",
@@ -287,22 +302,22 @@ def run():
     # Does the user want a shell?
     if args.command == "apply":
         from .apply import main
-    elif args.command == "submit":
-        from .apply import submit as main
-    elif args.command == "list":
-        from .listing import main
-    elif args.command == "run":
-        from .run import main
     elif args.command == "batch":
         from .run import batch as main
     elif args.command == "config":
         from .config import main
-    elif args.command == "ui":
-        from .ui import main
-    elif args.command == "up":
-        from .up import main
     elif args.command == "down":
         from .down import main
+    elif args.command == "experiment":
+        from .experiment import main
+    elif args.command == "list":
+        from .listing import main
+    elif args.command == "run":
+        from .run import main
+    elif args.command == "submit":
+        from .apply import submit as main
+    elif args.command == "up":
+        from .up import main
 
     # Pass on to the correct parser
     return_code = 0

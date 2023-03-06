@@ -24,14 +24,14 @@ job_spec = {
     "properties": {
         "command": {"type": "string"},
         "repeats": {"type": "number"},
-        "workdir": {"type": "string"},
+        "working_dir": {"type": "string"},
         "image": {"type": "string"},
         "machine": {"type": "string"},
         "machines": {"type": "array", "items": {"type": "string"}},
         "size": {"type": "number"},
         "sizes": {"type": "array", "items": {"type": "number"}},
     },
-    "required": ["command"],
+    "required": ["command", "image"],
 }
 
 jobs_properties = {
@@ -186,6 +186,9 @@ experiment_schema = {
             },
             "required": ["size"],
         },
+    },
+    "patternProperties": {
+        "x-*": {"type": "object"},
     },
     "additionalProperties": False,
 }

@@ -1,0 +1,25 @@
+# This is intended for MiniKube, so no machine needed
+matrix:
+  size: [4]
+
+# Flux Mini Cluster experiment attributes
+minicluster:
+  name: lammps-job
+  namespace: flux-operator
+  # Each of these sizes will be brought up and have commands run across it
+  size: [2]
+
+jobs:
+  reaxc-hns:
+    command: 'lmp -v x 1 -v y 1 -v z 1 -in in.reaxc.hns -nocite'
+    image: ghcr.io/rse-ops/lammps:flux-sched-focal-v0.24.0
+    repeats: 2
+    working_dir: /home/flux/examples/reaxff/HNS
+
+    # Resources for the specific container job
+    resources:
+      limits:
+        cpu: 1
+
+      requests:
+        cpu: 1

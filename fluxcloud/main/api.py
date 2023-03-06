@@ -3,167 +3,319 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-import atexit
-import logging
 import os
+import re
 import shutil
-import subprocess
-import threading
 import time
 import uuid
 
 from flux_restful_client.main import get_client
+from fluxoperator.client import FluxOperator
 
 import fluxcloud.utils as utils
 from fluxcloud.logger import logger
 
 here = os.path.dirname(os.path.abspath(__file__))
 
-exit_event = threading.Event()
-
 
 class APIClient:
-    def __init__(self, token=None, user=None):
+    def __init__(self, token=None, user=None, secret_key=None):
         """
         API client wrapper.
         """
-        self.user = token or os.environ.get("FLUX_USER") or "fluxuser"
+        self.user = token or os.environ.get("FLUX_USER") or user or "fluxuser"
         self.token = token or os.environ.get("FLUX_TOKEN") or str(uuid.uuid4())
-        self.cli = get_client(user=self.user, token=self.token)
+        self.secret_key = (
+            secret_key or os.environ.get("FLUX_SECRET_KEY") or str(uuid.uuid4())
+        )
         self.proc = None
         self.broker_pod = None
 
-    def check(self, experiment):
+    def show_credentials(self):
         """
-        Set the basic auth for username and password and check it works
+        Show the token and user, if requested.
         """
-        minicluster = experiment.minicluster
-        get_broker_pod = experiment.get_shared_script(
-            "broker-id", {"minicluster": minicluster}
+        logger.info("MiniCluster created with credentials:")
+        logger.info(f"  FLUX_USER={self.user}")
+        logger.info(f"  FLUX_TOKEN={self.token}")
+
+    def _set_minicluster_credentials(self, minicluster):
+        """
+        If the user provided credentials, use
+        """
+        if "flux_restful" not in minicluster:
+            minicluster["flux_restful"] = {}
+
+        if "username" not in minicluster["flux_restful"]:
+            minicluster["flux_restful"]["username"] = self.user
+
+        if "token" not in minicluster["flux_restful"]:
+            minicluster["flux_restful"]["token"] = self.token
+
+        if "secret_key" not in minicluster["flux_restful"]:
+            minicluster["flux_restful"]["secret_key"] = self.secret_key
+
+        # Update credentials
+        self.user = minicluster["flux_restful"]["username"]
+        self.token = minicluster["flux_restful"]["token"]
+        self.secret_key = minicluster["flux_restful"]["secret_key"]
+        return minicluster
+
+    def _create_minicluster(
+        self, operator, minicluster, experiment, job, interactive=True
+    ):
+        """
+        Shared function to take an operator handle and create the minicluster.
+
+        This can be used for apply or submit! We separate minicluster (gets
+        piped into the MiniClusterSpec) from job (gets piped into a
+        MiniClusterContainer spec).
+        """
+        namespace = minicluster["namespace"]
+        image = job["image"]
+        name = minicluster["name"]
+        size = minicluster["size"]
+
+        self._set_minicluster_credentials(minicluster)
+
+        try:
+            # The operator will time creation through pods being ready
+            result = operator.create_minicluster(**minicluster, container=job)
+        except Exception as e:
+            # Give the user the option to delete and recreate or just exit
+            logger.error(f"There was an issue creating the MiniCluster: {e}")
+            if interactive and not utils.confirm_action(
+                "Would you like to submit jobs to the current cluster? You will need to have provided the same username as password."
+            ):
+                if utils.confirm_action(
+                    "Would you like to delete this mini cluster and re-create?"
+                ):
+                    logger.info("Cleaning up MiniCluster...")
+                    operator.delete_minicluster(name=name, namespace=namespace)
+                    return self._create_minicluster(
+                        operator, minicluster, experiment, job, interactive=interactive
+                    )
+                else:
+                    logger.exit(
+                        f"Try: 'kubectl delete -n {namespace} minicluster {name}'"
+                    )
+            elif not interactive:
+                logger.exit(f"Try: 'kubectl delete -n {namespace} minicluster {name}'")
+            return
+
+        # Wait for pods to be ready to include in minicluster up time
+        self.show_credentials()
+
+        # Save MiniCluster metadata
+        image_slug = re.sub("(:|/)", "-", image)
+        uid = f"{size}-{name}-{image_slug}"
+        experiment.save_json(result, f"minicluster-size-{uid}.json")
+
+        # This is a good point to also save nodes metadata
+        nodes = operator.get_nodes()
+        operator.wait_pods(quiet=True)
+        pods = operator.get_pods()
+
+        experiment.save_file(nodes.to_str(), f"nodes-{uid}.json")
+        experiment.save_file(pods.to_str(), f"pods-size-{uid}.json")
+        return result
+
+    def apply(
+        self,
+        experiment,
+        minicluster,
+        job=None,
+        outfile=None,
+        stdout=True,
+        interactive=True,
+    ):
+        """
+        Use the client to apply (1:1 job,minicluster) the jobs programatically.
+        """
+        namespace = minicluster["namespace"]
+        name = minicluster["name"]
+
+        # Interact with the Flux Operator Python SDK
+        operator = FluxOperator(namespace)
+
+        self._create_minicluster(
+            operator, minicluster, experiment, job, interactive=interactive
         )
 
-        logger.info("Waiting for id of running broker pod...")
+        # Get the broker pod (this would also wait for all pods to be ready)
+        broker = operator.get_broker_pod()
 
-        # We've already waited for them to be running
-        broker_pod = None
-        while not broker_pod:
-            result = utils.run_capture(["/bin/bash", get_broker_pod], stream=True)
+        # Time from when broker pod (and all pods are ready)
+        start = time.time()
 
-            # Save the broker pod, or exit on failure.
-            if result["message"]:
-                broker_pod = result["message"].strip()
+        # Get the pod to stream output from directly
+        if outfile is not None:
+            operator.stream_output(outfile, pod=broker, stdout=stdout)
 
-        self.broker_pod = broker_pod
-        self.port_forward(minicluster["namespace"], self.broker_pod)
+        # When output done streaming, job is done
+        end = time.time()
+        logger.info(f"Job {name} is complete! Cleaning up MiniCluster...")
 
-    def port_forward(self, namespace, broker_pod):
-        """
-        Ask user to open port to forward
-        """
-        command = ["kubectl", "port-forward", "-n", namespace, broker_pod, "5000:5000"]
+        # This also waits for termination (and pods to be gone) and times it
+        operator.delete_minicluster(name=name, namespace=namespace)
 
-        # This is detached - we can kill but not interact
-        logger.info(" ".join(command))
-        self.proc = proc = subprocess.Popen(
-            command,
-            stdout=subprocess.DEVNULL if logger.level >= logging.DEBUG else None,
-        )
+        # TODO likely need to separate minicluster up/down times.
+        results = {"times": operator.times}
+        results["times"][name] = end - start
+        return results
 
-        def cleanup():
-            proc.kill()
-
-        # Ensure we cleanup if anything goes wrong
-        atexit.register(cleanup)
-
-    def submit(self, setup, experiment, size):
+    def submit(
+        self, setup, experiment, minicluster, job, poll_seconds=20, interactive=True
+    ):
         """
         Use the client to submit the jobs programatically.
         """
-        # Submit jobs!
+        namespace = minicluster["namespace"]
+        image = job["image"]
+        name = minicluster["name"]
+        size = minicluster["size"]
 
-        # Sleep time will be time of last job, assuming they are similar
-        sleep_time = 5
-        for jobname, job in experiment.jobs.items():
-            # Do we want to run this job for this size and machine?
-            if not experiment.check_job_run(job, size):
-                logger.debug(
-                    f"Skipping job {jobname} as does not match inclusion criteria."
+        # Interact with the Flux Operator Python SDK
+        operator = FluxOperator(namespace)
+
+        self._create_minicluster(
+            operator, minicluster, experiment, job, interactive=interactive
+        )
+
+        # Get the broker pod (this would also wait for all pods to be ready)
+        broker = operator.get_broker_pod()
+
+        # Return results (and times) to calling client
+        results = {}
+
+        # Submit jobs via port forward - this waits until the server is ready
+        with operator.port_forward(broker) as forward_url:
+            print(f"Port forward opened to {forward_url}")
+
+            # See https://flux-framework.org/flux-restful-api/getting_started/api.html
+            cli = get_client(
+                host=forward_url,
+                user=self.user,
+                token=self.token,
+                secret_key=self.secret_key,
+            )
+            cli.set_basic_auth(self.user, self.token)
+
+            # Keep a lookup of jobid and output files.
+            # We will try waiting for all jobs to finish and then save output
+            jobs = []
+            for jobname, job in experiment.jobs.items():
+                # Do we want to run this job for this size, image?
+                if not experiment.check_job_run(job, size=size, image=image):
+                    logger.debug(
+                        f"Skipping job {jobname} as does not match inclusion criteria."
+                    )
+                    continue
+
+                if "command" not in job:
+                    logger.debug(f"Skipping job {jobname} as does not have a command.")
+                    continue
+
+                # Here we submit all jobs to the scheduler. Let the scheduler handle it!
+                submit_job = self.submit_job(
+                    cli, experiment, setup, minicluster, job, jobname
                 )
-                continue
+                if not submit_job:
+                    continue
+                jobs.append(submit_job)
 
-            if "command" not in job:
-                logger.debug(f"Skipping job {jobname} as does not have a command.")
-                continue
+            logger.info(f"Submit {len(jobs)} jobs! Waiting for completion...")
 
-            # The experiment is defined by the machine type and size
-            experiment_dir = experiment.root_dir
+            # Poll once every 30 seconds
+            # This could be improved with some kind of notification / pubsub thing
+            completed = []
+            while jobs:
+                logger.info(f"{len(jobs)} are active.")
+                time.sleep(poll_seconds)
+                unfinished = []
+                for job in jobs:
+                    if "id" not in job:
+                        logger.warning(
+                            f"Job {job} is missing an id or name, likely an issue or not ready, skipping."
+                        )
+                        continue
 
-            # Add the size
-            jobname = f"{jobname}-minicluster-size-{size}"
-            job_output = os.path.join(experiment_dir, jobname)
-            logfile = os.path.join(job_output, "log.out")
+                    info = cli.jobs(job["id"])
 
-            # Do we have output?
-            if os.path.exists(logfile) and not setup.force:
-                relpath = os.path.relpath(logfile, experiment_dir)
-                logger.warning(
-                    f"{relpath} already exists and force is False, skipping."
-                )
-                continue
+                    # If we don't have a name yet, it's still pending
+                    if "name" not in info:
+                        unfinished.append(job)
+                        continue
 
-            elif os.path.exists(logfile) and setup.force:
-                logger.warning(f"Cleaning up previous run in {job_output}.")
-                shutil.rmtree(job_output)
+                    jobname = info["name"].rjust(15)
+                    if info["state"] == "INACTIVE":
+                        finish_time = round(info["runtime"], 2)
+                        logger.debug(
+                            f"{jobname} is finished {info['result']} in {finish_time} seconds."
+                        )
+                        job["info"] = info
+                        job["output"] = cli.output(job["id"]).get("Output")
+                        completed.append(job)
+                    else:
+                        logger.debug(f"{jobname} is in state {info['state']}")
+                        unfinished.append(job)
+                jobs = unfinished
 
-            # Create job directory anew
-            utils.mkdir_p(job_output)
+        logger.info("All jobs are complete!")
 
-            kwargs = dict(job)
-            del kwargs["command"]
+        # This also waits for termination (and pods to be gone) and times it
+        if not interactive or utils.confirm_action(
+            "Would you like to delete this mini cluster?"
+        ):
+            logger.info("Cleaning up MiniCluster...")
+            operator.delete_minicluster(name=name, namespace=namespace)
 
-            # Assume the task gets all nodes, unless specified in job
-            # Also assume the flux restful server is using one node
-            if "nodes" not in kwargs:
-                kwargs["nodes"] = size - 1
-            if "tasks" not in kwargs:
-                kwargs["tasks"] = size - 1
+        # Get times recorded by FluxOperator Python SDK
+        results["jobs"] = completed
+        results["times"] = operator.times
+        return results
 
-            # Ensure we convert - map between job params and the flux restful api
-            for convert in (
-                ["num_tasks", "tasks"],
-                ["cores_per_task", "cores"],
-                ["gpus_per_task", "gpus"],
-                ["num_nodes", "nodes"],
-            ):
-                if convert[1] in kwargs:
-                    kwargs[convert[0]] = kwargs[convert[1]]
+    def submit_job(self, cli, experiment, setup, minicluster, job, jobname):
+        """
+        Submit the job (if appropriate for the minicluster)
 
-            # Let's also keep track of actual time to get logs, info, etc.
-            start = time.time()
+        Return an appended Flux Restful API job result with the expected
+        output file.
+        """
+        # The experiment is defined by the machine type and size
+        experiment_dir = experiment.root_dir
 
-            # Run and block output until job is done
-            res = self.cli.submit(command=job["command"], **kwargs)
+        jobname = f"{jobname}-minicluster-size-{minicluster['size']}"
+        job_output = os.path.join(experiment_dir, jobname)
+        logfile = os.path.join(job_output, "log.out")
 
-            logger.info(f"Submitting {jobname}: {job['command']}")
-            info = self.cli.jobs(res["id"])
+        # Do we have output?
+        if os.path.exists(logfile) and not setup.force:
+            relpath = os.path.relpath(logfile, experiment_dir)
+            logger.warning(f"{relpath} already exists and force is False, skipping.")
+            return
 
-            while info["returncode"] == "":
-                info = self.cli.jobs(res["id"])
-                time.sleep(sleep_time)
+        if os.path.exists(logfile) and setup.force:
+            logger.warning(f"Cleaning up previous run in {job_output}.")
+            shutil.rmtree(job_output)
 
-            end1 = time.time()
-            output = self.cli.output(res["id"]).get("Output")
-            if output:
-                utils.write_file("".join(output), logfile)
-            end2 = time.time()
+        kwargs = dict(job)
+        del kwargs["command"]
 
-            # Get the full job info, and add some wrapper times
-            info = self.cli.jobs(res["id"])
-            info["start_to_info_seconds"] = end1 - start
-            info["start_to_output_seconds"] = end2 - start
+        # Ensure we convert - map between job params and the flux restful api
+        for convert in (
+            ["num_tasks", "tasks"],
+            ["cores_per_task", "cores"],
+            ["gpus_per_task", "gpus"],
+            ["num_nodes", "nodes"],
+            ["workdir", "working_dir"],
+        ):
+            if convert[1] in kwargs:
+                kwargs[convert[0]] = kwargs[convert[1]]
+                del kwargs[convert[1]]
 
-            yield jobname, info
-            sleep_time = info["runtime"]
-
-        # Kill the connection to the service
-        self.proc.kill()
+        # Submit the job, add the expected output file, and return
+        logger.info(f"Submitting {jobname}: {job['command']}")
+        res = cli.submit(command=job["command"], **kwargs)
+        res["job_output"] = logfile
+        return res

@@ -10,8 +10,6 @@ install
 commands
 examples
 experiments
+debugging
 settings
-google
-aws
-minikube
 ```

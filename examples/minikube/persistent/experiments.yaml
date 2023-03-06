@@ -1,0 +1,16 @@
+# This is intended for MiniKube, so no machine needed
+matrix:
+  size: [4]
+
+# Flux Mini Cluster experiment attributes
+minicluster:
+  name: sleep-job
+  namespace: flux-operator
+  # Each of these sizes will be brought up and have commands run across it
+  size: [2]
+
+# This will bring up a cluster to stay online (until you kill it) as the job will never end
+jobs:
+  sleep:
+    command: 'sleep infinity'
+    image: ghcr.io/flux-framework/flux-restful-api:latest

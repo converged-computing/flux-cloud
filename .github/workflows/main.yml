@@ -24,13 +24,74 @@ jobs:
         pip install -r .github/dev-requirements.txt
         pre-commit run --all-files
 
+  test-python:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Clone the code
+      uses: actions/checkout@v3
+
+    - name: Install flux-cloud
+      run: |
+        conda create --quiet --name fc jinja2
+        export PATH="/usr/share/miniconda/bin:$PATH"
+        source activate fc
+        pip install .[all]
+
+    - name: Test Python
+      run: |
+        export PATH="/usr/share/miniconda/bin:$PATH"
+        source activate fc
+        export SHELL=/bin/bash
+        # This will bring MiniKube up/down
+        pytest -xs ./fluxcloud/tests/test_settings.py
+        pytest -xs ./fluxcloud/tests/test_utils.py
+
+  test-examples:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        test: ["test_minicluster_logging", "test_minicluster_volumes",
+               "test_minicluster_resources"]
+    steps:
+    - name: Clone the code
+      uses: actions/checkout@v3
+
+    - name: Setup Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: ^1.18
+
+    - name: Install flux-cloud
+      run: |
+        conda create --quiet --name fc jinja2
+        export PATH="/usr/share/miniconda/bin:$PATH"
+        source activate fc
+        pip install .[all]
+        pip install kubernetes
+
+    - name: Start minikube
+      uses: medyagh/setup-minikube@697f2b7aaed5f70bf2a94ee21a4ec3dde7b12f92 # v0.0.9
+
+    - name: Test Example
+      env:
+        test: ${{ matrix.test }}
+      run: |
+        export PATH="/usr/share/miniconda/bin:$PATH"
+        source activate fc
+        export SHELL=/bin/bash
+        eval $(minikube -p minikube docker-env)
+        # We need to delete the minikube cluster to bring it up again
+        minikube delete
+        # This will bring MiniKube up/down
+        pytest -xs ./fluxcloud/tests/test_examples.py::${test}
+
   test-runs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        test: ["lammps"]
-
+        command: [["apply", "lammps"], ["submit", "./examples/minikube/basic"]]
     steps:
     - name: Clone the code
       uses: actions/checkout@v3
@@ -50,9 +111,10 @@ jobs:
     - name: Start minikube
       uses: medyagh/setup-minikube@697f2b7aaed5f70bf2a94ee21a4ec3dde7b12f92 # v0.0.9
 
-    - name: Test ${{ matrix.test }}
+    - name: Test ${{ matrix.command }}
       env:
-        name: ${{ matrix.test }}
+        name: ${{ matrix.command[1] }}
+      if: (matrix.command[0] == 'apply')
       run: |
         export PATH="/usr/share/miniconda/bin:$PATH"
         source activate fc
@@ -61,3 +123,18 @@ jobs:
         # We need to delete the minikube cluster to bring it up again
         minikube delete
         /bin/bash ./tests/test.sh ${name}
+
+    - name: Test ${{ matrix.command }}
+      env:
+        workdir: ${{ matrix.command[1] }}
+      if: (matrix.command[0] == 'submit')
+      run: |
+        export PATH="/usr/share/miniconda/bin:$PATH"
+        source activate fc
+        export SHELL=/bin/bash
+        eval $(minikube -p minikube docker-env)
+        minikube delete
+        cd ${workdir}
+        flux-cloud up --cloud minikube --force-cluster
+        flux-cloud --debug submit --non-interactive
+        flux-cloud down --cloud minikube

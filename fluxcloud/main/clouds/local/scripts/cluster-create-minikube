@@ -5,6 +5,7 @@
 
 # Defaults - these are in the config but left here for information
 CLUSTER_NAME="{% if experiment.cluster_name %}{{ experiment.cluster_name }}{% else %}flux-cluster{% endif %}"
+NAMESPACE="{% if experiment.minicluster_namespace %}{{ experiment.minicluster_namespace }}{% else %}flux-operator{% endif %}"
 CLUSTER_VERSION="{% if experiment.kubernetes_version %}{{ experiment.kubernetes_version }}{% else %}1.23{% endif %}"
 FORCE_CLUSTER="{% if setup.force_cluster %}true{% else %}false{% endif %}"
 SIZE={% if experiment.size %}{{ experiment.size }}{% else %}4{% endif %}
@@ -12,6 +13,7 @@ REPOSITORY="{% if experiment.operator_repository %}{{ experiment.operator_reposi
 BRANCH="{% if experiment.operator_branch %}{{ experiment.operator_branch }}{% else %}main{% endif %}"
 SCRIPT_DIR="{{ experiment.script_dir }}"
 
+print_magenta "   namespace: ${NAMESPACE}"
 print_magenta "   cluster  : ${CLUSTER_NAME}"
 print_magenta "    version : ${CLUSTER_VERSION}"
 print_magenta "     size   : ${SIZE}"
@@ -51,7 +53,7 @@ install_operator ${SCRIPT_DIR} ${REPOSITORY} ${BRANCH}
 
 # Show nodes
 run_echo kubectl get nodes
-
+run_echo kubectl create namespace ${NAMESPACE} || true
 run_echo kubectl get namespace
 run_echo kubectl describe namespace operator-system
 save_versions ${SCRIPT_DIR} ${SIZE}
