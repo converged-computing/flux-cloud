@@ -404,29 +404,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="debugging.html" class="md-nav__link">
+    <span title="/getting_started/debugging.md (reference label)" class="md-ellipsis">Debugging</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="settings.html" class="md-nav__link">
     <span title="/getting_started/settings.md (reference label)" class="md-ellipsis">Settings</span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="google.html" class="md-nav__link">
-    <span title="/getting_started/google.md (reference label)" class="md-ellipsis">Google Cloud</span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="aws.html" class="md-nav__link">
-    <span title="/getting_started/aws.md (reference label)" class="md-ellipsis">AWS</span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="minikube.html" class="md-nav__link">
-    <span title="/getting_started/minikube.md (reference label)" class="md-ellipsis">Mini<wbr>Kube</span>
   </a>
   
 </li>
@@ -435,6 +421,21 @@
   
 </nav>
       
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorials/index.html" class="md-nav__link">
+        <span title="/tutorials/index.md (reference label)" class="md-ellipsis">Tutorials</span>
+      </a>
     </li>
   
 
@@ -542,22 +543,31 @@ any questions or issues, please <a class="reference external" href="https://gith
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="commands.html">Commands</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="commands.html#list">list</a></li>
-<li class="toctree-l2"><a class="reference internal" href="commands.html#run">run</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="commands.html#experiment">experiment</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="commands.html#init">init</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="commands.html#list">list</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="commands.html#up">up</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="commands.html#apply">apply</a></li>
-<li class="toctree-l2"><a class="reference internal" href="commands.html#submit">submit</a></li>
-<li class="toctree-l2"><a class="reference internal" href="commands.html#batch">batch</a></li>
-<li class="toctree-l2"><a class="reference internal" href="commands.html#ui">ui</a></li>
+<li class="toctree-l2"><a class="reference internal" href="commands.html#ways-to-run-jobs">Ways to run jobs</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="commands.html#apply-run">apply / run</a></li>
+<li class="toctree-l3"><a class="reference internal" href="commands.html#submit-batch">submit / batch</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="commands.html#down">down</a></li>
 <li class="toctree-l2"><a class="reference internal" href="commands.html#debug">debug</a></li>
 <li class="toctree-l2"><a class="reference internal" href="commands.html#scripts">scripts</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="examples.html#demo">Demo</a></li>
+<li class="toctree-l2"><a class="reference external" href="https://github.com/converged-computing/flux-cloud/tree/main/examples/minikube/basic">basic</a></li>
+<li class="toctree-l2"><a class="reference external" href="https://github.com/converged-computing/flux-cloud/tree/main/examples/minikube/volumes">volumes</a></li>
+<li class="toctree-l2"><a class="reference external" href="https://github.com/converged-computing/flux-cloud/tree/main/examples/minikube/resources">resources</a></li>
+<li class="toctree-l2"><a class="reference external" href="https://github.com/converged-computing/flux-cloud/tree/main/examples/minikube/osu-benchmarks">osu-benchmarks</a></li>
+<li class="toctree-l2"><a class="reference external" href="https://github.com/converged-computing/flux-cloud/tree/main/examples/minikube/persistent">persistent</a></li>
+<li class="toctree-l2"><a class="reference external" href="https://github.com/converged-computing/flux-cloud/tree/main/examples/google/osu-benchmarks">osu-benchmarks</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="experiments.html">Experiments</a><ul>
@@ -570,41 +580,20 @@ any questions or issues, please <a class="reference external" href="https://gith
 <li class="toctree-l3"><a class="reference internal" href="experiments.html#jobs">Jobs</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="experiments.html#custom-resource-definition">Custom Resource Definition</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="experiments.html#use-your-own">Use Your Own</a></li>
-<li class="toctree-l3"><a class="reference internal" href="experiments.html#use-the-default">Use The Default</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="debugging.html">Debugging</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="debugging.html#kubectl-pro-tips">0. kubectl pro tips</a></li>
+<li class="toctree-l2"><a class="reference internal" href="debugging.html#start-with-logs">1. Start with logs</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="debugging.html#what-should-i-expect-to-see">What should I expect to see?</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="debugging.html#use-describe">2. Use describe</a></li>
+<li class="toctree-l2"><a class="reference internal" href="debugging.html#advanced">3. Advanced</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="settings.html">Settings</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="settings.html#table">Table</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="google.html">Google Cloud</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="google.html#pre-requisites">Pre-requisites</a></li>
-<li class="toctree-l2"><a class="reference internal" href="google.html#cloud">Cloud</a></li>
-<li class="toctree-l2"><a class="reference internal" href="google.html#custom-variables">Custom Variables</a></li>
-<li class="toctree-l2"><a class="reference internal" href="google.html#run-experiments">Run Experiments</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="aws.html">AWS</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="aws.html#pre-requisites">Pre-requisites</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="aws.html#setup-ssh">Setup SSH</a></li>
-<li class="toctree-l3"><a class="reference internal" href="aws.html#cloud">Cloud</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="aws.html#custom-variables">Custom Variables</a></li>
-<li class="toctree-l2"><a class="reference internal" href="aws.html#run-experiments">Run Experiments</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="minikube.html">MiniKube</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="minikube.html#pre-requisites">Pre-requisites</a></li>
-<li class="toctree-l2"><a class="reference internal" href="minikube.html#run-experiments">Run Experiments</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="minikube.html#apply-run">Apply / Run</a></li>
-<li class="toctree-l3"><a class="reference internal" href="minikube.html#submit">Submit</a></li>
-</ul>
-</li>
 </ul>
 </li>
 </ul>
@@ -616,7 +605,7 @@ any questions or issues, please <a class="reference external" href="https://gith
   <small>
     
       Last update:
-      Feb 22, 2023
+      Mar 06, 2023
     
   </small>
 </div>
@@ -693,7 +682,7 @@ any questions or issues, please <a class="reference external" href="https://gith
   
     Created using
     <a href="https://www.sphinx-doc.org/" target="_blank" rel="noopener">Sphinx</a>
-    5.3.0.
+    6.1.3.
      and
     <a href="https://github.com/jbms/sphinx-immaterial/" target="_blank" rel="noopener">Sphinx-Immaterial</a>
   

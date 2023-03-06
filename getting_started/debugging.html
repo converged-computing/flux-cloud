@@ -14,7 +14,7 @@
     
     
       
-        <title>MiniKube - Flux Cloud</title>
+        <title>Debugging - Flux Cloud</title>
       
     
     
@@ -141,7 +141,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              MiniKube
+              Debugging
             
           </span>
         </div>
@@ -436,51 +436,6 @@
               
   
   
-  
-  
-    <li class="md-nav__item">
-      <a href="settings.html" class="md-nav__link">
-        <span title="/getting_started/settings.md (reference label)" class="md-ellipsis">Settings</span>
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="google.html" class="md-nav__link">
-        <span title="/getting_started/google.md (reference label)" class="md-ellipsis">Google Cloud</span>
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="aws.html" class="md-nav__link">
-        <span title="/getting_started/aws.md (reference label)" class="md-ellipsis">AWS</span>
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
     
   
     
@@ -492,12 +447,12 @@
       <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
-          <span title="/getting_started/minikube.md (reference label)" class="md-ellipsis">Mini<wbr>Kube</span>
+          <span title="/getting_started/debugging.md (reference label)" class="md-ellipsis">Debugging</span>
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <a href="#" class="md-nav__link md-nav__link--active">
-        <span title="/getting_started/minikube.md (reference label)" class="md-ellipsis">Mini<wbr>Kube</span>
+        <span title="/getting_started/debugging.md (reference label)" class="md-ellipsis">Debugging</span>
       </a>
       
         
@@ -515,36 +470,43 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#pre-requisites" class="md-nav__link">
-    <span title="/getting_started/minikube.md#pre-requisites (reference label)" class="md-ellipsis">Pre-<wbr>requisites</span>
+  <a href="#kubectl-pro-tips" class="md-nav__link">
+    <span title="/getting_started/debugging.md#kubectl-pro-tips (reference label)" class="md-ellipsis">0.<wbr> kubectl pro tips</span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#run-experiments" class="md-nav__link">
-    <span title="/getting_started/minikube.md#run-experiments (reference label)" class="md-ellipsis">Run Experiments</span>
+  <a href="#start-with-logs" class="md-nav__link">
+    <span title="/getting_started/debugging.md#start-with-logs (reference label)" class="md-ellipsis">1.<wbr> Start with logs</span>
   </a>
   
-    <nav class="md-nav" aria-label="Run Experiments">
+    <nav class="md-nav" aria-label="1. Start with logs">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#apply-run" class="md-nav__link">
-    <span title="/getting_started/minikube.md#apply-run (reference label)" class="md-ellipsis">Apply / Run</span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#submit" class="md-nav__link">
-    <span title="/getting_started/minikube.md#submit (reference label)" class="md-ellipsis">Submit</span>
+  <a href="#what-should-i-expect-to-see" class="md-nav__link">
+    <span title="/getting_started/debugging.md#what-should-i-expect-to-see (reference label)" class="md-ellipsis">What should I expect to see?</span>
   </a>
   
 </li>
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#use-describe" class="md-nav__link">
+    <span title="/getting_started/debugging.md#use-describe (reference label)" class="md-ellipsis">2.<wbr> Use describe</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#advanced" class="md-nav__link">
+    <span title="/getting_started/debugging.md#advanced (reference label)" class="md-ellipsis">3.<wbr> Advanced</span>
+  </a>
   
 </li>
       
@@ -557,10 +519,40 @@
 
             
           
+            
+              
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="settings.html" class="md-nav__link">
+        <span title="/getting_started/settings.md (reference label)" class="md-ellipsis">Settings</span>
+      </a>
+    </li>
+  
+
+            
+          
         </ul>
       </nav>
     </li>
   
+  
+
+            
+          
+            
+              
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorials/index.html" class="md-nav__link">
+        <span title="/tutorials/index.md (reference label)" class="md-ellipsis">Tutorials</span>
+      </a>
+    </li>
   
 
             
@@ -650,128 +642,134 @@
                   
 
 
-  <a href="https://github.com/converged-computing/flux-cloud/blob/main/docs/getting_started/minikube.md" title="Edit this page" class="md-content__button md-icon">
+  <a href="https://github.com/converged-computing/flux-cloud/blob/main/docs/getting_started/debugging.md" title="Edit this page" class="md-content__button md-icon">
     
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4v-2m10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1 2.1 2.1Z"/></svg>
   </a>
 
-<h1 id="minikube">MiniKube<a class="headerlink" href="#minikube" title="Permalink to this heading">¶</a></h1>
+<h1 id="debugging">Debugging<a class="headerlink" href="#debugging" title="Permalink to this heading">¶</a></h1>
 <blockquote>
-<div><p>Running on a local MiniKube cluster</p>
+<div><p>Oh no, my MiniCluster jobs aren’t running!</p>
 </div></blockquote>
-<p>Flux Cloud (as of version 0.1.0) can run on MiniKube! The main steps of running experiments with
-different container bases are:</p>
-<ul class="simple">
-<li><p><strong>up</strong> to bring up a cluster</p></li>
-<li><p><strong>apply</strong> to apply one or more CRDs from experiments defined by an experiments.yaml</p></li>
-<li><p><strong>down</strong> to destroy a cluster</p></li>
-</ul>
-<p>or one or more commands with the same container base(s):</p>
-<ul class="simple">
-<li><p><strong>up</strong> to bring up a cluster</p></li>
-<li><p><strong>submit</strong> to submit one or more experiments to the same set of pods defined by an experiments.yaml</p></li>
-<li><p><strong>down</strong> to destroy a cluster</p></li>
-</ul>
-<p>Each of these commands can be run in isolation, and we provide a single command <strong>run</strong> to
-automate the entire thing. We emphasize the term “wrapper” as we are using scripts on your
-machine to do the work (e.g., minikube and kubectl) and importantly, for every step we show
-you the command, and if it fails, give you a chance to bail out. We do this so if you
-want to remove the abstraction at any point and run the commands on your own, you can.</p>
-<h2 id="pre-requisites">Pre-requisites<a class="headerlink" href="#pre-requisites" title="Permalink to this heading">¶</a></h2>
-<p>You should first <a class="reference external" href="https://minikube.sigs.k8s.io/docs/start/">install minikube</a>
-and kubectl.</p>
-<h2 id="run-experiments">Run Experiments<a class="headerlink" href="#run-experiments" title="Permalink to this heading">¶</a></h2>
-<p>Each experiment is defined by the matrix and variables in an <code class="docutils literal notranslate"><span class="pre">experiment.yaml</span></code> that is used to
-populate a <code class="docutils literal notranslate"><span class="pre">minicluster-template.yaml</span></code> that you can either provide, or use a template provided by the
-library. One of the goals of the Flux Cloud Experiment runner is not just to run things, but to
-provide this library for you to easily edit and use! Take a look at the <a class="reference external" href="https://github.com/converged-computing/flux-cloud/tree/main/examples">examples</a>
-directory for a few that we provide. We will walk through a generic one here to launch
-an experiment on a MiniKube Kubernetes cluster. Note that before doing this step you should
-have installed flux-cloud, along with kubectl and minikube. Note that if it’s not the default,
-you’ll need to specify using MiniKube</p>
-<h3 id="apply-run">Apply / Run<a class="headerlink" href="#apply-run" title="Permalink to this heading">¶</a></h3>
-<blockquote>
-<div><p>Ideal if you need to run multiple jobs on different containers</p>
-</div></blockquote>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>flux-cloud<span class="w"> </span>run<span class="w"> </span>--cloud<span class="w"> </span>minikube<span class="w"> </span>experiments.yaml
+<p>Kubernetes is a complex beast, so here are some debugging tips that might help you figure out what
+is going on. We are generally going to be looking at objects owned by the Flux Operator - pods,
+config maps, and (sometimes volumes or services). Note that the object deployed by the Flux Operator
+custom resource definition is called a <code class="docutils literal notranslate"><span class="pre">minicluster</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>-n<span class="w"> </span>flux-operator<span class="w"> </span>minicluster
 </code></pre></div>
 </div>
-<p>Or set to the default:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>flux-cloud<span class="w"> </span>config<span class="w"> </span><span class="nb">set</span><span class="w"> </span>default_cloud:minikube
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><code><span class="go">NAME             AGE</span>
+<span class="go">osu-benchmarks   57s</span>
 </code></pre></div>
 </div>
-<p>Given MiniKube is the default, since the experiments file defaults to that name, you can also just do:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>flux-cloud<span class="w"> </span>run
+<h2 id="kubectl-pro-tips">0. kubectl pro tips<a class="headerlink" href="#kubectl-pro-tips" title="Permalink to this heading">¶</a></h2>
+<p>These tips come from the amazing <a class="reference external" href="https://github.com/cmisale">Claudia</a>!</p>
+<p>It’s fairly arduous to copy paste or type complete pod names, especially for indexed jobs where there is a random
+set of characters. You can enable kubectl to autocomplete by adding this to your bash profile (<code class="docutils literal notranslate"><span class="pre">~/.bashrc</span></code>):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code><span class="nb">source</span><span class="w"> </span>&lt;<span class="o">(</span>kubectl<span class="w"> </span>completion<span class="w"> </span>bash<span class="o">)</span>
 </code></pre></div>
 </div>
-<p>Given an experiments.yaml in the present working directory. Take a look at an <code class="docutils literal notranslate"><span class="pre">experients.yaml</span></code> in an example directory.
-Note that only size is required for the matrix for MiniKube (there is currently no concept of a machine,
-although there could be), and variables get piped into all experiments (in full). Under variables,
-both “commands” and “ids” are required, and must be equal in length (each command is assigned to one id
-for output). To just run the first entry in the matrix (test mode) do:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>flux-cloud<span class="w"> </span>run<span class="w"> </span>experiments.yaml<span class="w"> </span>--test
+<p>Another shortcut that is nice to have is to make an alias for <code class="docutils literal notranslate"><span class="pre">kubectl</span></code> to just be <code class="docutils literal notranslate"><span class="pre">k</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code><span class="nb">alias</span><span class="w"> </span><span class="nv">k</span><span class="o">=</span>kubectl
 </code></pre></div>
 </div>
-<p>Note that you can also use the other commands in place of a single run, notably “up” “apply” and “down.”
-By default, results will be written to a temporary output directory, but you can customize this with <code class="docutils literal notranslate"><span class="pre">--outdir</span></code>.
-Finally, since MiniKube often has trouble pulling images, we recommend you include the container image as a variable
-in the experiment.yaml so it can be pulled before the experiment is run. E.g., this experiment:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><code><span class="nt">matrix</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">size</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">4</span><span class="p p-Indicator">]</span>
+<p>Another tip is how to get an interactive session to a pod:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-n<span class="w"> </span>flux-operator<span class="w"> </span>-it<span class="w"> </span>&lt;pod&gt;<span class="w"> </span>--<span class="w"> </span>bash
+</code></pre></div>
+</div>
+<p>Yes, it’s very docker-like! I’ve found I’m much faster having these tricks than before.</p>
+<h2 id="start-with-logs">1. Start with logs<a class="headerlink" href="#start-with-logs" title="Permalink to this heading">¶</a></h2>
+<p>You can usually first look to pod logs to see what pods are there, and their various states:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>-n<span class="w"> </span>flux-operator<span class="w"> </span>pods
+</code></pre></div>
+</div>
+<p>Remember that if you use <code class="docutils literal notranslate"><span class="pre">flux-cloud</span></code> apply without debug, you won’t see output after it finds the broker pod,
+but you’ll see it being printed to logs in your <code class="docutils literal notranslate"><span class="pre">data</span></code> folder. If you want to see output, either add <code class="docutils literal notranslate"><span class="pre">--debug</span></code>
+after <code class="docutils literal notranslate"><span class="pre">flux-cloud</span></code> or look at the log and add <code class="docutils literal notranslate"><span class="pre">-f</span></code> to keep it hanging:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code><span class="c1"># See instant of a log</span>
+$<span class="w"> </span>kubectl<span class="w"> </span>logs<span class="w"> </span>-n<span class="w"> </span>flux-operator<span class="w"> </span>osu-benchmarks-0-vxnfq
 
-<span class="c1"># Flux Mini Cluster experiment attributes</span>
-<span class="nt">minicluster</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lammps</span>
-<span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">flux-operator</span>
-<span class="w">  </span><span class="nt">size</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">2</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">4</span><span class="p p-Indicator">]</span>
-
-<span class="c1"># Each job can have a command and working directory</span>
-<span class="nt">jobs</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">lmp</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lmp -v x 2 -v y 2 -v z 2 -in in.reaxc.hns -nocite</span>
-<span class="w">    </span><span class="nt">repeats</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
-<span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ghcr.io/rse-ops/lammps:flux-sched-focal-v0.24.0</span>
+<span class="c1"># Stream to the terminal until the container is done</span>
+$<span class="w"> </span>kubectl<span class="w"> </span>logs<span class="w"> </span>-n<span class="w"> </span>flux-operator<span class="w"> </span>osu-benchmarks-0-vxnfq<span class="w"> </span>-f
 </code></pre></div>
 </div>
-<p>And this config file:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><code><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">flux-framework.org/v1alpha1</span>
-<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MiniCluster</span>
-<span class="nt">metadata</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="w"> </span><span class="nv">minicluster.name</span><span class="w"> </span><span class="p p-Indicator">}}</span>
-<span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="w"> </span><span class="nv">minicluster.namespace</span><span class="w"> </span><span class="p p-Indicator">}}</span>
-<span class="nt">spec</span><span class="p">:</span>
-<span class="w">  </span><span class="c1"># Number of pods to create for MiniCluster</span>
-<span class="w">  </span><span class="nt">size</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="w"> </span><span class="nv">minicluster.size</span><span class="w"> </span><span class="p p-Indicator">}}</span>
-
-<span class="w">  </span><span class="c1"># Disable verbose output</span>
-<span class="w">  </span><span class="nt">logging</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">quiet</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
-
-<span class="w">  </span><span class="c1"># This is a list because a pod can support multiple containers</span>
-<span class="w">  </span><span class="nt">containers</span><span class="p">:</span>
-<span class="w">    </span><span class="c1"># The container URI to pull (currently needs to be public)</span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="w"> </span><span class="nv">job.image</span><span class="w"> </span><span class="p p-Indicator">}}</span>
-
-<span class="w">      </span><span class="c1"># You can set the working directory if your container WORKDIR is not correct.</span>
-<span class="w">      </span><span class="nt">workingDir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/home/flux/examples/reaxff/HNS</span>
-<span class="w">      </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="w"> </span><span class="nv">job.command</span><span class="w"> </span><span class="p p-Indicator">}}</span>
+<p>Here is looking at output for the certificate generator pod:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>kubectl<span class="w"> </span>logs<span class="w"> </span>-n<span class="w"> </span>flux-operator<span class="w"> </span>osu-benchmarks-cert-generator
 </code></pre></div>
 </div>
-<h3 id="submit">Submit<a class="headerlink" href="#submit" title="Permalink to this heading">¶</a></h3>
-<blockquote>
-<div><p>Ideal for one or more commands across the same container(s) and MiniCluster size.</p>
-</div></blockquote>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>flux-cloud<span class="w"> </span>up<span class="w"> </span>--cloud<span class="w"> </span>minikube
-$<span class="w"> </span>flux-cloud<span class="w"> </span>submit<span class="w"> </span>--cloud<span class="w"> </span>minikube
-$<span class="w"> </span>flux-cloud<span class="w"> </span>down<span class="w"> </span>--cloud<span class="w"> </span>minikube
+<p>For <code class="docutils literal notranslate"><span class="pre">flux-cloud</span> <span class="pre">apply</span></code> if you want to see output consistently, it’s suggested to add <code class="docutils literal notranslate"><span class="pre">--debug</span></code>,
+as the miniclusters are going to be created / deleted and you’d need to grab the pod logs
+multiple times!</p>
+<h3 id="what-should-i-expect-to-see">What should I expect to see?<a class="headerlink" href="#what-should-i-expect-to-see" title="Permalink to this heading">¶</a></h3>
+<p>The certificate generator pod runs first. It’s output should <em>only</em> be
+the certificate:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><code><span class="gp">#   </span>****<span class="w">  </span>Generated<span class="w"> </span>on<span class="w"> </span><span class="m">2023</span>-03-04<span class="w"> </span><span class="m">04</span>:24:46<span class="w"> </span>by<span class="w"> </span>CZMQ<span class="w">  </span>****
+<span class="gp">#   </span>ZeroMQ<span class="w"> </span>CURVE<span class="w"> </span>**Secret**<span class="w"> </span>Certificate
+<span class="gp">#   </span>DO<span class="w"> </span>NOT<span class="w"> </span>PROVIDE<span class="w"> </span>THIS<span class="w"> </span>FILE<span class="w"> </span>TO<span class="w"> </span>OTHER<span class="w"> </span>USERS<span class="w"> </span>nor<span class="w"> </span>change<span class="w"> </span>its<span class="w"> </span>permissions.
+
+<span class="go">metadata</span>
+<span class="go">    name = &quot;osu-benchmarks-cert-generator&quot;</span>
+<span class="go">    time = &quot;2023-03-04T04:24:46&quot;</span>
+<span class="go">    userid = &quot;0&quot;</span>
+<span class="go">    hostname = &quot;osu-benchmarks-cert-generator&quot;</span>
+<span class="go">curve</span>
+<span class="go">    public-key = &quot;l12&amp;OlN-DwF*6rhx##Y#ZQ^9w1zON039Vxh2&amp;+8r&quot;</span>
+<span class="go">    secret-key = &quot;o^(dM0R96q-d=2Jk-tEjgh=syRjW?q6%Kq{Q8Y4H&quot;</span>
 </code></pre></div>
 </div>
-<p>The submit will always check if the MiniCluster is already created, and if not, create it
-to submit jobs. For submit (and the equivalent to bring it up and down with batch)
-your commands aren’t provided in the CRD,
-but rather to the Flux Restful API. Submit / batch will also generate one CRD
-per MiniCluster size, but use the same MiniCluster across jobs. This is different
-from apply, which generates one CRD per job to run.</p>
+<p>If you see any error message about “invalid curve cert” this means that something was incorrectly
+generated. As an example, you should use <code class="docutils literal notranslate"><span class="pre">preCommand</span></code> for any logic that is shared between
+the certificate generator and worker/broker pods (e.g., sourcing an environment for Flux) and commands-&gt;pre
+for anything else that is just for the worker/broker pods (printing to debug, etc.)</p>
+<p>For the broker pod, you should expect to see debugging output (if logging-&gt;debug is true) and then the
+Flux Broker starting. The quorum should be reported to be full. E.g.,</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><code><span class="go">🌀 flux start -o --config /etc/flux/config -Scron.directory=/etc/flux/system/cron.d   -Stbon.fanout=256   -Srundir=/run/flux   -Sstatedir=/var/lib/flux   -Slocal-uri=local:///run/flux/local   -Slog-stderr-level=6    -Slog-stderr-mode=local</span>
+<span class="go">broker.info[1]: start: none-&gt;join 13.3684ms</span>
+<span class="go">broker.info[1]: parent-ready: join-&gt;init 1.14525s</span>
+<span class="go">broker.info[1]: configuration updated</span>
+<span class="go">broker.info[1]: rc1.0: running /etc/flux/rc1.d/01-sched-fluxion</span>
+<span class="go">broker.info[1]: rc1.0: running /etc/flux/rc1.d/02-cron</span>
+<span class="go">broker.info[1]: rc1.0: /etc/flux/rc1 Exited (rc=0) 0.2s</span>
+<span class="go">broker.info[1]: rc1-success: init-&gt;quorum 0.234173s</span>
+<span class="go">broker.info[1]: quorum-full: quorum-&gt;run 0.204937s</span>
+</code></pre></div>
+</div>
+<p>If you see any error messages from the broker, this should be looked into.
+Warnings can sometimes be OK. Ask if you aren’t sure.</p>
+<h2 id="use-describe">2. Use describe<a class="headerlink" href="#use-describe" title="Permalink to this heading">¶</a></h2>
+<p>You can describe any object in Kubernetes space to debug. Describe is especially important when you are debugging
+storage and want to figure out why something isn’t mounting. Typically you might start by looking at pods in all
+namespaces:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>pods<span class="w"> </span>--all-namespaces<span class="w"> </span>-o<span class="w"> </span>wide
+</code></pre></div>
+</div>
+<p>The wide format is useful because it will show you the node each pod is assigned to, which can be useful
+for debugging resource limits and requests. You then might want to describe a particular pod,
+maybe to look at annotations or volume mounts:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>kubectl<span class="w"> </span>describe<span class="w"> </span>pod<span class="w"> </span>-n<span class="w"> </span>flux-operator<span class="w"> </span>osu-benchmarks-1-tj6bt
+</code></pre></div>
+</div>
+<p>You can get json output with a get for the pod (or object):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>pod<span class="w"> </span>-n<span class="w"> </span>flux-operator<span class="w"> </span>osu-benchmarks-1-tj6bt<span class="w"> </span>-o<span class="w"> </span>json
+</code></pre></div>
+</div>
+<p>And pipe that into <code class="docutils literal notranslate"><span class="pre">jq</span></code> to look for specific attributes! So let’s say you see that a volume
+failed for your pod. You likely want to next check your persistent volumes “pv” and claims “pvc”:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>kubectl<span class="w"> </span>describe<span class="w"> </span>-n<span class="w"> </span>flux-operator<span class="w"> </span>pv
+$<span class="w"> </span>kubectl<span class="w"> </span>describe<span class="w"> </span>-n<span class="w"> </span>flux-operator<span class="w"> </span>pvc
+</code></pre></div>
+</div>
+<p>For volumes, if you are using a container storage interface (CSI) you likely are using a daemon set that
+deploys pods. Try looking at the logs for the pods, and/or the daemonset for issues:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>kubectl<span class="w"> </span>describe<span class="w"> </span>daemonset<span class="w"> </span>--all-namespaces
+</code></pre></div>
+</div>
+<p>Finally, services (svc) can be useful if you suspect a permission or credential is wonky.</p>
+<h2 id="advanced">3. Advanced<a class="headerlink" href="#advanced" title="Permalink to this heading">¶</a></h2>
+<p>Often when I’m debugging something complex I try to create the object I’m interested in so it is in a
+continuously running state. As an example, to test a pod for a daemonset, I will get the raw YAML
+for the daemonset and change the entrypoint to <code class="docutils literal notranslate"><span class="pre">sleep</span> <span class="pre">infinity</span></code>. I can then shell in and manually run
+commands to see their output.</p>
 
 
   <hr>
@@ -779,7 +777,7 @@ from apply, which generates one CRD per job to run.</p>
   <small>
     
       Last update:
-      Feb 22, 2023
+      Mar 06, 2023
     
   </small>
 </div>
@@ -810,7 +808,7 @@ from apply, which generates one CRD per job to run.</p>
     <nav class="md-footer__inner md-grid" aria-label="Footer" >
       
         
-        <a href="aws.html" class="md-footer__link md-footer__link--prev" aria-label="Previous: AWS" rel="prev">
+        <a href="experiments.html" class="md-footer__link md-footer__link--prev" aria-label="Previous: Experiments" rel="prev">
           <div class="md-footer__button md-icon">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
           </div>
@@ -819,20 +817,20 @@ from apply, which generates one CRD per job to run.</p>
               <span class="md-footer__direction">
                 Previous
               </span>
-              AWS
+              Experiments
             </div>
           </div>
         </a>
       
       
         
-        <a href="../contributing.html" class="md-footer__link md-footer__link--next" aria-label="Next: Contributing" rel="next">
+        <a href="settings.html" class="md-footer__link md-footer__link--next" aria-label="Next: Settings" rel="next">
           <div class="md-footer__title">
             <div class="md-ellipsis">
               <span class="md-footer__direction">
                 Next
               </span>
-              Contributing
+              Settings
             </div>
           </div>
           <div class="md-footer__button md-icon">
@@ -856,7 +854,7 @@ from apply, which generates one CRD per job to run.</p>
   
     Created using
     <a href="https://www.sphinx-doc.org/" target="_blank" rel="noopener">Sphinx</a>
-    5.3.0.
+    6.1.3.
      and
     <a href="https://github.com/jbms/sphinx-immaterial/" target="_blank" rel="noopener">Sphinx-Immaterial</a>
   

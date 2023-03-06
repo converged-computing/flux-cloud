@@ -522,32 +522,25 @@
     <span title="/getting_started/experiments.md#jobs (reference label)" class="md-ellipsis">Jobs</span>
   </a>
   
+    <nav class="md-nav" aria-label="Jobs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#flux-options" class="md-nav__link">
+    <span title="/getting_started/experiments.md#flux-options (reference label)" class="md-ellipsis">Flux Options</span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#yaml-tricks" class="md-nav__link">
+    <span title="/getting_started/experiments.md#yaml-tricks (reference label)" class="md-ellipsis">Yaml Tricks</span>
+  </a>
+  
 </li>
         
       </ul>
     </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#custom-resource-definition" class="md-nav__link">
-    <span title="/getting_started/experiments.md#custom-resource-definition (reference label)" class="md-ellipsis">Custom Resource Definition</span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Custom Resource Definition">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#use-your-own" class="md-nav__link">
-    <span title="/getting_started/experiments.md#use-your-own (reference label)" class="md-ellipsis">Use Your Own</span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#use-the-default" class="md-nav__link">
-    <span title="/getting_started/experiments.md#use-the-default (reference label)" class="md-ellipsis">Use The Default</span>
-  </a>
   
 </li>
         
@@ -572,53 +565,23 @@
   
   
     <li class="md-nav__item">
+      <a href="debugging.html" class="md-nav__link">
+        <span title="/getting_started/debugging.md (reference label)" class="md-ellipsis">Debugging</span>
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="settings.html" class="md-nav__link">
         <span title="/getting_started/settings.md (reference label)" class="md-ellipsis">Settings</span>
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="google.html" class="md-nav__link">
-        <span title="/getting_started/google.md (reference label)" class="md-ellipsis">Google Cloud</span>
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="aws.html" class="md-nav__link">
-        <span title="/getting_started/aws.md (reference label)" class="md-ellipsis">AWS</span>
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="minikube.html" class="md-nav__link">
-        <span title="/getting_started/minikube.md (reference label)" class="md-ellipsis">Mini<wbr>Kube</span>
       </a>
     </li>
   
@@ -629,6 +592,21 @@
       </nav>
     </li>
   
+  
+
+            
+          
+            
+              
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorials/index.html" class="md-nav__link">
+        <span title="/tutorials/index.md (reference label)" class="md-ellipsis">Tutorials</span>
+      </a>
+    </li>
   
 
             
@@ -725,14 +703,21 @@
 
 <h1 id="experiments">Experiments<a class="headerlink" href="#experiments" title="Permalink to this heading">¶</a></h1>
 <p>Welcome to the Flux Cloud experiments user guide! If you come here, we are assuming you want
-to run jobs with the Flux Operator on GKE, and that you have <a class="reference internal" href="install.html"><span class="doc std std-doc">installed</span></a> flux-cloud.
+to run jobs with the Flux Operator on GKE, and that you have <a class="reference internal" href="install.html"><span class="std std-doc">installed</span></a> flux-cloud.
 Note this project is early in development so this could change or bugs could be introduced.
-Let’s get started with talking about experiments. Your experiments will typically be defined by two files:</p>
+Let’s get started with talking about experiments. As of version 0.2.0, your experiments will be defined by one file:</p>
 <ul class="simple">
-<li><p>experiments.yaml: a yaml file that describes sizes, machines, and jobs to run</p></li>
-<li><p>minicluster-template.yaml: a completely or partially filled template custom resource definition.</p></li>
+<li><p>experiments.yaml: a yaml file that describes sizes, machines, miniclusters, and jobs to run</p></li>
 </ul>
-<p>We will walk through example experiment files here, along with a full set of fields you can use.</p>
+<p>We will walk through example experiment files here, along with a full set of fields you can use.
+Note that to get an example experiments.yaml template for any cloud, you can always do:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>flux-cloud<span class="w"> </span>experiment<span class="w"> </span>init<span class="w"> </span>--cloud<span class="w"> </span>minikube
+$<span class="w"> </span>flux-cloud<span class="w"> </span>experiment<span class="w"> </span>init<span class="w"> </span>--cloud<span class="w"> </span>aws
+$<span class="w"> </span>flux-cloud<span class="w"> </span>experiment<span class="w"> </span>init<span class="w"> </span>--cloud<span class="w"> </span>google
+</code></pre></div>
+</div>
+<p>The documentation here outlines the sections in details, however the above is the best
+means to get an entire, holistic file.</p>
 <h2 id="experiment-definition">Experiment Definition<a class="headerlink" href="#experiment-definition" title="Permalink to this heading">¶</a></h2>
 <blockquote>
 <div><p>experiments.yaml</p>
@@ -855,75 +840,82 @@ and repeats (optional).</p>
 <span class="w">  </span><span class="nt">osu_get_latency</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;./osu_get_latency&#39;</span>
 <span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ghcr.io/awesome/science:latest</span>
-<span class="w">    </span><span class="nt">workdir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/science</span>
+<span class="w">    </span><span class="nt">working_dir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/science</span>
 <span class="w">    </span><span class="nt">repeats</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
 </code></pre></div>
 </div>
 <p>For repeats, we add another level to the output directory, and represent the result data as
-subdirectories of the machine and size from 1..N. Note also that likely in the future we
-can provide a default template and require all these variables
-defined. For now we require you to provide the template.</p>
-<h2 id="custom-resource-definition">Custom Resource Definition<a class="headerlink" href="#custom-resource-definition" title="Permalink to this heading">¶</a></h2>
-<blockquote>
-<div><p>minicluster-template.yaml</p>
-</div></blockquote>
-<p>The custom resource definition template “CRD” is currently suggested so you can customize exactly to your liking,
-but it’s not required. It is used by flux-cloud to populate your job metadata and then submit one or more jobs to your Kubernetes cluster.</p>
-<h3 id="use-your-own">Use Your Own<a class="headerlink" href="#use-your-own" title="Permalink to this heading">¶</a></h3>
-<p>Here is an example that uses a shared working directory (so it’s hard coded) and a variable
-for the command:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><code><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">flux-framework.org/v1alpha1</span>
-<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MiniCluster</span>
-<span class="nt">metadata</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="w"> </span><span class="nv">minicluster.name</span><span class="w"> </span><span class="p p-Indicator">}}</span>
-<span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="w"> </span><span class="nv">minicluster.namespace</span><span class="w"> </span><span class="p p-Indicator">}}</span>
-<span class="nt">spec</span><span class="p">:</span>
-<span class="w">  </span><span class="c1"># Number of pods to create for MiniCluster</span>
-<span class="w">  </span><span class="nt">size</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="w"> </span><span class="nv">minicluster.size</span><span class="w"> </span><span class="p p-Indicator">}}</span>
+subdirectories of the machine and size from 1..N.</p>
+<h4 id="flux-options">Flux Options<a class="headerlink" href="#flux-options" title="Permalink to this heading">¶</a></h4>
+<p>How do job parameters map to Flux, in the case of using <code class="docutils literal notranslate"><span class="pre">flux-cloud</span> <span class="pre">submit</span></code>? Good question! Here is the mapping:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><code><span class="nt">jobs</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">example-job</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;./osu_get_latency&#39;</span>
+<span class="w">    </span><span class="nt">flux_option_flags</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;-ompi=openmpi@5&quot;</span>
+<span class="w">    </span><span class="nt">working_dir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/one-sided</span><span class="w">  </span><span class="c1"># workdir</span>
+<span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ghcr.io/rse-ops/osu-microbench:test</span>
 
-<span class="w">  </span><span class="c1"># Disable verbose output</span>
-<span class="w">  </span><span class="nt">logging</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">quiet</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
-
-<span class="w">  </span><span class="c1"># This is a list because a pod can support multiple containers</span>
-<span class="w">  </span><span class="nt">containers</span><span class="p">:</span>
-<span class="w">    </span><span class="c1"># The container URI to pull (currently needs to be public)</span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ghcr.io/rse-ops/lammps:flux-sched-focal-v0.24.0</span>
-
-<span class="w">      </span><span class="c1"># You can set the working directory if your container WORKDIR is not correct.</span>
-<span class="w">      </span><span class="nt">workingDir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/home/flux/examples/reaxff/HNS</span>
-<span class="w">      </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="w"> </span><span class="nv">job.command</span><span class="w"> </span><span class="p p-Indicator">}}</span>
+<span class="w">    </span><span class="c1"># osu benchmarks requires exactly 2 processes</span>
+<span class="w">    </span><span class="nt">tasks</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span><span class="w">    </span><span class="c1"># num_tasks</span>
+<span class="w">    </span><span class="nt">cores</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w">    </span><span class="c1"># cores_per_task</span>
+<span class="w">    </span><span class="nt">gpus</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span><span class="w">     </span><span class="c1"># gpus_per_task</span>
+<span class="w">    </span><span class="nt">nodes</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w">    </span><span class="c1"># num_nodes</span>
 </code></pre></div>
 </div>
-<h3 id="use-the-default">Use The Default<a class="headerlink" href="#use-the-default" title="Permalink to this heading">¶</a></h3>
-<p>To use the default, you want to make sure that you provide all variables that are required.
-The following are required (and have defaults or are otherwise generated by flux cloud
-so you could leave them out of your experiments.yaml):</p>
-<ul class="simple">
-<li><p>minicluster.name</p></li>
-<li><p>minicluster.namespace</p></li>
-<li><p>minicluster.local_deploy (defaults to false)</p></li>
-<li><p>minicluster.verbose (default to false to run in test mode)</p></li>
-</ul>
-<p>It’s recommended to set your listing of sizes for miniclusters:</p>
-<ul class="simple">
-<li><p>minicluster.size</p></li>
-</ul>
-<p>The following are specific to the job and required:</p>
-<ul class="simple">
-<li><p>job.image</p></li>
-<li><p>job.command</p></li>
-</ul>
-<p>The following are specific to the job but not required:</p>
-<ul class="simple">
-<li><p>job.workdir</p></li>
-<li><p>job.tasks (recommended for better control of flux, as this would default to 1)</p></li>
-<li><p>job.flux_option_flags (e.g., “-ompi=openmpi&#64;5”)</p></li>
-<li><p>job.cores (defaults to 1 if not set, likely not ideal for your experiment)</p></li>
-<li><p>job.limits (key value pairs)</p></li>
-<li><p>job.requests (key value pairs)</p></li>
-<li><p>job.pre_command: the job pre-command (usually multiple lines) but not required.</p></li>
-</ul>
+<h4 id="yaml-tricks">Yaml Tricks<a class="headerlink" href="#yaml-tricks" title="Permalink to this heading">¶</a></h4>
+<p>For your jobs, you likely will want to re-use parameters. There is a trick with YAML
+to define a named section, and then re-use it. Here is an example running the OSU
+benchmarks.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><code><span class="c1"># matrix of experiments to run - machine types and sizes are required</span>
+<span class="c1"># This can obviously be expanded to more sizes or machines,</span>
+<span class="nt">matrix</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">size</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">2</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">machine</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;n1-standard-1&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;n1-standard-2&quot;</span><span class="p p-Indicator">]</span>
+
+<span class="c1"># An example of shared container options!</span>
+<span class="nt">x-container-options</span><span class="p">:</span><span class="w"> </span><span class="nl">&amp;options</span>
+<span class="w">  </span><span class="nt">fluxOptionFlags</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;-ompi=openmpi@5&quot;</span>
+<span class="w">  </span><span class="nt">working_dir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/opt/osu-benchmark/build.openmpi/libexec/osu-micro-benchmarks/mpi/one-sided</span>
+<span class="w">  </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ghcr.io/rse-ops/osu-microbench:app-latest</span>
+<span class="w">  </span><span class="c1"># This MUST be run for the certificate generator and workers/broker</span>
+<span class="w">  </span><span class="nt">pre_command</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">source /etc/profile.d/z10_spack_environment.sh</span>
+
+<span class="c1"># Flux Mini Cluster experiment attributes</span>
+<span class="nt">minicluster</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">osu-benchmarks</span>
+<span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">flux-operator</span>
+
+<span class="c1"># Each job can have a command and working directory</span>
+<span class="nt">jobs</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">osu_get_latency</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;./osu_get_latency&#39;</span>
+<span class="w">    </span><span class="nt">&lt;&lt;</span><span class="p">:</span><span class="w"> </span><span class="nv">*options</span>
+<span class="w">  </span><span class="nt">osu_acc_latency</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;./osu_acc_latency&#39;</span>
+<span class="w">    </span><span class="nt">&lt;&lt;</span><span class="p">:</span><span class="w"> </span><span class="nv">*options</span>
+<span class="w">  </span><span class="nt">osu_fop_latency</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;./osu_fop_latency&#39;</span>
+<span class="w">    </span><span class="nt">&lt;&lt;</span><span class="p">:</span><span class="w"> </span><span class="nv">*options</span>
+<span class="w">  </span><span class="nt">osu_get_bw</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;./osu_get_bw&#39;</span>
+<span class="w">    </span><span class="nt">&lt;&lt;</span><span class="p">:</span><span class="w"> </span><span class="nv">*options</span>
+<span class="w">  </span><span class="nt">osu_put_bibw</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;./osu_put_bibw&#39;</span>
+<span class="w">    </span><span class="nt">&lt;&lt;</span><span class="p">:</span><span class="w"> </span><span class="nv">*options</span>
+<span class="w">  </span><span class="nt">osu_put_latency</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;./osu_put_latency&#39;</span>
+<span class="w">    </span><span class="nt">&lt;&lt;</span><span class="p">:</span><span class="w"> </span><span class="nv">*options</span>
+<span class="w">  </span><span class="nt">osu_cas_latency</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;./osu_cas_latency&#39;</span>
+<span class="w">    </span><span class="nt">&lt;&lt;</span><span class="p">:</span><span class="w"> </span><span class="nv">*options</span>
+<span class="w">  </span><span class="nt">osu_get_acc_latency</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;./osu_get_acc_latency&#39;</span>
+<span class="w">    </span><span class="nt">&lt;&lt;</span><span class="p">:</span><span class="w"> </span><span class="nv">*options</span>
+<span class="w">  </span><span class="nt">osu_put_bw</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;./osu_put_bw&#39;</span>
+<span class="w">    </span><span class="nt">&lt;&lt;</span><span class="p">:</span><span class="w"> </span><span class="nv">*options</span>
+</code></pre></div>
+</div>
 
 
   <hr>
@@ -931,7 +923,7 @@ so you could leave them out of your experiments.yaml):</p>
   <small>
     
       Last update:
-      Feb 22, 2023
+      Mar 06, 2023
     
   </small>
 </div>
@@ -978,13 +970,13 @@ so you could leave them out of your experiments.yaml):</p>
       
       
         
-        <a href="settings.html" class="md-footer__link md-footer__link--next" aria-label="Next: Settings" rel="next">
+        <a href="debugging.html" class="md-footer__link md-footer__link--next" aria-label="Next: Debugging" rel="next">
           <div class="md-footer__title">
             <div class="md-ellipsis">
               <span class="md-footer__direction">
                 Next
               </span>
-              Settings
+              Debugging
             </div>
           </div>
           <div class="md-footer__button md-icon">
@@ -1008,7 +1000,7 @@ so you could leave them out of your experiments.yaml):</p>
   
     Created using
     <a href="https://www.sphinx-doc.org/" target="_blank" rel="noopener">Sphinx</a>
-    5.3.0.
+    6.1.3.
      and
     <a href="https://github.com/jbms/sphinx-immaterial/" target="_blank" rel="noopener">Sphinx-Immaterial</a>
   
