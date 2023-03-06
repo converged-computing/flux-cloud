@@ -61,7 +61,9 @@ class APIClient:
         self.secret_key = minicluster["flux_restful"]["secret_key"]
         return minicluster
 
-    def _create_minicluster(self, operator, minicluster, experiment, job):
+    def _create_minicluster(
+        self, operator, minicluster, experiment, job, interactive=True
+    ):
         """
         Shared function to take an operator handle and create the minicluster.
 
@@ -82,7 +84,7 @@ class APIClient:
         except Exception as e:
             # Give the user the option to delete and recreate or just exit
             logger.error(f"There was an issue creating the MiniCluster: {e}")
-            if not utils.confirm_action(
+            if interactive and not utils.confirm_action(
                 "Would you like to submit jobs to the current cluster? You will need to have provided the same username as password."
             ):
                 if utils.confirm_action(
@@ -91,12 +93,14 @@ class APIClient:
                     logger.info("Cleaning up MiniCluster...")
                     operator.delete_minicluster(name=name, namespace=namespace)
                     return self._create_minicluster(
-                        operator, minicluster, experiment, job
+                        operator, minicluster, experiment, job, interactive=interactive
                     )
                 else:
                     logger.exit(
                         f"Try: 'kubectl delete -n {namespace} minicluster {name}'"
                     )
+            elif not interactive:
+                logger.exit(f"Try: 'kubectl delete -n {namespace} minicluster {name}'")
             return
 
         # Wait for pods to be ready to include in minicluster up time
@@ -116,7 +120,15 @@ class APIClient:
         experiment.save_file(pods.to_str(), f"pods-size-{uid}.json")
         return result
 
-    def apply(self, experiment, minicluster, job=None, outfile=None, stdout=True):
+    def apply(
+        self,
+        experiment,
+        minicluster,
+        job=None,
+        outfile=None,
+        stdout=True,
+        interactive=True,
+    ):
         """
         Use the client to apply (1:1 job,minicluster) the jobs programatically.
         """
@@ -126,7 +138,9 @@ class APIClient:
         # Interact with the Flux Operator Python SDK
         operator = FluxOperator(namespace)
 
-        self._create_minicluster(operator, minicluster, experiment, job)
+        self._create_minicluster(
+            operator, minicluster, experiment, job, interactive=interactive
+        )
 
         # Get the broker pod (this would also wait for all pods to be ready)
         broker = operator.get_broker_pod()
@@ -150,7 +164,9 @@ class APIClient:
         results["times"][name] = end - start
         return results
 
-    def submit(self, setup, experiment, minicluster, job, poll_seconds=20):
+    def submit(
+        self, setup, experiment, minicluster, job, poll_seconds=20, interactive=True
+    ):
         """
         Use the client to submit the jobs programatically.
         """
@@ -162,7 +178,9 @@ class APIClient:
         # Interact with the Flux Operator Python SDK
         operator = FluxOperator(namespace)
 
-        self._create_minicluster(operator, minicluster, experiment, job)
+        self._create_minicluster(
+            operator, minicluster, experiment, job, interactive=interactive
+        )
 
         # Get the broker pod (this would also wait for all pods to be ready)
         broker = operator.get_broker_pod()
@@ -246,7 +264,9 @@ class APIClient:
         logger.info("All jobs are complete!")
 
         # This also waits for termination (and pods to be gone) and times it
-        if utils.confirm_action("Would you like to delete this mini cluster?"):
+        if not interactive or utils.confirm_action(
+            "Would you like to delete this mini cluster?"
+        ):
             logger.info("Cleaning up MiniCluster...")
             operator.delete_minicluster(name=name, namespace=namespace)
 

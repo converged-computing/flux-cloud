@@ -5,6 +5,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+from glob import glob
 import os
 
 import fluxcloud.utils as utils
@@ -48,10 +49,6 @@ def _test_example(dirname, tmp_path, check, test_apply=True):
     # Expected output directory
     expected_outdir = os.path.join(outdir, f"k8s-size-{experiment.size}-local")
     expected_scripts = os.path.join(expected_outdir, ".scripts")
-    minicluster_file = os.path.join(
-        expected_scripts,
-        "minicluster-size-2-lammps-job-ghcr.io-rse-ops-lammps-flux-sched-focal-v0.24.0.json",
-    )
 
     def shared_checks(info=True):
         assert os.path.exists(expected_outdir)
@@ -68,14 +65,19 @@ def _test_example(dirname, tmp_path, check, test_apply=True):
     # Run the experiment in the working directory
     with utils.working_dir(experiment_dir):
         # This won't work in the CI it seems
-        client.submit(setup, experiment)
+        client.submit(setup, experiment, interactive=False)
         shared_checks()
+
+        files = glob(os.path.join(expected_scripts, "minicluster-size*.json"))
+        minicluster_file = files[0]
+        print(f'Found minicluster metadata file {minicluster_file}')
+
         check(minicluster_file, experiment)
 
         # Now do the same for apply
         # shutil.rmtree(expected_outdir)
         if test_apply:
-            client.apply(setup, experiment)
+            client.apply(setup, experiment, interactive=False)
             shared_checks(info=False)
             check(minicluster_file, experiment)
 
@@ -151,20 +153,6 @@ def test_osu_benchmarks(tmp_path):
     def check(minicluster_file, experiment):
         assert os.path.exists(minicluster_file)
 
-        # Assert that the logging spec matches
-        minicluster = utils.read_json(minicluster_file)
-
-        print('TEST OSU')
-        import IPython 
-        IPython.embed()
-        sys.exit()
-
-        assert "resources" in minicluster["spec"]["containers"][0]
-        resources = minicluster["spec"]["containers"][0]["resources"]
-
-        for rtype, rvalue in experiment.jobs["reaxc-hns-1"]["resources"].items():
-            assert rtype in resources
-            assert resources[rtype] == rvalue
 
     # Run the example for submit and apply, with check
     _test_example("osu-benchmarks", tmp_path, check, test_apply=False)

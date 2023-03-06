@@ -94,7 +94,7 @@ class ExperimentClient:
         raise NotImplementedError
 
     @save_meta
-    def submit(self, setup, experiment):
+    def submit(self, setup, experiment, interactive=True):
         """
         Submit a Job via the Restful API
         """
@@ -129,7 +129,9 @@ class ExperimentClient:
                     self.pre_apply(experiment, minicluster["name"], job=job)
 
                 # Get back results with times (for minicluster assets) and jobs
-                results = cli.submit(setup, experiment, minicluster, job=job)
+                results = cli.submit(
+                    setup, experiment, minicluster, job=job, interactive=interactive
+                )
 
                 # Save times and output files for jobs
                 for job in results.get("jobs", []):
@@ -153,7 +155,7 @@ class ExperimentClient:
         self.info[jobid] = job
 
     @save_meta
-    def apply(self, setup, experiment):
+    def apply(self, setup, experiment, interactive=True):
         """
         Apply a CRD to run the experiment and wait for output.
 
@@ -209,6 +211,7 @@ class ExperimentClient:
                 outfile=logfile,
                 stdout=self.debug,
                 job=job,
+                interactive=interactive,
             )
             self.times[jobname] = results["times"]
 
