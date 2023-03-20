@@ -14,9 +14,9 @@ minicluster:
 jobs:
   lmp-size-2:
     command: lmp -v x 2 -v y 2 -v z 2 -in in.reaxc.hns -nocite
-    image: ghcr.io/rse-ops/lammps:flux-sched-focal-v0.24.0
+    image: ghcr.io/rse-ops/lammps:flux-sched-focal
     size: 2
   lmp-size-4:
     command: lmp -v x 2 -v y 2 -v z 2 -in in.reaxc.hns -nocite
-    image: ghcr.io/rse-ops/lammps:flux-sched-focal-v0.24.0
+    image: ghcr.io/rse-ops/lammps:flux-sched-focal
     size: 4

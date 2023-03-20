@@ -152,8 +152,6 @@ class APIClient:
 
         # This also waits for termination (and pods to be gone) and times it
         operator.delete()
-
-        # TODO likely need to separate minicluster up/down times.
         results = {"times": operator.times}
         results["times"][name] = end - start
         return results
