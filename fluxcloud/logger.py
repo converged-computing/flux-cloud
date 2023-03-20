@@ -203,3 +203,4 @@ def setup_logger(
     logger.set_level(logger.level)
     logger.quiet = quiet
     logger.printshellcmds = printshellcmds
+    os.environ["LOGGING_LEVEL"] = "DEBUG"

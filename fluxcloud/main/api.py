@@ -80,7 +80,7 @@ class APIClient:
 
         try:
             # The operator will time creation through pods being ready
-            result = operator.create(**minicluster, container=job)
+            operator.create(**minicluster, container=job)
         except Exception as e:
             # Give the user the option to delete and recreate or just exit
             logger.error(f"There was an issue creating the MiniCluster: {e}")
@@ -109,15 +109,14 @@ class APIClient:
         # Save MiniCluster metadata
         image_slug = re.sub("(:|/)", "-", image)
         uid = f"{size}-{name}-{image_slug}"
-        experiment.save_json(result, f"minicluster-size-{uid}.json")
+        experiment.save_json(operator.metadata, f"minicluster-size-{uid}.json")
 
         # This is a good point to also save nodes metadata
         nodes = operator.get_nodes()
         pods = operator.get_pods()
-
         experiment.save_file(nodes.to_str(), f"nodes-{uid}.json")
         experiment.save_file(pods.to_str(), f"pods-size-{uid}.json")
-        return result
+        return operator.metadata
 
     def apply(
         self,
