@@ -10,7 +10,7 @@ import time
 import uuid
 
 from flux_restful_client.main import get_client
-from fluxoperator.client import FluxOperator
+from fluxoperator.client import FluxMiniCluster
 
 import fluxcloud.utils as utils
 from fluxcloud.logger import logger
@@ -80,7 +80,7 @@ class APIClient:
 
         try:
             # The operator will time creation through pods being ready
-            result = operator.create_minicluster(**minicluster, container=job)
+            result = operator.create(**minicluster, container=job)
         except Exception as e:
             # Give the user the option to delete and recreate or just exit
             logger.error(f"There was an issue creating the MiniCluster: {e}")
@@ -91,7 +91,7 @@ class APIClient:
                     "Would you like to delete this mini cluster and re-create?"
                 ):
                     logger.info("Cleaning up MiniCluster...")
-                    operator.delete_minicluster(name=name, namespace=namespace)
+                    operator.delete()
                     return self._create_minicluster(
                         operator, minicluster, experiment, job, interactive=interactive
                     )
@@ -113,7 +113,6 @@ class APIClient:
 
         # This is a good point to also save nodes metadata
         nodes = operator.get_nodes()
-        operator.wait_pods(quiet=True)
         pods = operator.get_pods()
 
         experiment.save_file(nodes.to_str(), f"nodes-{uid}.json")
@@ -132,32 +131,28 @@ class APIClient:
         """
         Use the client to apply (1:1 job,minicluster) the jobs programatically.
         """
-        namespace = minicluster["namespace"]
         name = minicluster["name"]
 
         # Interact with the Flux Operator Python SDK
-        operator = FluxOperator(namespace)
+        operator = FluxMiniCluster()
 
         self._create_minicluster(
             operator, minicluster, experiment, job, interactive=interactive
         )
-
-        # Get the broker pod (this would also wait for all pods to be ready)
-        broker = operator.get_broker_pod()
 
         # Time from when broker pod (and all pods are ready)
         start = time.time()
 
         # Get the pod to stream output from directly
         if outfile is not None:
-            operator.stream_output(outfile, pod=broker, stdout=stdout)
+            operator.stream_output(outfile, stdout=stdout)
 
         # When output done streaming, job is done
         end = time.time()
         logger.info(f"Job {name} is complete! Cleaning up MiniCluster...")
 
         # This also waits for termination (and pods to be gone) and times it
-        operator.delete_minicluster(name=name, namespace=namespace)
+        operator.delete()
 
         # TODO likely need to separate minicluster up/down times.
         results = {"times": operator.times}
@@ -170,26 +165,21 @@ class APIClient:
         """
         Use the client to submit the jobs programatically.
         """
-        namespace = minicluster["namespace"]
         image = job["image"]
-        name = minicluster["name"]
         size = minicluster["size"]
 
         # Interact with the Flux Operator Python SDK
-        operator = FluxOperator(namespace)
+        operator = FluxMiniCluster()
 
         self._create_minicluster(
             operator, minicluster, experiment, job, interactive=interactive
         )
 
-        # Get the broker pod (this would also wait for all pods to be ready)
-        broker = operator.get_broker_pod()
-
         # Return results (and times) to calling client
         results = {}
 
         # Submit jobs via port forward - this waits until the server is ready
-        with operator.port_forward(broker) as forward_url:
+        with operator.port_forward() as forward_url:
             print(f"Port forward opened to {forward_url}")
 
             # See https://flux-framework.org/flux-restful-api/getting_started/api.html
@@ -268,7 +258,7 @@ class APIClient:
             "Would you like to delete this mini cluster?"
         ):
             logger.info("Cleaning up MiniCluster...")
-            operator.delete_minicluster(name=name, namespace=namespace)
+            operator.delete()
 
         # Get times recorded by FluxOperator Python SDK
         results["jobs"] = completed

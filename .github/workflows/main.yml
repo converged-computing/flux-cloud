@@ -35,6 +35,10 @@ jobs:
         conda create --quiet --name fc jinja2
         export PATH="/usr/share/miniconda/bin:$PATH"
         source activate fc
+        git clone -b test/merlin https://github.com/flux-framework/flux-operator /tmp/fo
+        cd /tmp/fo
+        pip install -e .
+        cd -
         pip install .[all]
 
     - name: Test Python
