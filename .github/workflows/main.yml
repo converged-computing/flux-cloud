@@ -38,6 +38,7 @@ jobs:
         git clone -b test/merlin https://github.com/flux-framework/flux-operator /tmp/fo
         cd /tmp/fo/sdk/python/v1alpha1
         pip install -e .
+        cd -
         pip install .[all]
 
     - name: Test Python
@@ -73,6 +74,7 @@ jobs:
         git clone -b test/merlin https://github.com/flux-framework/flux-operator /tmp/fo
         cd /tmp/fo/sdk/python/v1alpha1
         pip install -e .
+        cd -
         pip install .[all]
         pip install kubernetes
 
@@ -115,6 +117,7 @@ jobs:
         git clone -b test/merlin https://github.com/flux-framework/flux-operator /tmp/fo
         cd /tmp/fo/sdk/python/v1alpha1
         pip install -e .
+        cd -
         pip install .[all]
 
     - name: Start minikube
