@@ -36,9 +36,8 @@ jobs:
         export PATH="/usr/share/miniconda/bin:$PATH"
         source activate fc
         git clone -b test/merlin https://github.com/flux-framework/flux-operator /tmp/fo
-        cd /tmp/fo
+        cd /tmp/fo/sdk/python/v1alpha1
         pip install -e .
-        cd -
         pip install .[all]
 
     - name: Test Python
@@ -71,6 +70,9 @@ jobs:
         conda create --quiet --name fc jinja2
         export PATH="/usr/share/miniconda/bin:$PATH"
         source activate fc
+        git clone -b test/merlin https://github.com/flux-framework/flux-operator /tmp/fo
+        cd /tmp/fo/sdk/python/v1alpha1
+        pip install -e .
         pip install .[all]
         pip install kubernetes
 
@@ -110,6 +112,9 @@ jobs:
         conda create --quiet --name fc jinja2
         export PATH="/usr/share/miniconda/bin:$PATH"
         source activate fc
+        git clone -b test/merlin https://github.com/flux-framework/flux-operator /tmp/fo
+        cd /tmp/fo/sdk/python/v1alpha1
+        pip install -e .
         pip install .[all]
 
     - name: Start minikube
