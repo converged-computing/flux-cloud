@@ -4,6 +4,8 @@
 [![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 [![PyPI](https://img.shields.io/pypi/v/flux-cloud)](https://pypi.org/project/flux-cloud/)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8311879.svg)](https://doi.org/10.5281/zenodo.8311879)
+
 
 <a target="_blank" rel="noopener noreferrer" href="https://github.com/converged-computing/flux-cloud/blob/main/docs/images/logo-transparent.png">
     <img align="right" style="width: 250px; float: right; padding-left: 20px;" src="https://github.com/converged-computing/flux-cloud/raw/main/docs/images/logo-transparent.png" alt="fluxcloud Logo">
