@@ -33,10 +33,10 @@
         <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
       
     
-        <link rel="stylesheet" type="text/css" href="../_static/sphinx_immaterial_theme.74678bd4555640f0b.min.css" />
-        <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+        <link rel="stylesheet" type="text/css" href="../_static/sphinx_immaterial_theme.a60204c58f5e4ff66.min.css?v=f7c3c3dc" />
+        <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
         <link rel="stylesheet" type="text/css" href="../_static/css/rtd_sphinx_search.min.css" />
-        <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
+        <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=d68d0989" />
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -647,7 +647,7 @@
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4v-2m10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1 2.1 2.1Z"/></svg>
   </a>
 
-<h1 id="debugging">Debugging<a class="headerlink" href="#debugging" title="Permalink to this heading">¶</a></h1>
+<h1 id="debugging">Debugging<a class="headerlink" href="#debugging" title="Link to this heading">¶</a></h1>
 <blockquote>
 <div><p>Oh no, my MiniCluster jobs aren’t running!</p>
 </div></blockquote>
@@ -662,7 +662,7 @@ custom resource definition is called a <code class="docutils literal notranslate
 <span class="go">osu-benchmarks   57s</span>
 </code></pre></div>
 </div>
-<h2 id="kubectl-pro-tips">0. kubectl pro tips<a class="headerlink" href="#kubectl-pro-tips" title="Permalink to this heading">¶</a></h2>
+<h2 id="kubectl-pro-tips">0. kubectl pro tips<a class="headerlink" href="#kubectl-pro-tips" title="Link to this heading">¶</a></h2>
 <p>These tips come from the amazing <a class="reference external" href="https://github.com/cmisale">Claudia</a>!</p>
 <p>It’s fairly arduous to copy paste or type complete pod names, especially for indexed jobs where there is a random
 set of characters. You can enable kubectl to autocomplete by adding this to your bash profile (<code class="docutils literal notranslate"><span class="pre">~/.bashrc</span></code>):</p>
@@ -678,7 +678,7 @@ set of characters. You can enable kubectl to autocomplete by adding this to your
 </code></pre></div>
 </div>
 <p>Yes, it’s very docker-like! I’ve found I’m much faster having these tricks than before.</p>
-<h2 id="start-with-logs">1. Start with logs<a class="headerlink" href="#start-with-logs" title="Permalink to this heading">¶</a></h2>
+<h2 id="start-with-logs">1. Start with logs<a class="headerlink" href="#start-with-logs" title="Link to this heading">¶</a></h2>
 <p>You can usually first look to pod logs to see what pods are there, and their various states:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>-n<span class="w"> </span>flux-operator<span class="w"> </span>pods
 </code></pre></div>
@@ -700,7 +700,7 @@ $<span class="w"> </span>kubectl<span class="w"> </span>logs<span class="w"> </s
 <p>For <code class="docutils literal notranslate"><span class="pre">flux-cloud</span> <span class="pre">apply</span></code> if you want to see output consistently, it’s suggested to add <code class="docutils literal notranslate"><span class="pre">--debug</span></code>,
 as the miniclusters are going to be created / deleted and you’d need to grab the pod logs
 multiple times!</p>
-<h3 id="what-should-i-expect-to-see">What should I expect to see?<a class="headerlink" href="#what-should-i-expect-to-see" title="Permalink to this heading">¶</a></h3>
+<h3 id="what-should-i-expect-to-see">What should I expect to see?<a class="headerlink" href="#what-should-i-expect-to-see" title="Link to this heading">¶</a></h3>
 <p>The certificate generator pod runs first. It’s output should <em>only</em> be
 the certificate:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><code><span class="gp">#   </span>****<span class="w">  </span>Generated<span class="w"> </span>on<span class="w"> </span><span class="m">2023</span>-03-04<span class="w"> </span><span class="m">04</span>:24:46<span class="w"> </span>by<span class="w"> </span>CZMQ<span class="w">  </span>****
@@ -736,7 +736,7 @@ Flux Broker starting. The quorum should be reported to be full. E.g.,</p>
 </div>
 <p>If you see any error messages from the broker, this should be looked into.
 Warnings can sometimes be OK. Ask if you aren’t sure.</p>
-<h2 id="use-describe">2. Use describe<a class="headerlink" href="#use-describe" title="Permalink to this heading">¶</a></h2>
+<h2 id="use-describe">2. Use describe<a class="headerlink" href="#use-describe" title="Link to this heading">¶</a></h2>
 <p>You can describe any object in Kubernetes space to debug. Describe is especially important when you are debugging
 storage and want to figure out why something isn’t mounting. Typically you might start by looking at pods in all
 namespaces:</p>
@@ -765,7 +765,7 @@ deploys pods. Try looking at the logs for the pods, and/or the daemonset for iss
 </code></pre></div>
 </div>
 <p>Finally, services (svc) can be useful if you suspect a permission or credential is wonky.</p>
-<h2 id="advanced">3. Advanced<a class="headerlink" href="#advanced" title="Permalink to this heading">¶</a></h2>
+<h2 id="advanced">3. Advanced<a class="headerlink" href="#advanced" title="Link to this heading">¶</a></h2>
 <p>Often when I’m debugging something complex I try to create the object I’m interested in so it is in a
 continuously running state. As an example, to test a pod for a daemonset, I will get the raw YAML
 for the daemonset and change the entrypoint to <code class="docutils literal notranslate"><span class="pre">sleep</span> <span class="pre">infinity</span></code>. I can then shell in and manually run
@@ -777,7 +777,7 @@ commands to see their output.</p>
   <small>
     
       Last update:
-      Apr 15, 2023
+      Sep 02, 2023
     
   </small>
 </div>
@@ -854,7 +854,7 @@ commands to see their output.</p>
   
     Created using
     <a href="https://www.sphinx-doc.org/" target="_blank" rel="noopener">Sphinx</a>
-    6.1.3.
+    7.2.5.
      and
     <a href="https://github.com/jbms/sphinx-immaterial/" target="_blank" rel="noopener">Sphinx-Immaterial</a>
   
@@ -889,9 +889,9 @@ commands to see their output.</p>
     <script id="__config" type="application/json">{"base": "..", "features": ["navigation.expand", "navigation.tabs", "toc.integrate", "navigation.sections", "navigation.instant", "header.autohide", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "toc.follow", "toc.sticky", "content.tabs.link", "announce.dismiss"], "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
     
       
-        <script src="../_static/sphinx_immaterial_theme.cea6a0c1d5b0618cf.min.js"></script>
-        <script src="../_static/clipboard.min.js"></script>
-        <script src="../_static/copybutton.js"></script>
+        <script src="../_static/sphinx_immaterial_theme.1b5b7a2d5891aec19.min.js?v=14bafe8d"></script>
+        <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../_static/copybutton.js?v=f281be69"></script>
         <script src="../_static/js/rtd_search_config.js"></script>
         <script src="../_static/js/rtd_sphinx_search.min.js"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>

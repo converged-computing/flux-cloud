@@ -33,10 +33,10 @@
         <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
       
     
-        <link rel="stylesheet" type="text/css" href="../_static/sphinx_immaterial_theme.74678bd4555640f0b.min.css" />
-        <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+        <link rel="stylesheet" type="text/css" href="../_static/sphinx_immaterial_theme.a60204c58f5e4ff66.min.css?v=f7c3c3dc" />
+        <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
         <link rel="stylesheet" type="text/css" href="../_static/css/rtd_sphinx_search.min.css" />
-        <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
+        <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=d68d0989" />
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -602,7 +602,7 @@
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4v-2m10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1 2.1 2.1Z"/></svg>
   </a>
 
-<h1 id="aws">AWS<a class="headerlink" href="#aws" title="Permalink to this heading">¶</a></h1>
+<h1 id="aws">AWS<a class="headerlink" href="#aws" title="Link to this heading">¶</a></h1>
 <blockquote>
 <div><p>Running on Amazon Elastic Kubernetes Service EKS
 Flux Cloud (as of version 0.1.0) can run on MiniKube! There are two primary use cases for using flux-cloud:</p>
@@ -614,7 +614,7 @@ Flux Cloud (as of version 0.1.0) can run on MiniKube! There are two primary use 
 <p>For the latter (submit) we will bring up the minimum number of MiniClusters required (unique based on container image size)
 and launch all jobs across them, using Flux as a scheduler. As of version 0.2.0 both commands both use the fluxoperator Python
 SDK, so we only use bash scripts to bring up and down cloud-specific clusters.</p>
-<h2 id="pre-requisites">Pre-requisites<a class="headerlink" href="#pre-requisites" title="Permalink to this heading">¶</a></h2>
+<h2 id="pre-requisites">Pre-requisites<a class="headerlink" href="#pre-requisites" title="Link to this heading">¶</a></h2>
 <p>You should first <a class="reference external" href="https://github.com/weaveworks/eksctl">install eksctrl</a> and make sure you have access to an AWS cloud (e.g.,
 with credentials or similar in your environment). E.g.,:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">AWS_ACCESS_KEY_ID</span><span class="o">=</span>xxxxxxxxxxxxxxxxxxx
@@ -624,17 +624,17 @@ with credentials or similar in your environment). E.g.,:</p>
 </div>
 <p>The last session token may not be required depending on your setup.
 We assume you also have <a class="reference external" href="https://kubernetes.io/docs/tasks/tools/">kubectl</a>.</p>
-<h3 id="setup-ssh">Setup SSH<a class="headerlink" href="#setup-ssh" title="Permalink to this heading">¶</a></h3>
+<h3 id="setup-ssh">Setup SSH<a class="headerlink" href="#setup-ssh" title="Link to this heading">¶</a></h3>
 <p>You’ll need an ssh key for EKS. Here is how to generate it:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>ssh-keygen
 <span class="c1"># Ensure you enter the path to ~/.ssh/id_eks</span>
 </code></pre></div>
 </div>
 <p>This is used so you can ssh (connect) to your workers!</p>
-<h3 id="cloud">Cloud<a class="headerlink" href="#cloud" title="Permalink to this heading">¶</a></h3>
+<h3 id="cloud">Cloud<a class="headerlink" href="#cloud" title="Link to this heading">¶</a></h3>
 <p>Finally, ensure that aws is either your default cloud (the <code class="docutils literal notranslate"><span class="pre">default_cloud</span></code> in your settings.yml)
 or you specify it with <code class="docutils literal notranslate"><span class="pre">--cloud</span></code> when you do run.</p>
-<h2 id="run-experiments">Run Experiments<a class="headerlink" href="#run-experiments" title="Permalink to this heading">¶</a></h2>
+<h2 id="run-experiments">Run Experiments<a class="headerlink" href="#run-experiments" title="Link to this heading">¶</a></h2>
 <p><strong>IMPORTANT</strong> for any experiment when you choose an instance type, you absolutely
 need to choose a size that has <a class="reference external" href="https://github.com/aws/amazon-vpc-resource-controller-k8s/blob/master/pkg/aws/vpc/limits.go">IsTrunkingCompatible</a>
 true. E.g., <code class="docutils literal notranslate"><span class="pre">m5.large</span></code> has it set to true so it would work. Each experiment is defined by the matrix and variables in an <code class="docutils literal notranslate"><span class="pre">experiment.yaml</span></code>. It’s recommended you
@@ -642,7 +642,7 @@ start with a template populated for aws:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>flux-cloud<span class="w"> </span>experiment<span class="w"> </span>init<span class="w"> </span>--cloud<span class="w"> </span>aws
 </code></pre></div>
 </div>
-<p>And see the <a class="reference internal" href="#custom-variables"><span class="xref myst">custom variables</span></a> defined below to learn more about them,
+<p>And see the <a class="reference internal" href="#custom-variables"><span class="std std-ref">custom variables</span></a> defined below to learn more about them,
 or the <a class="reference external" href="https://github.com/converged-computing/flux-cloud/tree/main/examples">examples</a>
 directory for a few examples that we provide. We will walk through a generic one here to launch
 an experiment on a Kubernetes cluster. Note that before doing this step you should
@@ -670,7 +670,7 @@ $<span class="w"> </span>flux-cloud<span class="w"> </span>down<span class="w"> 
 </code></pre></div>
 </div>
 <p>Note that machines and size are required for the matrix.</p>
-<h2 id="custom-variables">Custom Variables<a class="headerlink" href="#custom-variables" title="Permalink to this heading">¶</a></h2>
+<h2 id="custom-variables">Custom Variables<a class="headerlink" href="#custom-variables" title="Link to this heading">¶</a></h2>
 <p>The following custom variables are supported in the “variables” section (key value pairs)
 for Amazon in an <code class="docutils literal notranslate"><span class="pre">experiments.yaml</span></code></p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><code><span class="nt">variables</span><span class="p">:</span>
@@ -703,7 +703,7 @@ above) it will be rendered as true. Don’t put False in there, but rather just 
   <small>
     
       Last update:
-      Apr 15, 2023
+      Sep 02, 2023
     
   </small>
 </div>
@@ -780,7 +780,7 @@ above) it will be rendered as true. Don’t put False in there, but rather just 
   
     Created using
     <a href="https://www.sphinx-doc.org/" target="_blank" rel="noopener">Sphinx</a>
-    6.1.3.
+    7.2.5.
      and
     <a href="https://github.com/jbms/sphinx-immaterial/" target="_blank" rel="noopener">Sphinx-Immaterial</a>
   
@@ -815,9 +815,9 @@ above) it will be rendered as true. Don’t put False in there, but rather just 
     <script id="__config" type="application/json">{"base": "..", "features": ["navigation.expand", "navigation.tabs", "toc.integrate", "navigation.sections", "navigation.instant", "header.autohide", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "toc.follow", "toc.sticky", "content.tabs.link", "announce.dismiss"], "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
     
       
-        <script src="../_static/sphinx_immaterial_theme.cea6a0c1d5b0618cf.min.js"></script>
-        <script src="../_static/clipboard.min.js"></script>
-        <script src="../_static/copybutton.js"></script>
+        <script src="../_static/sphinx_immaterial_theme.1b5b7a2d5891aec19.min.js?v=14bafe8d"></script>
+        <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../_static/copybutton.js?v=f281be69"></script>
         <script src="../_static/js/rtd_search_config.js"></script>
         <script src="../_static/js/rtd_sphinx_search.min.js"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>

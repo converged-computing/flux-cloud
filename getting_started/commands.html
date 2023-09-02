@@ -33,10 +33,10 @@
         <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
       
     
-        <link rel="stylesheet" type="text/css" href="../_static/sphinx_immaterial_theme.74678bd4555640f0b.min.css" />
-        <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+        <link rel="stylesheet" type="text/css" href="../_static/sphinx_immaterial_theme.a60204c58f5e4ff66.min.css?v=f7c3c3dc" />
+        <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
         <link rel="stylesheet" type="text/css" href="../_static/css/rtd_sphinx_search.min.css" />
-        <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
+        <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=d68d0989" />
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -734,7 +734,7 @@
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4v-2m10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1 2.1 2.1Z"/></svg>
   </a>
 
-<h1 id="commands">Commands<a class="headerlink" href="#commands" title="Permalink to this heading">¶</a></h1>
+<h1 id="commands">Commands<a class="headerlink" href="#commands" title="Link to this heading">¶</a></h1>
 <p>Welcome to the commands section! You can learn the details of each command below, or
 check out an <a class="reference internal" href="examples.html"><span class="std std-doc">example</span></a> or <a class="reference internal" href="../tutorials/index.html"><span class="std std-doc">cloud tutorial</span></a>.
 The general steps you want to take are:</p>
@@ -743,7 +743,7 @@ The general steps you want to take are:</p>
 <li><p>Decide if you want to use <code class="docutils literal notranslate"><span class="pre">submit</span></code> or <code class="docutils literal notranslate"><span class="pre">apply</span></code></p></li>
 <li><p>Create the cluster, run experiments, and clean up.</p></li>
 </ol>
-<p>If you don’t want to use an existing example, see <a class="reference internal" href="#init"><span class="xref myst">experiment init</span></a> for how to create an <code class="docutils literal notranslate"><span class="pre">experiments.yaml</span></code> from scratch.</p>
+<p>If you don’t want to use an existing example, see <a class="reference internal" href="#init"><span class="std std-ref">experiment init</span></a> for how to create an <code class="docutils literal notranslate"><span class="pre">experiments.yaml</span></code> from scratch.</p>
 <blockquote>
 <div><p>What’s the difference between submit and apply?</p>
 </div></blockquote>
@@ -763,8 +763,8 @@ only brought up once (and you don’t need to wait for pods to go up and down fo
 approach are getting logs at the end, unless you decide to interact with the Flux RESTFul API on your own
 earlier.</p>
 <p>Next, read about how to use these commands in detail.</p>
-<h2 id="experiment">experiment<a class="headerlink" href="#experiment" title="Permalink to this heading">¶</a></h2>
-<h3 id="init">init<a class="headerlink" href="#init" title="Permalink to this heading">¶</a></h3>
+<h2 id="experiment">experiment<a class="headerlink" href="#experiment" title="Link to this heading">¶</a></h2>
+<h3 id="init">init<a class="headerlink" href="#init" title="Link to this heading">¶</a></h3>
 <p>When you want to create a new experiment, do:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>mkdir<span class="w"> </span>-p<span class="w"> </span>my-experiment
 $<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>my-experiment
@@ -823,7 +823,7 @@ cloud of choice, and robustly commented.</p>
 </code></pre></div>
 </div>
 </details>
-<h2 id="list">list<a class="headerlink" href="#list" title="Permalink to this heading">¶</a></h2>
+<h2 id="list">list<a class="headerlink" href="#list" title="Link to this heading">¶</a></h2>
 <p>After creating an experiments.yaml file, you might want to know how your matrix maps out into kubernetes
 clusters. To see all identifiers generated, you can use list:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>flux-cloud<span class="w"> </span>list
@@ -855,7 +855,7 @@ with <code class="docutils literal notranslate"><span class="pre">-e</span></cod
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>flux-cloud<span class="w"> </span>apply<span class="w"> </span>-e<span class="w"> </span>k8s-size-8-m5.large<span class="w"> </span>--size<span class="w"> </span><span class="m">2</span>
 </code></pre></div>
 </div>
-<h3 id="up">up<a class="headerlink" href="#up" title="Permalink to this heading">¶</a></h3>
+<h3 id="up">up<a class="headerlink" href="#up" title="Link to this heading">¶</a></h3>
 <p>Here is how to bring up a cluster (with the operator installed). For this command,
 we will either select the first in the matrix (default):</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>flux-cloud<span class="w"> </span>up
@@ -875,14 +875,14 @@ we will either select the first in the matrix (default):</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>flux-cloud<span class="w"> </span>up<span class="w"> </span>-e<span class="w"> </span>n1-standard-1-2<span class="w"> </span>--force-cluster
 </code></pre></div>
 </div>
-<h2 id="ways-to-run-jobs">Ways to run jobs<a class="headerlink" href="#ways-to-run-jobs" title="Permalink to this heading">¶</a></h2>
+<h2 id="ways-to-run-jobs">Ways to run jobs<a class="headerlink" href="#ways-to-run-jobs" title="Link to this heading">¶</a></h2>
 <p>The following commands are provided by Flux Cloud. For running jobs, you can either do:</p>
 <ul class="simple">
 <li><p><strong>apply</strong>/<strong>run</strong>: A single/multi job submission intended for different containers to re-create pods each time.</p></li>
 <li><p><strong>batch</strong>/<strong>submit</strong>: A batch mode, where we submit / schedule many jobs on the fewest MiniClusters</p></li>
 </ul>
 <p>Both are described in the following sections.</p>
-<h3 id="apply-run">apply / run<a class="headerlink" href="#apply-run" title="Permalink to this heading">¶</a></h3>
+<h3 id="apply-run">apply / run<a class="headerlink" href="#apply-run" title="Link to this heading">¶</a></h3>
 <blockquote>
 <div><p>Ideal for running multiple jobs with different containers.</p>
 </div></blockquote>
@@ -890,7 +890,7 @@ we will either select the first in the matrix (default):</p>
 bringing up an entire set of pods, running a single command, and then bringing everything
 down. This is ideal for longing running experiments, but note that it does not take advantage
 of using Flux as a scheduler. Flux is basically running one job and going away.</p>
-<h4 id="apply">apply<a class="headerlink" href="#apply" title="Permalink to this heading">¶</a></h4>
+<h4 id="apply">apply<a class="headerlink" href="#apply" title="Link to this heading">¶</a></h4>
 <p>After “up” you can choose to run experiments (as you feel) with “apply.”</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>flux-cloud<span class="w"> </span>apply
 </code></pre></div>
@@ -914,7 +914,7 @@ ask you before cleaning up) you can do:</p>
 </code></pre></div>
 </div>
 <p>By default, apply via a “run” is non-interactive.</p>
-<h4 id="run">run<a class="headerlink" href="#run" title="Permalink to this heading">¶</a></h4>
+<h4 id="run">run<a class="headerlink" href="#run" title="Link to this heading">¶</a></h4>
 <p>The main command is a “run” that is going to, for each cluster:</p>
 <ol class="arabic simple">
 <li><p>Create the cluster</p></li>
@@ -965,7 +965,7 @@ $<span class="w"> </span>flux-cloud<span class="w"> </span>apply<span class="w">
 $<span class="w"> </span>flux-cloud<span class="w"> </span>down<span class="w"> </span>-e<span class="w"> </span>n1-standard-1-2
 </code></pre></div>
 </div>
-<h3 id="submit-batch">submit / batch<a class="headerlink" href="#submit-batch" title="Permalink to this heading">¶</a></h3>
+<h3 id="submit-batch">submit / batch<a class="headerlink" href="#submit-batch" title="Link to this heading">¶</a></h3>
 <blockquote>
 <div><p>Ideal for one or more commands and/or containers across persistent MiniClusters.</p>
 </div></blockquote>
@@ -973,7 +973,7 @@ $<span class="w"> </span>flux-cloud<span class="w"> </span>down<span class="w"> 
 as a scheduler! This means we get the unique set of images and MiniCluster sizes for
 your experiments, and then bring up each one, submitting the matching jobs to it.
 We submit all jobs at once, and then poll Flux until they are completed to get output.</p>
-<h4 id="submit">submit<a class="headerlink" href="#submit" title="Permalink to this heading">¶</a></h4>
+<h4 id="submit">submit<a class="headerlink" href="#submit" title="Link to this heading">¶</a></h4>
 <p>The entire flow might look like:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>flux-cloud<span class="w"> </span>up<span class="w"> </span>--cloud<span class="w"> </span>minikube
 $<span class="w"> </span>flux-cloud<span class="w"> </span>submit<span class="w"> </span>--cloud<span class="w"> </span>minikube
@@ -991,7 +991,7 @@ from apply, which generates one CRD per job to run. If you don’t want submit t
 </code></pre></div>
 </div>
 <p>By default, submit run with batch is non-interactive.</p>
-<h4 id="batch">batch<a class="headerlink" href="#batch" title="Permalink to this heading">¶</a></h4>
+<h4 id="batch">batch<a class="headerlink" href="#batch" title="Link to this heading">¶</a></h4>
 <p>This is the equivalent of “submit” but includes the up and down for the larger
 Kubernetes cluster.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>flux-cloud<span class="w"> </span>batch<span class="w"> </span>--cloud<span class="w"> </span>aws
@@ -1014,7 +1014,7 @@ $<span class="w"> </span>flux-cloud<span class="w"> </span>submit
 $<span class="w"> </span>flux-cloud<span class="w"> </span>down
 </code></pre></div>
 </div>
-<h2 id="down">down<a class="headerlink" href="#down" title="Permalink to this heading">¶</a></h2>
+<h2 id="down">down<a class="headerlink" href="#down" title="Link to this heading">¶</a></h2>
 <p>And then bring down your first (or named) cluster:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>flux-cloud<span class="w"> </span>down
 $<span class="w"> </span>flux-cloud<span class="w"> </span>down<span class="w"> </span>-e<span class="w"> </span>n1-standard-1-2
@@ -1028,7 +1028,7 @@ $<span class="w"> </span>flux-cloud<span class="w"> </span>down<span class="w"> 
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>flux-cloud<span class="w"> </span>down<span class="w"> </span>--force-cluster
 </code></pre></div>
 </div>
-<h2 id="debug">debug<a class="headerlink" href="#debug" title="Permalink to this heading">¶</a></h2>
+<h2 id="debug">debug<a class="headerlink" href="#debug" title="Link to this heading">¶</a></h2>
 <p>For any command, you can add <code class="docutils literal notranslate"><span class="pre">--debug</span></code> as a main client argument to see additional information. E.g.,
 the cluster config created for eksctl:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>flux-cloud<span class="w"> </span>--debug<span class="w"> </span>up
@@ -1053,7 +1053,7 @@ the cluster config created for eksctl:</p>
 <span class="go">...</span>
 </code></pre></div>
 </div>
-<h2 id="scripts">scripts<a class="headerlink" href="#scripts" title="Permalink to this heading">¶</a></h2>
+<h2 id="scripts">scripts<a class="headerlink" href="#scripts" title="Link to this heading">¶</a></h2>
 <p>Flux cloud (prior to version 0.2.0) ran each job with a script, and it would save each script. Since version 0.2.0,
 we refactored to do everything with Python APIs/SDKs, so we no longer save submit scripts. However, we still save
 scripts for bringing up an down each cluster, along with node and pod metadata (as json). We save this in in the
@@ -1083,7 +1083,7 @@ your own experiment from scratch.</p>
   <small>
     
       Last update:
-      Apr 15, 2023
+      Sep 02, 2023
     
   </small>
 </div>
@@ -1160,7 +1160,7 @@ your own experiment from scratch.</p>
   
     Created using
     <a href="https://www.sphinx-doc.org/" target="_blank" rel="noopener">Sphinx</a>
-    6.1.3.
+    7.2.5.
      and
     <a href="https://github.com/jbms/sphinx-immaterial/" target="_blank" rel="noopener">Sphinx-Immaterial</a>
   
@@ -1195,9 +1195,9 @@ your own experiment from scratch.</p>
     <script id="__config" type="application/json">{"base": "..", "features": ["navigation.expand", "navigation.tabs", "toc.integrate", "navigation.sections", "navigation.instant", "header.autohide", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "toc.follow", "toc.sticky", "content.tabs.link", "announce.dismiss"], "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
     
       
-        <script src="../_static/sphinx_immaterial_theme.cea6a0c1d5b0618cf.min.js"></script>
-        <script src="../_static/clipboard.min.js"></script>
-        <script src="../_static/copybutton.js"></script>
+        <script src="../_static/sphinx_immaterial_theme.1b5b7a2d5891aec19.min.js?v=14bafe8d"></script>
+        <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../_static/copybutton.js?v=f281be69"></script>
         <script src="../_static/js/rtd_search_config.js"></script>
         <script src="../_static/js/rtd_sphinx_search.min.js"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
